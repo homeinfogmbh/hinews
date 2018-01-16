@@ -1,5 +1,8 @@
 """ORM models."""
 
+from contextlib import suppress
+from datetime import datetime
+
 from peewee import DoesNotExist, Model, PrimaryKeyField, ForeignKeyField, \
     DateTimeField, CharField, TextField, IntegerField
 
@@ -7,7 +10,7 @@ from filedb import delete, FileProperty
 from his.orm import Account
 from homeinfo.crm import Customer
 from peeweeplus import MySQLDatabase
-from timelib import isoformat
+from timelib import strpdatetime, isoformat
 
 from hinews.config import CONFIG
 
@@ -23,6 +26,13 @@ class InvalidTag(Exception):
     """Indicates that a respective tag is not registered."""
 
     pass
+
+
+def create_tables(fail_silently=False):
+    """Creates all tables."""
+
+    for model in MODELS:
+        model.create_table(fail_silently=fail_silently)
 
 
 class NewsModel(Model):
@@ -47,6 +57,30 @@ class Article(NewsModel):
     title = CharField(255)
     subtitle = CharField(255, null=True)
     text = TextField()
+
+    @classmethod
+    def from_dict(cls, dictionary, author=None):
+        """Creates a new article from the provided dictionary."""
+        article = cls()
+        article.author = author
+        article.created = datetime.now()
+        article.last_change = None
+        article.active_from = strpdatetime(dictionary.get('active_from'))
+        article.active_until = strpdatetime(dictionary.get('active_until'))
+        article.title = dictionary['title']
+        article.subtitle = dictionary.get('subtitle')
+        article.text = dictionary['text']
+        return article
+
+    @property
+    def editors(self):
+        """Yields article editors."""
+        return ArticleEditorProxy(self)
+
+    @property
+    def sources(self):
+        """Returns an article source proxy."""
+        return ArticleSourceProxy(self)
 
     @property
     def images(self):
@@ -74,9 +108,29 @@ class Article(NewsModel):
             'title': self.title,
             'subtitle': self.subtitle,
             'text': self.text,
+            'sources': [source.to_dict() for source in self.sources],
             'images': [image.to_dict() for image in self.images],
             'tags': [tag.to_dict() for tag in self.tags],
             'customers': [customer.to_dict() for customer in self.customers]}
+
+    def patch(self, dictionary):
+        """Patches the article with the provided JSON-ish dictionary."""
+        self.last_change = datetime.now()
+
+        with suppress(KeyError):
+            self.active_from = strpdatetime(dictionary['active_from'])
+
+        with suppress(KeyError):
+            self.active_until = strpdatetime(dictionary['active_until'])
+
+        with suppress(KeyError):
+            self.title = dictionary['title']
+
+        with suppress(KeyError):
+            self.subtitle = dictionary['subtitle']
+
+        with suppress(KeyError):
+            self.text = dictionary['text']
 
     def delete_instance(self):
         """Deletes the article."""
@@ -86,11 +140,73 @@ class Article(NewsModel):
         return super().delete_instance()
 
 
+class ArticleEditor(NewsModel):
+    """An article's editor."""
+
+    class Meta:
+        """Sets the table name."""
+        db_table = 'article_editor'
+
+    article = ForeignKeyField(
+        Article, db_column='article', on_delete='CASCADE')
+    account = ForeignKeyField(
+        Account, db_column='account', on_delete='CASCADE')
+    timestamp = DateTimeField()
+
+    @classmethod
+    def add(cls, article, account, timestamp=None):
+        """Adds a new author record to the respective article."""
+        article_author = cls()
+        article_author.article = article
+        article_author.account = account
+        article_author.timestamp = timestamp or datetime.now()
+        return article_author
+
+    def to_dict(self):
+        """Returns a JSON-ish dictionary."""
+        return {
+            'account': self.account.to_dict(),
+            'timestamp': isoformat(self.timestamp)}
+
+
+class ArticleSource(NewsModel):
+    """Represents article sources."""
+
+    class Meta:
+        """Sets the table name."""
+        db_table = 'article_source'
+
+    article = ForeignKeyField(
+        Article, db_column='article', on_delete='CASCADE')
+    source = TextField()
+
+    @classmethod
+    def add(cls, article, source):
+        """Adds the respective source."""
+        try:
+            return cls.get((cls.article == article) & (cls.source == source))
+        except DoesNotExist:
+            article_source = cls()
+            article_source.article = article
+            article_source.source = source
+            return article_source
+
+    def to_dict(self):
+        """Returns the source description."""
+        return self.source
+
+
 class ArticleImage(NewsModel):
     """An image of an article."""
 
+    class Meta:
+        """Sets the table name."""
+        db_table = 'image'
+
     article = ForeignKeyField(Article, db_column='article')
     file = IntegerField()
+    source = TextField(null=True)
+
     data = FileProperty(file)
 
     def __bytes__(self):
@@ -98,16 +214,17 @@ class ArticleImage(NewsModel):
         return self.data
 
     @classmethod
-    def add(cls, article, data):
+    def add(cls, article, data, source):
         """Adds the respective image data to the article."""
         article_image = cls()
         article_image.article = article
+        article_image.source = source
         article_image.data = data
         return article_image
 
     def to_dict(self):
         """Returns a JSON-compliant integer."""
-        return self.id
+        return {'id': self.id, 'source': self.source}
 
     def delete_instance(self):
         """Deltes the image."""
@@ -138,7 +255,12 @@ class Tag(NewsModel):
 class ArticleTag(NewsModel):
     """Article <> Tag mappings."""
 
-    article = ForeignKeyField(Article, db_column='article')
+    class Meta:
+        """Sets the table name."""
+        db_table = 'article_tag'
+
+    article = ForeignKeyField(
+        Article, db_column='article', on_delete='CASCADE')
     tag = CharField(255)
 
     @classmethod
@@ -162,8 +284,14 @@ class ArticleTag(NewsModel):
 class ArticleCustomer(NewsModel):
     """Article <> Customer mappings."""
 
-    article = ForeignKeyField(Article, db_column='article')
-    customer = ForeignKeyField(Customer, db_column='customer')
+    class Meta:
+        """Sets the table name."""
+        db_table = 'article_customer'
+
+    article = ForeignKeyField(
+        Article, db_column='article', on_delete='CASCADE')
+    customer = ForeignKeyField(
+        Customer, db_column='customer', on_delete='CASCADE')
 
     @classmethod
     def add(cls, article, customer):
@@ -179,34 +307,88 @@ class ArticleCustomer(NewsModel):
             return article_customer
 
 
-class ArticleProxy:
-    """Proxy.to transparently handle data associated with articles."""
+class Proxy:
+    """Proxy.to transparently handle data
+    associated with the respective target.
+    """
 
-    def __init__(self, article):
-        """Sets the respective article."""
-        self.article = article
+    def __init__(self, model, target):
+        """Sets the model and target."""
+        self.model = model
+        self.target = target
+
+
+class ArticleProxy(Proxy):
+    """An article-related proxy."""
+
+    def __iter__(self):
+        """Yields sources of the respective article."""
+        yield from self.model.select().where(self.model.article == self.target)
+
+
+class ArticleEditorProxy(ArticleProxy):
+    """Proxies article authors."""
+
+    def __init__(self, target):
+        """Sets model and target."""
+        super().__init__(ArticleEditor, target)
+
+    def add(self, author):
+        """Adds the respective author."""
+        article_author = self.model.add(self.target, author)
+        article_author.save()
+        return article_author
+
+
+class ArticleSourceProxy(ArticleProxy):
+    """Proxies article sources."""
+
+    def __init__(self, target):
+        """Sets the model and target."""
+        super().__init__(ArticleSource, target)
+
+    def add(self, source):
+        """Adds the respective source."""
+        article_source = self.model.add(self.target, source)
+        article_source.save()
+        return article_source
+
+    def delete(self, source_or_id):
+        """Deletes the respective source from the article."""
+        try:
+            ident = int(source_or_id)
+        except ValueError:
+            selector = self.model.source == source_or_id
+        else:
+            selector = self.model.id == ident
+
+        try:
+            article_source = self.model.get(
+                (self.model.article == self.target) & selector)
+        except DoesNotExist:
+            return False
+
+        return article_source.delete_instance()
 
 
 class ArticleImageProxy(ArticleProxy):
     """Proxies images of articles."""
 
-    def __iter__(self):
-        """Yields images of the respective article."""
-        yield from ArticleImage.select().where(
-            ArticleImage.article == self.article)
+    def __init__(self, target):
+        """Sets the model and target."""
+        super().__init__(ArticleImage, target)
 
     def add(self, data):
         """Adds an image to the respective article."""
-        article_image = ArticleImage.add(self.article, data)
+        article_image = self.model.add(self.target, data)
         article_image.save()
         return article_image
 
     def delete(self, ident):
         """Removes the respective article image."""
         try:
-            article_image = ArticleImage.get(
-                (ArticleImage.article == self.article)
-                & (ArticleImage.id == ident))
+            article_image = self.model.get(
+                (self.model.article == self.target) & (self.model.id == ident))
         except DoesNotExist:
             return False
 
@@ -216,14 +398,13 @@ class ArticleImageProxy(ArticleProxy):
 class ArticleTagProxy(ArticleProxy):
     """Proxies tags of articles."""
 
-    def __iter__(self):
-        """Yields the respective article's tags."""
-        yield from ArticleTag.select().where(
-            ArticleTag.article == self.article)
+    def __init__(self, target):
+        """Sets the model and target."""
+        super().__init__(ArticleTag, target)
 
     def add(self, tag):
         """Adds the respective tag."""
-        article_tag = ArticleTag.add(self.article, tag)
+        article_tag = self.model.add(self.target, tag)
         article_tag.save()
         return article_tag
 
@@ -232,13 +413,13 @@ class ArticleTagProxy(ArticleProxy):
         try:
             ident = int(tag_or_id)
         except ValueError:
-            selection = ArticleTag.tag == tag_or_id
+            selection = self.model.tag == tag_or_id
         else:
-            selection = ArticleTag.id == ident
+            selection = self.model.id == ident
 
         try:
-            article_tag = ArticleTag.get(
-                (ArticleTag.article == self.article) & selection)
+            article_tag = self.model.get(
+                (self.model.article == self.target) & selection)
         except DoesNotExist:
             return False
 
@@ -248,24 +429,67 @@ class ArticleTagProxy(ArticleProxy):
 class ArticleCustomerProxy(ArticleProxy):
     """Proxies customers of the respective article."""
 
-    def __iter__(self):
-        """Yields customers of the respective article."""
-        yield from ArticleCustomer.select().where(
-            ArticleCustomer.article == self.article)
+    def __init__(self, target):
+        """Sets the model and target."""
+        super().__init__(ArticleCustomer, target)
 
     def add(self, customer):
         """Adds a customer to the respective article."""
-        article_customer = ArticleCustomer.add(self.article, customer)
+        article_customer = self.model.add(self.target, customer)
         article_customer.save()
         return article_customer
 
     def delete(self, customer):
         """Deletes the respective customer from the article."""
         try:
-            article_customer = ArticleCustomer.get(
-                (ArticleCustomer.article == self.article)
-                & (ArticleCustomer.customer == customer))
+            article_customer = self.model.get(
+                (self.model.article == self.target)
+                & (self.model.customer == customer))
         except DoesNotExist:
             return False
 
         return article_customer.delete_instance()
+
+
+class ImageProxy(Proxy):
+    """An image-related proxy."""
+
+    def __iter__(self):
+        """Yields records of the respective model, related tor the image."""
+        yield from self.model.select().where(self.model.image == self.target)
+
+
+class ArticleImageSourceProxy(ImageProxy):
+    """An article-related proxy."""
+
+    def __init__(self, target):
+        """Sets the model and target."""
+        super().__init__(ArticleImageSource, target)
+
+    def add(self, source):
+        """Adds the respective source to the image."""
+        article_image_source = self.model.add(self.target, source)
+        article_image_source.save()
+        return article_image_source
+
+    def delete(self, source_or_id):
+        """Deletes the respective source from the image."""
+        try:
+            ident = int(source_or_id)
+        except ValueError:
+            selector = self.model.source == source_or_id
+        else:
+            selector = self.model.id == ident
+
+        try:
+            article_image_source = self.model.get(
+                (self.model.image == self.target) & selector)
+        except DoesNotExist:
+            return False
+
+        return article_image_source.delete_instance()
+
+
+MODELS = [
+    Article, ArticleEditor, ArticleSource, ArticleImage, Tag, ArticleTag,
+    ArticleCustomer]
