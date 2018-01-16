@@ -1,11 +1,17 @@
 """ORM models."""
 
-from peewee import Model, PrimaryKeyField, ForeignKeyField, DateTimeField, \
-    CharField, TextField, IntegerField
+from peewee import DoesNotExist, Model, PrimaryKeyField, ForeignKeyField, \
+    DateTimeField, CharField, TextField, IntegerField
 
+from filedb import delete, FileProperty
+from his.orm import Account
+from homeinfo.crm import Customer
 from peeweeplus import MySQLDatabase
+from timelib import isoformat
 
 from hinews.config import CONFIG
+
+__all__ = ['InvalidTag', 'Article']
 
 
 DATABASE = MySQLDatabase(
@@ -13,10 +19,17 @@ DATABASE = MySQLDatabase(
     passwd=CONFIG['db']['passwd'], closing=True)
 
 
+class InvalidTag(Exception):
+    """Indicates that a respective tag is not registered."""
+
+    pass
+
+
 class NewsModel(Model):
     """Basic news database model."""
 
     class Meta:
+        """Configures the database and schema."""
         database = DATABASE
         schema = database.database
 
@@ -92,6 +105,10 @@ class ArticleImage(NewsModel):
         article_image.data = data
         return article_image
 
+    def to_dict(self):
+        """Returns a JSON-compliant integer."""
+        return self.id
+
     def delete_instance(self):
         """Deltes the image."""
         delete(self.file)
@@ -112,6 +129,10 @@ class Tag(NewsModel):
             tag_ = cls()
             tag_.tag = tag
             return tag_
+
+    def to_dict(self):
+        """Returns a JSON-compliant string."""
+        return self.tag
 
 
 class ArticleTag(NewsModel):
