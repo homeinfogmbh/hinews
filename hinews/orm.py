@@ -390,6 +390,20 @@ class ArticleCustomerProxy(ArticleProxy):
         """Sets the model and target."""
         super().__init__(ArticleCustomer, target)
 
+    def __contains__(self, customer):
+        """Determines whether the respective
+        customer may use the respective article.
+        """
+        empty = True
+
+        for article_customer in self:
+            empty = False
+
+            if article_customer.customer == customer:
+                return True
+
+        return empty
+
     def add(self, customer):
         """Adds a customer to the respective article."""
         article_customer = self.model.add(self.target, customer)
