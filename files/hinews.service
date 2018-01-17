@@ -1,6 +1,5 @@
 [Unit]
 Description=HOMEINFO News Service
-After=his.service
 Requires=his.service
 
 [Service]
@@ -9,4 +8,4 @@ Group=hinews
 ExecStart=/usr/local/bin/hinewsd
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=wsgi-services.target
