@@ -132,12 +132,13 @@ class Article(NewsModel):
         with suppress(KeyError):
             self.text = dictionary['text']
 
-    def delete_instance(self):
+    def delete_instance(self, recursive=False, delete_nullable=False):
         """Deletes the article."""
         for image in self.images:
             image.delete_instance()
 
-        return super().delete_instance()
+        return super().delete_instance(
+            recursive=recursive, delete_nullable=delete_nullable)
 
 
 class ArticleEditor(NewsModel):
@@ -196,17 +197,20 @@ class ArticleSource(NewsModel):
         return self.source
 
 
-class ArticleImage(NewsModel):
+class Image(NewsModel):
     """An image of an article."""
 
     class Meta:
         """Sets the table name."""
         db_table = 'image'
 
-    article = ForeignKeyField(Article, db_column='article')
+    article = ForeignKeyField(
+        Article, db_column='article', on_delete='CASCADE')
+    account = ForeignKeyField(
+        Account, db_column='account', on_delete='CASCADE')
     file = IntegerField()
+    uploaded = DateTimeField()
     source = TextField(null=True)
-
     data = FileProperty(file)
 
     def __bytes__(self):
@@ -214,22 +218,30 @@ class ArticleImage(NewsModel):
         return self.data
 
     @classmethod
-    def add(cls, article, data, source):
+    def add(cls, article, data, metadata, account):
         """Adds the respective image data to the article."""
         article_image = cls()
         article_image.article = article
-        article_image.source = source
+        article_image.account = account
+        article_image.source = metadata['source']
+        article_image.uploaded = datetime.now()
         article_image.data = data
         return article_image
+
+    def patch(self, dictionary):
+        """Patches the image metadata with the respective dictionary."""
+        with suppress(KeyError):
+            self.source = dictionary['source']
 
     def to_dict(self):
         """Returns a JSON-compliant integer."""
         return {'id': self.id, 'source': self.source}
 
-    def delete_instance(self):
+    def delete_instance(self, recursive=False, delete_nullable=False):
         """Deltes the image."""
         delete(self.file)
-        return super().delete_instance()
+        return super().delete_instance(
+            recursive=recursive, delete_nullable=delete_nullable)
 
 
 class Tag(NewsModel):
@@ -376,11 +388,11 @@ class ArticleImageProxy(ArticleProxy):
 
     def __init__(self, target):
         """Sets the model and target."""
-        super().__init__(ArticleImage, target)
+        super().__init__(Image, target)
 
-    def add(self, data):
+    def add(self, data, metadata, account):
         """Adds an image to the respective article."""
-        article_image = self.model.add(self.target, data)
+        article_image = self.model.add(self.target, data, metadata, account)
         article_image.save()
         return article_image
 
@@ -459,37 +471,6 @@ class ImageProxy(Proxy):
         yield from self.model.select().where(self.model.image == self.target)
 
 
-class ArticleImageSourceProxy(ImageProxy):
-    """An article-related proxy."""
-
-    def __init__(self, target):
-        """Sets the model and target."""
-        super().__init__(ArticleImageSource, target)
-
-    def add(self, source):
-        """Adds the respective source to the image."""
-        article_image_source = self.model.add(self.target, source)
-        article_image_source.save()
-        return article_image_source
-
-    def delete(self, source_or_id):
-        """Deletes the respective source from the image."""
-        try:
-            ident = int(source_or_id)
-        except ValueError:
-            selector = self.model.source == source_or_id
-        else:
-            selector = self.model.id == ident
-
-        try:
-            article_image_source = self.model.get(
-                (self.model.image == self.target) & selector)
-        except DoesNotExist:
-            return False
-
-        return article_image_source.delete_instance()
-
-
 MODELS = [
-    Article, ArticleEditor, ArticleSource, ArticleImage, Tag, ArticleTag,
+    Article, ArticleEditor, ArticleSource, Image, Tag, ArticleTag,
     ArticleCustomer]
