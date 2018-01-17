@@ -263,6 +263,12 @@ class ArticleTag(NewsModel):
             article_tag.tag = tag
             return article_tag
 
+    def to_dict(self):
+        """Returns a JSON-ish dictionary."""
+        return {
+            'id': self.id,
+            'tag': self.tag}
+
 
 class ArticleCustomer(NewsModel):
     """Article <> Customer mappings."""

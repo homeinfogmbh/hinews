@@ -24,7 +24,15 @@ def get_image(ident):
 
 @authenticated
 @authorized('hinews')
-def lst(article_id):
+def lst():
+    """Lists all available articles."""
+
+    return JSON([image.to_dict() for image in ArticleImage])
+
+
+@authenticated
+@authorized('hinews')
+def list_article(article_id):
     """Lists all available articles."""
 
     return JSON([image.to_dict() for image in get_article(article_id).images])
@@ -57,7 +65,7 @@ def post(ident):
 
     image = get_article(ident).images.add(
         image.bytes, metadata.json, SESSION.account)
-    return ImageAdded(image.id)
+    return ImageAdded(id=image.id)
 
 
 @authenticated
@@ -81,8 +89,10 @@ def patch(ident):
 
 
 ROUTES = (
-    ('GET', '/article/<int:ident>/images', lst, 'list_article_images'),
-    ('GET', '/image/<int:ident>', get, 'get_image'),
+    ('GET', '/article/<int:ident>/images', list_article,
+     'list_article_images'),
     ('POST', '/article/<int:ident>/images', post, 'post_article_image'),
+    ('GET', '/image', lst, 'list_images'),
+    ('GET', '/image/<int:ident>', get, 'get_image'),
     ('DELETE', '/image/<int:ident>', delete, 'delete_image'),
     ('PATCH', '/image/<int:ident>', patch, 'patch_image'))
