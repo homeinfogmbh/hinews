@@ -59,7 +59,7 @@ class Article(NewsModel):
     source = TextField()
 
     @classmethod
-    def from_dict(cls, dictionary, author=None):
+    def from_dict(cls, author, dictionary):
         """Creates a new article from the provided dictionary."""
         article = cls()
         article.author = author
