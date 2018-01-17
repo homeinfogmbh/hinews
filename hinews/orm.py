@@ -305,7 +305,7 @@ class AccessToken(NewsModel):
 
     customer = ForeignKeyField(
         Customer, db_column='customer', on_delete='CASCADE',
-        on_change='CASCADE')
+        on_update='CASCADE')
     token = CharField(36)   # UUID4
 
     @classmethod
