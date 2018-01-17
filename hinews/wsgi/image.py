@@ -63,8 +63,14 @@ def post(ident):
     except KeyError:
         raise NoMetaDataProvided()
 
-    image = get_article(ident).images.add(
-        image.bytes, metadata.json, SESSION.account)
+    try:
+        image = get_article(ident).images.add(
+            image.bytes, metadata.json, SESSION.account)
+    except KeyError as key_error:
+        raise MissingData(key=key_error.args[0])
+    except ValueError as value_error:
+        raise InvalidData(hint=value_error.args[0])
+
     return ImageAdded(id=image.id)
 
 
