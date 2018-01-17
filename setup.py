@@ -11,7 +11,7 @@ setup(
     maintainer='Richard Neumann',
     maintainer_email='<r dot neumann at homeinfo period de>',
     requires=['his'],
-    packages=['hinews', 'hinews.wsgi'],
+    packages=['hinews', 'hinews.messages', 'hinews.wsgi'],
     scripts=['files/hinewsd'],
     data_files=[
         ('/usr/lib/systemd/system', ['files/hinews.service']),
