@@ -3,6 +3,7 @@
 from peewee import DoesNotExist
 
 from his import SESSION, DATA, authenticated, authorized
+from his.messages import MissingData, InvalidData
 from wsgilib import JSON
 
 from hinews.messages.article import NoSuchArticle, ArticleCreated, \
@@ -42,7 +43,13 @@ def get(ident):
 def post():
     """Adds a new article."""
 
-    article = Article.from_dict(SESSION.account, DATA.json)
+    try:
+        article = Article.from_dict(SESSION.account, DATA.json)
+    except KeyError as key_error:
+        raise MissingData(key=key_error.args[0])
+    except ValueError as value_error:
+        raise InvalidData(hint=value_error.args[0])
+
     article.save()
     return ArticleCreated(id=article.id)
 
