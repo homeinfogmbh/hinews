@@ -1,0 +1,12 @@
+[Unit]
+Description=HOMEINFO News Service
+After=his.service
+Requires=his.service
+
+[Service]
+User=hinews
+Group=hinews
+ExecStart=/usr/local/bin/hinewsd
+
+[Install]
+WantedBy=multi-user.target
