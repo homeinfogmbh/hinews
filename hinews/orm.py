@@ -10,7 +10,6 @@ from filedb import delete, FileProperty
 from his.orm import Account
 from homeinfo.crm import Customer
 from peeweeplus import MySQLDatabase
-from timelib import strpdatetime, isoformat
 
 from hinews.config import CONFIG
 
@@ -64,8 +63,8 @@ class Article(NewsModel):
         article = cls()
         article.author = author
         article.created = datetime.now()
-        article.active_from = strpdatetime(dictionary.get('active_from'))
-        article.active_until = strpdatetime(dictionary.get('active_until'))
+        article.active_from = dictionary.get('active_from')
+        article.active_until = dictionary.get('active_until')
         article.title = dictionary['title']
         article.subtitle = dictionary.get('subtitle')
         article.text = dictionary['text']
@@ -96,9 +95,9 @@ class Article(NewsModel):
         return {
             'id': self.id,
             'author': self.author.to_dict(),
-            'created': isoformat(self.created),
-            'active_from': isoformat(self.active_from),
-            'active_until': isoformat(self.active_until),
+            'created': self.created,
+            'active_from': self.active_from,
+            'active_until': self.active_until,
             'title': self.title,
             'subtitle': self.subtitle,
             'text': self.text,
@@ -113,10 +112,10 @@ class Article(NewsModel):
         self.last_change = datetime.now()
 
         with suppress(KeyError):
-            self.active_from = strpdatetime(dictionary['active_from'])
+            self.active_from = dictionary['active_from']
 
         with suppress(KeyError):
-            self.active_until = strpdatetime(dictionary['active_until'])
+            self.active_until = dictionary['active_until']
 
         with suppress(KeyError):
             self.title = dictionary['title']
@@ -167,7 +166,7 @@ class ArticleEditor(NewsModel):
         """Returns a JSON-ish dictionary."""
         return {
             'account': self.account.to_dict(),
-            'timestamp': isoformat(self.timestamp)}
+            'timestamp': self.timestamp}
 
 
 class ArticleImage(NewsModel):
