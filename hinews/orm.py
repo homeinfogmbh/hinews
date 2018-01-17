@@ -14,7 +14,7 @@ from timelib import strpdatetime, isoformat
 
 from hinews.config import CONFIG
 
-__all__ = ['InvalidTag', 'create_tables', 'Article', 'Image']
+__all__ = ['InvalidTag', 'create_tables', 'Article', 'ArticleImage', 'MODELS']
 
 
 DATABASE = MySQLDatabase(
@@ -105,6 +105,7 @@ class Article(NewsModel):
             'subtitle': self.subtitle,
             'text': self.text,
             'source': self.source,
+            'editors': [editor.to_dict() for editor in self.editors],
             'images': [image.to_dict() for image in self.images],
             'tags': [tag.to_dict() for tag in self.tags],
             'customers': [customer.to_dict() for customer in self.customers]}
@@ -133,6 +134,8 @@ class Article(NewsModel):
 
     def delete_instance(self, recursive=False, delete_nullable=False):
         """Deletes the article."""
+        # Manually delete all referencing images to ensure
+        # deletion of the respective filedb entries.
         for image in self.images:
             image.delete_instance()
 
@@ -169,7 +172,7 @@ class ArticleEditor(NewsModel):
             'timestamp': isoformat(self.timestamp)}
 
 
-class Image(NewsModel):
+class ArticleImage(NewsModel):
     """An image of an article."""
 
     class Meta:
@@ -184,10 +187,6 @@ class Image(NewsModel):
     uploaded = DateTimeField()
     source = TextField(null=True)
     data = FileProperty(file)
-
-    def __bytes__(self):
-        """Returns the file's data."""
-        return self.data
 
     @classmethod
     def add(cls, article, data, metadata, account):
@@ -329,7 +328,7 @@ class ArticleImageProxy(ArticleProxy):
 
     def __init__(self, target):
         """Sets the model and target."""
-        super().__init__(Image, target)
+        super().__init__(ArticleImage, target)
 
     def add(self, data, metadata, account):
         """Adds an image to the respective article."""
@@ -412,4 +411,5 @@ class ImageProxy(Proxy):
         yield from self.model.select().where(self.model.image == self.target)
 
 
-MODELS = [Article, ArticleEditor, Image, Tag, ArticleTag, ArticleCustomer]
+MODELS = [
+    Article, ArticleEditor, ArticleImage, Tag, ArticleTag, ArticleCustomer]
