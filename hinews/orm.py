@@ -94,6 +94,7 @@ class Article(NewsModel):
     def to_dict(self):
         """Returns a JSON-ish dictionary."""
         return {
+            'id': self.id,
             'author': self.author.to_dict(),
             'created': isoformat(self.created),
             'active_from': isoformat(self.active_from),
