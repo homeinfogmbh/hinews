@@ -2,6 +2,7 @@
 
 from contextlib import suppress
 from datetime import datetime
+from uuid import uuid4
 
 from peewee import DoesNotExist, Model, PrimaryKeyField, ForeignKeyField, \
     DateField, DateTimeField, CharField, TextField, IntegerField
@@ -295,6 +296,30 @@ class ArticleCustomer(NewsModel):
         return {'id': self.id, 'customer': self.customer.id}
 
 
+class AccessToken(NewsModel):
+    """Customers' access tokens."""
+
+    class Meta:
+        """Sets the table name."""
+        db_table = 'access_token'
+
+    customer = ForeignKeyField(
+        Customer, db_column='customer', on_delete='CASCADE',
+        on_change='CASCADE')
+    token = CharField(36)   # UUID4
+
+    @classmethod
+    def add(cls, customer):
+        """Adds an access token for the respective customer."""
+        try:
+            return cls.get(cls.customer == customer)
+        except DoesNotExist:
+            access_token = cls()
+            access_token.customer = customer
+            access_token.token = str(uuid4())
+            return access_token
+
+
 class Proxy:
     """Proxy.to transparently handle data
     associated with the respective target.
@@ -431,4 +456,5 @@ class ImageProxy(Proxy):
 
 
 MODELS = [
-    Article, ArticleEditor, ArticleImage, Tag, ArticleTag, ArticleCustomer]
+    Article, ArticleEditor, ArticleImage, Tag, ArticleTag, ArticleCustomer,
+    AccessToken]
