@@ -3,6 +3,7 @@
 from peewee import DoesNotExist
 
 from his import SESSION, DATA, authenticated, authorized
+from his.messages import MissingData, InvalidData
 from wsgilib import Binary, JSON
 
 from hinews.messages.image import NoSuchImage, NoImageProvided, \

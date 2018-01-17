@@ -34,7 +34,7 @@ def get_articles(customer):
     """Yields articles of the querying customer."""
 
     for article in Article:
-        if customer in article.customers:
+        if article.active and customer in article.customers:
             yield article
 
 
@@ -66,11 +66,11 @@ def get_image(ident):
     raise NoSuchArticle()
 
 
-
 def lst():
     """Lists the respective news."""
 
-    return JSON([article.id for article in get_articles(get_customer())])
+    return JSON([article.to_dict() for article in get_articles(
+        get_customer())])
 
 
 def get(ident):
