@@ -14,7 +14,7 @@ from timelib import strpdatetime, isoformat
 
 from hinews.config import CONFIG
 
-__all__ = ['InvalidTag', 'Article']
+__all__ = ['InvalidTag', 'create_tables', 'Article', 'Image']
 
 
 DATABASE = MySQLDatabase(
@@ -57,6 +57,7 @@ class Article(NewsModel):
     title = CharField(255)
     subtitle = CharField(255, null=True)
     text = TextField()
+    source = TextField()
 
     @classmethod
     def from_dict(cls, dictionary, author=None):
@@ -76,11 +77,6 @@ class Article(NewsModel):
     def editors(self):
         """Yields article editors."""
         return ArticleEditorProxy(self)
-
-    @property
-    def sources(self):
-        """Returns an article source proxy."""
-        return ArticleSourceProxy(self)
 
     @property
     def images(self):
@@ -108,7 +104,7 @@ class Article(NewsModel):
             'title': self.title,
             'subtitle': self.subtitle,
             'text': self.text,
-            'sources': [source.to_dict() for source in self.sources],
+            'source': self.source,
             'images': [image.to_dict() for image in self.images],
             'tags': [tag.to_dict() for tag in self.tags],
             'customers': [customer.to_dict() for customer in self.customers]}
@@ -131,6 +127,9 @@ class Article(NewsModel):
 
         with suppress(KeyError):
             self.text = dictionary['text']
+
+        with suppress(KeyError):
+            self.source = dictionary['source']
 
     def delete_instance(self, recursive=False, delete_nullable=False):
         """Deletes the article."""
@@ -168,33 +167,6 @@ class ArticleEditor(NewsModel):
         return {
             'account': self.account.to_dict(),
             'timestamp': isoformat(self.timestamp)}
-
-
-class ArticleSource(NewsModel):
-    """Represents article sources."""
-
-    class Meta:
-        """Sets the table name."""
-        db_table = 'article_source'
-
-    article = ForeignKeyField(
-        Article, db_column='article', on_delete='CASCADE')
-    source = TextField()
-
-    @classmethod
-    def add(cls, article, source):
-        """Adds the respective source."""
-        try:
-            return cls.get((cls.article == article) & (cls.source == source))
-        except DoesNotExist:
-            article_source = cls()
-            article_source.article = article
-            article_source.source = source
-            return article_source
-
-    def to_dict(self):
-        """Returns the source description."""
-        return self.source
 
 
 class Image(NewsModel):
@@ -352,37 +324,6 @@ class ArticleEditorProxy(ArticleProxy):
         return article_author
 
 
-class ArticleSourceProxy(ArticleProxy):
-    """Proxies article sources."""
-
-    def __init__(self, target):
-        """Sets the model and target."""
-        super().__init__(ArticleSource, target)
-
-    def add(self, source):
-        """Adds the respective source."""
-        article_source = self.model.add(self.target, source)
-        article_source.save()
-        return article_source
-
-    def delete(self, source_or_id):
-        """Deletes the respective source from the article."""
-        try:
-            ident = int(source_or_id)
-        except ValueError:
-            selector = self.model.source == source_or_id
-        else:
-            selector = self.model.id == ident
-
-        try:
-            article_source = self.model.get(
-                (self.model.article == self.target) & selector)
-        except DoesNotExist:
-            return False
-
-        return article_source.delete_instance()
-
-
 class ArticleImageProxy(ArticleProxy):
     """Proxies images of articles."""
 
@@ -471,6 +412,4 @@ class ImageProxy(Proxy):
         yield from self.model.select().where(self.model.image == self.target)
 
 
-MODELS = [
-    Article, ArticleEditor, ArticleSource, Image, Tag, ArticleTag,
-    ArticleCustomer]
+MODELS = [Article, ArticleEditor, Image, Tag, ArticleTag, ArticleCustomer]

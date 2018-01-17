@@ -1,6 +1,6 @@
 """Article image handlers."""
 
-from his import authenticated, authorized
+from his import SESSION, authenticated, authorized
 from wsgilib import Binary, JSON
 
 from hinews.wsgi.article import get_article
@@ -38,7 +38,20 @@ def get(ident):
 def post(ident):
     """Adds a new article."""
 
-    image = get_article(ident).images.add(DATA.bytes)
+    files = DATA.files
+
+    try:
+        image = files['image']
+    except KeyError:
+        raise NoImageProvided()
+
+    try:
+        metadata = files['metadata']
+    except KeyError:
+        raise NoMetaDataProvided()
+
+    image = get_article(ident).images.add(
+        image.bytes, metadata.json, SESSION.account)
     return ImageAdded(image.id)
 
 
