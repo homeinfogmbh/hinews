@@ -51,7 +51,6 @@ class Article(NewsModel):
 
     author = ForeignKeyField(Account, db_column='author')
     created = DateTimeField()
-    last_change = DateTimeField(null=True)
     active_from = DateTimeField(null=True)
     active_until = DateTimeField(null=True)
     title = CharField(255)
@@ -65,7 +64,6 @@ class Article(NewsModel):
         article = cls()
         article.author = author
         article.created = datetime.now()
-        article.last_change = None
         article.active_from = strpdatetime(dictionary.get('active_from'))
         article.active_until = strpdatetime(dictionary.get('active_until'))
         article.title = dictionary['title']
@@ -98,7 +96,6 @@ class Article(NewsModel):
         return {
             'author': self.author.to_dict(),
             'created': isoformat(self.created),
-            'last_change': isoformat(self.last_change),
             'active_from': isoformat(self.active_from),
             'active_until': isoformat(self.active_until),
             'title': self.title,
