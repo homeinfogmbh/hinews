@@ -30,37 +30,47 @@ def get_customer():
     return access_token.customer
 
 
-def get_articles():
+def get_articles(customer):
     """Yields articles of the querying customer."""
 
-    return Article.select().where(Article.customer == get_customer())
+    for article in Article:
+        if customer in article.customers:
+            yield article
 
 
 def get_article(ident):
     """Yields articles of the querying customer."""
 
     try:
-        return Article.get(
-            (Article.customer == get_customer()) & (Article.id == ident))
+        article = Article.get(Article.id == ident)
     except DoesNotExist:
         raise NoSuchArticle()
+
+    if get_customer() in article.customers:
+        return article
+
+    raise NoSuchArticle()
 
 
 def get_image(ident):
     """Returns the respective image."""
 
     try:
-        return ArticleImage.get(
-            (ArticleImage.article.customer == get_customer())
-            & (ArticleImage.id == ident))
+        article_image = ArticleImage.get(ArticleImage.id == ident)
     except DoesNotExist:
         raise NoSuchImage()
+
+    if get_customer() in article_image.article.customers:
+        return article_image
+
+    raise NoSuchArticle()
+
 
 
 def lst():
     """Lists the respective news."""
 
-    return JSON([article.id for article in get_articles()])
+    return JSON([article.id for article in get_articles(get_customer())])
 
 
 def get(ident):
