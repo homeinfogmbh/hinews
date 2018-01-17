@@ -4,7 +4,7 @@ from contextlib import suppress
 from datetime import datetime
 
 from peewee import DoesNotExist, Model, PrimaryKeyField, ForeignKeyField, \
-    DateTimeField, CharField, TextField, IntegerField
+    DateField, DateTimeField, CharField, TextField, IntegerField
 
 from filedb import delete, FileProperty
 from his.orm import Account
@@ -50,8 +50,8 @@ class Article(NewsModel):
 
     author = ForeignKeyField(Account, db_column='author')
     created = DateTimeField()
-    active_from = DateTimeField(null=True)
-    active_until = DateTimeField(null=True)
+    active_from = DateField(null=True)
+    active_until = DateField(null=True)
     title = CharField(255)
     subtitle = CharField(255, null=True)
     text = TextField()
@@ -109,8 +109,6 @@ class Article(NewsModel):
 
     def patch(self, dictionary):
         """Patches the article with the provided JSON-ish dictionary."""
-        self.last_change = datetime.now()
-
         with suppress(KeyError):
             self.active_from = dictionary['active_from']
 
@@ -291,6 +289,10 @@ class ArticleCustomer(NewsModel):
             article_customer.article = article
             article_customer.customer = customer
             return article_customer
+
+    def to_dict(self):
+        """Returns a JSON-ish representation of the article customer."""
+        return {'id': self.id, 'customer': self.customer.id}
 
 
 class Proxy:

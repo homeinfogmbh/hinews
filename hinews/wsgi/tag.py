@@ -52,4 +52,4 @@ ROUTES = (
     ('GET', '/tags', lst, 'list_tags'),
     ('GET', '/article/<int:ident>/tags', get, 'get_tags'),
     ('POST', '/article/<int:ident>/tags', post, 'post_tag'),
-    ('DELETE', '/article/<int:article_id>/<tag>', delete, 'delete_tag'))
+    ('DELETE', '/article/<int:article_id>/tags/<tag>', delete, 'delete_tag'))
