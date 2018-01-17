@@ -76,6 +76,6 @@ def image(ident):
 
 
 ROUTES = (
-    ('GET', '/pub/article', lst, 'list_articles'),
-    ('GET', '/pub/article/<int:ident>', get, 'get_article'),
-    ('GET', '/pub/image/<int:ident>', image, 'get_image'))
+    ('GET', '/pub/article', lst, 'list_customer_articles'),
+    ('GET', '/pub/article/<int:ident>', get, 'get_customer_article'),
+    ('GET', '/pub/image/<int:ident>', image, 'get_customer_image'))
