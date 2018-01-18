@@ -28,7 +28,7 @@ def set_tags(article, dictionary):
     try:
         article.tags = dictionary.get('tags', ())
     except InvalidElements as invalid_elements:
-        return invalid_elements
+        return list(invalid_elements)
 
     return ()
 
@@ -39,7 +39,7 @@ def set_customers(article, dictionary):
     try:
         article.customers = dictionary.get('customers', ())
     except InvalidElements as invalid_elements:
-        return invalid_elements
+        return list(invalid_elements)
 
     return ()
 
