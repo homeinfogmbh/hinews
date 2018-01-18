@@ -138,7 +138,7 @@ class Article(NewsModel):
         for cid in cids:
             try:
                 customer = Customer.get(Customer.id == cid)
-            except DoesNotExist:
+            except (ValueError, DoesNotExist):
                 invalid_customers.append(cid)
             else:
                 self.customers.add(customer)
