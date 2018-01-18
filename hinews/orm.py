@@ -14,7 +14,13 @@ from peeweeplus import MySQLDatabase
 
 from hinews.config import CONFIG
 
-__all__ = ['InvalidTag', 'create_tables', 'Article', 'ArticleImage', 'MODELS']
+__all__ = [
+    'InvalidTag',
+    'InvalidElements',
+    'create_tables',
+    'Article',
+    'ArticleImage',
+    'MODELS']
 
 
 DATABASE = MySQLDatabase(
@@ -26,6 +32,19 @@ class InvalidTag(Exception):
     """Indicates that a respective tag is not registered."""
 
     pass
+
+
+class InvalidElements(Exception):
+    """Indicates that the respective elements are invalid."""
+
+    def __init__(self, elements):
+        """Sets the invalid elements."""
+        super().__init__(elements)
+        self.elements = elements
+
+    def __iter__(self):
+        """Yields the invalid elements."""
+        yield from self.elements
 
 
 def create_tables(fail_silently=False):
@@ -86,10 +105,46 @@ class Article(NewsModel):
         """Yields tags of this article."""
         return ArticleTagProxy(self)
 
+    @tags.setter
+    def tags(self, tags):
+        """Sets the respective tags."""
+        for tag in self.tags:
+            tag.delete_instance()
+
+        invalid_tags = []
+
+        for tag in tags:
+            try:
+                self.tags.add(tag)
+            except InvalidTag:
+                invalid_tags.append(tag)
+
+        if invalid_tags:
+            raise InvalidElements(invalid_tags)
+
     @property
     def customers(self):
         """Yields customers of this article."""
         return ArticleCustomerProxy(self)
+
+    @customers.setter
+    def customers(self, cids):
+        """Sets the respective customers."""
+        for customer in self.customers:
+            customer.delete_instance()
+
+        invalid_customers = []
+
+        for cid in cids:
+            try:
+                customer = Customer.get(Customer.id == cid)
+            except DoesNotExist:
+                invalid_customers.append(cid)
+            else:
+                self.customers.add(customer)
+
+        if invalid_customers:
+            raise InvalidElements(invalid_customers)
 
     @property
     def active(self):

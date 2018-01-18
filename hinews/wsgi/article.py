@@ -8,7 +8,7 @@ from wsgilib import JSON
 
 from hinews.messages.article import NoSuchArticle, ArticleCreated, \
     ArticleDeleted, ArticlePatched
-from hinews.orm import Article
+from hinews.orm import InvalidElements, Article
 
 __all__ = ['get_article', 'ROUTES']
 
@@ -20,6 +20,28 @@ def get_article(ident):
         return Article.get(Article.id == ident)
     except DoesNotExist:
         raise NoSuchArticle()
+
+
+def set_tags(article, dictionary):
+    """Sets the respective tags of the article."""
+
+    try:
+        article.tags = dictionary.get('tags', ())
+    except InvalidElements as invalid_elements:
+        return invalid_elements
+
+    return ()
+
+
+def set_customers(article, dictionary):
+    """Sets the respective customers of the article."""
+
+    try:
+        article.customers = dictionary.get('customers', ())
+    except InvalidElements as invalid_elements:
+        return invalid_elements
+
+    return ()
 
 
 @authenticated
@@ -43,15 +65,22 @@ def get(ident):
 def post():
     """Adds a new article."""
 
+    dictionary = DATA.json
+
     try:
-        article = Article.from_dict(SESSION.account, DATA.json)
+        article = Article.from_dict(SESSION.account, dictionary)
     except KeyError as key_error:
         raise MissingData(key=key_error.args[0])
     except ValueError as value_error:
         raise InvalidData(hint=value_error.args[0])
 
     article.save()
-    return ArticleCreated(id=article.id)
+    invalid_tags = set_tags(article, dictionary)
+    invalid_customers = set_customers(article, dictionary)
+
+    return ArticleCreated(
+        id=article.id, invalid_tags=invalid_tags,
+        invalid_customers=invalid_customers)
 
 
 @authenticated
@@ -69,10 +98,14 @@ def patch(ident):
     """Adds a new article."""
 
     article = get_article(ident)
-    article.patch(DATA.json)
+    dictionary = DATA.json
+    article.patch(dictionary)
     article.save()
     article.editors.add(SESSION.account)
-    return ArticlePatched()
+    invalid_tags = set_tags(article, dictionary)
+    invalid_customers = set_customers(article, dictionary)
+    return ArticlePatched(
+        invalid_tags=invalid_tags, invalid_customers=invalid_customers)
 
 
 ROUTES = (
