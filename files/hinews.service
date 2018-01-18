@@ -1,6 +1,6 @@
 [Unit]
 Description=HOMEINFO News Service
-Requires=his.service
+PartOf=wsgi-services.target
 
 [Service]
 User=hinews
