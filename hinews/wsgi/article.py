@@ -23,25 +23,29 @@ def get_article(ident):
 
 
 def set_tags(article, dictionary):
-    """Sets the respective tags of the article."""
+    """Sets the respective tags of the article iff specified."""
 
     try:
-        article.tags = dictionary.get('tags', ())
+        article.tags = dictionary['tags']
+    except KeyError:
+        return []
     except InvalidElements as invalid_elements:
         return list(invalid_elements)
 
-    return ()
+    return []
 
 
 def set_customers(article, dictionary):
-    """Sets the respective customers of the article."""
+    """Sets the respective customers of the article iff specified."""
 
     try:
-        article.customers = dictionary.get('customers', ())
+        article.customers = dictionary['customers']
+    except KeyError:
+        return []
     except InvalidElements as invalid_elements:
         return list(invalid_elements)
 
-    return ()
+    return []
 
 
 @authenticated
