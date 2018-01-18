@@ -27,7 +27,7 @@ def get_customer(cid):
 def lst():
     """Lists available customers."""
 
-    return JSON([customer.to_dict() for customer in Customer])
+    return JSON([customer.to_dict(cascade=True) for customer in Customer])
 
 
 @authenticated
