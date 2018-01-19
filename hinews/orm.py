@@ -258,9 +258,12 @@ class ArticleImage(NewsModel):
     def add(cls, article, data, metadata, account):
         """Adds the respective image data to the article."""
         print('Integer field name: ', cls.data_.integer_field.name)
-        print('Integer field match: ', cls.data_.integer_field == cls.file)
+        print('Integer field match: ', cls.data_.integer_field is cls.file)
         article_image = cls()
-        print('Integer field value: ', article_image.file, flush=True)
+        print('Integer field value: ', article_image.file)
+        print('Setting property.', flush=True)
+        self.data_ = data
+        print('Property set.', flush=True)
         article_image.article = article
         article_image.account = account
         article_image.data = data
