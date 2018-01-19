@@ -257,6 +257,8 @@ class ArticleImage(NewsModel):
     @classmethod
     def add(cls, article, data, metadata, account):
         """Adds the respective image data to the article."""
+        print('ArticleImage.add():', article.id, len(data), metadata,
+              account.id, flush=True)
         article_image = cls()
         article_image.article = article
         article_image.account = account
@@ -432,6 +434,8 @@ class ArticleImageProxy(ArticleProxy):
 
     def add(self, data, metadata, account):
         """Adds an image to the respective article."""
+        print('ArticleImage.add():', self.target.id, len(data), metadata,
+              account.id, flush=True)
         article_image = self.model.add(self.target, data, metadata, account)
         article_image.save()
         return article_image

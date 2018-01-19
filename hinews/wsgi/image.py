@@ -64,9 +64,6 @@ def post(ident):
     except KeyError:
         raise NoMetaDataProvided()
 
-    #print('Files:', list(files))
-    print('Image data:', image.bytes, sep='\n', flush=True)
-
     try:
         image = get_article(ident).images.add(
             image.bytes, metadata.json, SESSION.account)
