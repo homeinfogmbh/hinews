@@ -261,7 +261,8 @@ class ArticleImage(NewsModel):
         print('Integer field match: ', cls.data_.interger_field == cls.file)
         article_image = cls()
         print('Integer field value: ', article_image.file)
-        print('Integer field value2: ', article_image.data_.interger_field)
+        print('Integer field value on file property: ',
+              article_image.data_.interger_field, flush=True)
         article_image.article = article
         article_image.account = account
         article_image.data = data
