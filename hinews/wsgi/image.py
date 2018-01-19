@@ -33,10 +33,10 @@ def lst():
 
 @authenticated
 @authorized('hinews')
-def list_article(article_id):
+def list_article(ident):
     """Lists all available articles."""
 
-    return JSON([image.to_dict() for image in get_article(article_id).images])
+    return JSON([image.to_dict() for image in get_article(ident).images])
 
 
 @authenticated
