@@ -7,7 +7,7 @@ from uuid import uuid4
 from peewee import DoesNotExist, Model, PrimaryKeyField, ForeignKeyField, \
     DateField, DateTimeField, CharField, TextField, IntegerField
 
-from filedb import add, get, delete, FileProperty
+from filedb import FileProperty
 from his.orm import Account
 from homeinfo.crm import Customer
 from peeweeplus import MySQLDatabase
@@ -252,38 +252,18 @@ class ArticleImage(NewsModel):
     file = IntegerField()
     uploaded = DateTimeField()
     source = TextField(null=True)
-    data_ = FileProperty(file)
+    data = FileProperty(file)
 
     @classmethod
     def add(cls, article, data, metadata, account):
         """Adds the respective image data to the article."""
-        print('Integer field name: ', cls.data_.integer_field.name)
-        print('Integer field match: ', cls.data_.integer_field is cls.file)
         article_image = cls()
-        print('Integer field value: ', article_image.file)
-        print('Setting property.', flush=True)
-        article_image.data_ = data
-        print('Property set.', flush=True)
         article_image.article = article
         article_image.account = account
         article_image.data = data
         article_image.uploaded = datetime.now()
         article_image.source = metadata['source']
         return article_image
-
-    @property
-    def data(self):
-        """Returns the respective data."""
-        return get(self.file)
-
-    @data.setter
-    def data(self, data):
-        """Sets the respective data."""
-        if self.file is not None:
-            delete(self.file)
-
-        if data is not None:
-            self.file = add(data)
 
     def patch(self, dictionary):
         """Patches the image metadata with the respective dictionary."""
@@ -296,7 +276,7 @@ class ArticleImage(NewsModel):
 
     def delete_instance(self, recursive=False, delete_nullable=False):
         """Deltes the image."""
-        delete(self.file)
+        self.data = None    # Delete file.
         return super().delete_instance(
             recursive=recursive, delete_nullable=delete_nullable)
 
