@@ -57,15 +57,15 @@ def post(ident):
     try:
         image = files['image']
     except KeyError:
-        return Binary(DATA.bytes)
         print('Image data:', DATA.bytes, flush=True, sep='\n')
+        return Binary(DATA.bytes)
         #raise NoImageProvided()
 
     try:
         metadata = files['metadata']
     except KeyError:
-        return Binary(DATA.bytes)
         print('Image data:', DATA.bytes, flush=True, sep='\n')
+        return Binary(DATA.bytes)
         #raise NoMetaDataProvided()
 
     try:
