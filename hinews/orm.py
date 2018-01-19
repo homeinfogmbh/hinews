@@ -7,7 +7,7 @@ from uuid import uuid4
 from peewee import DoesNotExist, Model, PrimaryKeyField, ForeignKeyField, \
     DateField, DateTimeField, CharField, TextField, IntegerField
 
-from filedb import add, get, delete
+from filedb import add, get, delete, FileProperty
 from his.orm import Account
 from homeinfo.crm import Customer
 from peeweeplus import MySQLDatabase
@@ -252,13 +252,16 @@ class ArticleImage(NewsModel):
     file = IntegerField()
     uploaded = DateTimeField()
     source = TextField(null=True)
+    data_ = FileProperty(file)
 
     @classmethod
     def add(cls, article, data, metadata, account):
         """Adds the respective image data to the article."""
-        print('ArticleImage.add():', article.id, len(data), metadata,
-              account.id, flush=True)
+        print('Integer field name: ', cls.data_.interger_field.name)
+        print('Integer field match: ', cls.data_.interger_field == cls.file)
         article_image = cls()
+        print('Integer field value: ', article_image.file)
+        print('Integer field value2: ', article_image.data_.interger_field)
         article_image.article = article
         article_image.account = account
         article_image.data = data
@@ -447,8 +450,6 @@ class ArticleImageProxy(ArticleProxy):
 
     def add(self, data, metadata, account):
         """Adds an image to the respective article."""
-        print('ArticleImage.add():', self.target.id, len(data), metadata,
-              account.id, flush=True)
         article_image = self.model.add(self.target, data, metadata, account)
         article_image.save()
         return article_image
