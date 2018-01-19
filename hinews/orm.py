@@ -260,9 +260,7 @@ class ArticleImage(NewsModel):
         print('Integer field name: ', cls.data_.integer_field.name)
         print('Integer field match: ', cls.data_.integer_field == cls.file)
         article_image = cls()
-        print('Integer field value: ', article_image.file)
-        print('Integer field value on file property: ',
-              article_image.data_.integer_field, flush=True)
+        print('Integer field value: ', article_image.file, flush=True)
         article_image.article = article
         article_image.account = account
         article_image.data = data
