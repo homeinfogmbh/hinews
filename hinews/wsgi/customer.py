@@ -8,7 +8,7 @@ from wsgilib import JSON
 
 from hinews.messages.customer import NoSuchCustomer, CustomerAdded, \
     CustomerDeleted
-from hinews.orm import CustomerList
+from hinews.orm import InvalidCustomer, CustomerList
 from hinews.wsgi.article import get_article
 
 __all__ = ['ROUTES']
@@ -45,7 +45,11 @@ def get(ident):
 def post(ident):
     """Adds a customer to the respective article."""
 
-    get_article(ident).customers.add(get_customer(DATA.text))
+    try:
+        get_article(ident).customers.add(get_customer(DATA.text))
+    except InvalidCustomer:
+        return NoSuchCustomer()
+
     return CustomerAdded()
 
 
