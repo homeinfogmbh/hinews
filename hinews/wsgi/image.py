@@ -33,7 +33,7 @@ def lst():
 
 @authenticated
 @authorized('hinews')
-def list_article(ident):
+def list_article_images(ident):
     """Lists all available articles."""
 
     return JSON([image.to_dict() for image in get_article(ident).images])
@@ -96,7 +96,7 @@ def patch(ident):
 
 
 ROUTES = (
-    ('GET', '/article/<int:ident>/images', list_article,
+    ('GET', '/article/<int:ident>/images', list_article_images,
      'list_article_images'),
     ('POST', '/article/<int:ident>/images', post, 'post_article_image'),
     ('GET', '/image', lst, 'list_images'),

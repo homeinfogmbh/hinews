@@ -16,6 +16,7 @@ from hinews.config import CONFIG
 
 __all__ = [
     'InvalidTag',
+    'InvalidCustomer',
     'InvalidElements',
     'create_tables',
     'Article',
@@ -29,6 +30,12 @@ DATABASE = MySQLDatabase(
 
 
 class InvalidTag(Exception):
+    """Indicates that a respective tag is not registered."""
+
+    pass
+
+
+class InvalidCustomer(Exception):
     """Indicates that a respective tag is not registered."""
 
     pass
@@ -281,8 +288,12 @@ class ArticleImage(NewsModel):
             recursive=recursive, delete_nullable=delete_nullable)
 
 
-class Tag(NewsModel):
+class TagList(NewsModel):
     """An tag for articles."""
+
+    class Meta:
+        """Sets the table name."""
+        db_table = 'tag_list'
 
     tag = CharField(255)
 
@@ -301,6 +312,22 @@ class Tag(NewsModel):
         return self.tag
 
 
+class CustomerList(NewsModel):
+    """Csutomers enabled for gettings news."""
+
+    class Meta:
+        """Sets the table name."""
+        db_table = 'customer_list'
+
+    customer = ForeignKeyField(
+        Customer, db_column='customer', on_delete='CASCADE',
+        on_update='CASCADE')
+
+    def to_dict(self):
+        """Returns the respective customer's dict."""
+        return self.customer.to_dict(cascade=True)
+
+
 class ArticleTag(NewsModel):
     """Article <> Tag mappings."""
 
@@ -317,7 +344,7 @@ class ArticleTag(NewsModel):
         """Adds a new tag to the article."""
         if validate:
             try:
-                Tag.get(Tag.tag == tag)
+                TagList.get(TagList.tag == tag)
             except DoesNotExist:
                 raise InvalidTag(tag)
 
@@ -331,9 +358,7 @@ class ArticleTag(NewsModel):
 
     def to_dict(self):
         """Returns a JSON-ish dictionary."""
-        return {
-            'id': self.id,
-            'tag': self.tag}
+        return {'id': self.id, 'tag': self.tag}
 
 
 class ArticleCustomer(NewsModel):
@@ -351,6 +376,11 @@ class ArticleCustomer(NewsModel):
     @classmethod
     def add(cls, article, customer):
         """Adds the respective customer to the article."""
+        try:
+            CustomerList.get(CustomerList.customer == customer)
+        except DoesNotExist:
+            raise InvalidCustomer(customer)
+
         try:
             return ArticleCustomer.get(
                 (ArticleCustomer.article == article)
@@ -526,5 +556,5 @@ class ImageProxy(Proxy):
 
 
 MODELS = [
-    Article, ArticleEditor, ArticleImage, Tag, ArticleTag, ArticleCustomer,
-    AccessToken]
+    Article, ArticleEditor, ArticleImage, TagList, CustomerList, ArticleTag,
+    ArticleCustomer, AccessToken]

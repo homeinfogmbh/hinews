@@ -4,7 +4,7 @@ from his import DATA, authenticated, authorized
 from wsgilib import JSON
 
 from hinews.messages.tag import NoSuchTag, TagAdded, TagDeleted
-from hinews.orm import InvalidTag, Tag
+from hinews.orm import InvalidTag, TagList
 from hinews.wsgi.article import get_article
 
 __all__ = ['ROUTES']
@@ -15,7 +15,7 @@ __all__ = ['ROUTES']
 def lst():
     """Lists available tags."""
 
-    return JSON([tag.to_dict() for tag in Tag])
+    return JSON([tag.to_dict() for tag in TagList])
 
 
 @authenticated
