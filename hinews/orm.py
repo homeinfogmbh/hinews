@@ -262,7 +262,7 @@ class ArticleImage(NewsModel):
         article_image = cls()
         print('Integer field value: ', article_image.file)
         print('Setting property.', flush=True)
-        self.data_ = data
+        article_image.data_ = data
         print('Property set.', flush=True)
         article_image.article = article
         article_image.account = account
