@@ -16,7 +16,7 @@ OFFSET = 10
 def bottom_left(image, font):
     """Bottom left position in image."""
 
-    return (OFFSET, image.height - font.size - OFFSET)
+    return (0, image.height - font.size - 2*OFFSET)
 
 
 def watermark(image_data, text, font=None):
