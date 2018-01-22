@@ -10,11 +10,12 @@ from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.messages.public import MissingAccessToken, InvalidAccessToken
 from hinews.orm import Article, ArticleImage, AccessToken
+from hinews.watermark import write_image
 
 __all__ = ['ROUTES']
 
 
-def get_customer():
+def _get_customer():
     """Returns the customer for the respective access token."""
 
     try:
@@ -30,7 +31,7 @@ def get_customer():
     return access_token.customer
 
 
-def get_articles(customer):
+def _get_articles(customer):
     """Yields articles of the querying customer."""
 
     for article in Article:
@@ -38,7 +39,7 @@ def get_articles(customer):
             yield article
 
 
-def get_article(ident):
+def _get_article(ident):
     """Yields articles of the querying customer."""
 
     try:
@@ -46,13 +47,13 @@ def get_article(ident):
     except DoesNotExist:
         raise NoSuchArticle()
 
-    if get_customer() in article.customers:
+    if _get_customer() in article.customers:
         return article
 
     raise NoSuchArticle()
 
 
-def get_image(ident):
+def _get_image(ident):
     """Returns the respective image."""
 
     try:
@@ -60,7 +61,7 @@ def get_image(ident):
     except DoesNotExist:
         raise NoSuchImage()
 
-    if get_customer() in article_image.article.customers:
+    if _get_customer() in article_image.article.customers:
         return article_image
 
     raise NoSuchArticle()
@@ -69,23 +70,24 @@ def get_image(ident):
 def lst():
     """Lists the respective news."""
 
-    return JSON([article.to_dict() for article in get_articles(
-        get_customer())])
+    return JSON([article.to_dict() for article in _get_articles(
+        _get_customer())])
 
 
-def get(ident):
+def get_article(ident):
     """Returns the respective article."""
 
-    return JSON(get_article(ident).to_dict())
+    return JSON(_get_article(ident).to_dict())
 
 
-def image(ident):
+def get_image(ident):
     """Returns the respective image."""
 
-    return Binary(get_image(ident).data)
+    image = _get_image(ident)
+    return Binary(write_image(image.data, image.source))
 
 
 ROUTES = (
     ('GET', '/pub/article', lst, 'list_customer_articles'),
-    ('GET', '/pub/article/<int:ident>', get, 'get_customer_article'),
-    ('GET', '/pub/image/<int:ident>', image, 'get_customer_image'))
+    ('GET', '/pub/article/<int:ident>', get_article, 'get_customer_article'),
+    ('GET', '/pub/image/<int:ident>', get_image, 'get_customer_image'))
