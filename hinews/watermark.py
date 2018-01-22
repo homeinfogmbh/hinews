@@ -1,4 +1,4 @@
-"""Write copyright text onto images."""
+"""Write watermark text onto images."""
 
 from io import BytesIO
 from tempfile import TemporaryFile
@@ -15,6 +15,7 @@ __all__ = [
 
 TTF_DEJAVU = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 YELLOW = (255, 255, 0)
+GREY = (102, 102, 102)
 
 
 def top_left(_, __, offset=10):
@@ -29,7 +30,7 @@ def bottom_left(image, font, offset=10):
     return (offset, image.height - font.size - offset)
 
 
-def watermark(image_data, text, position=bottom_left, color=YELLOW, font=None):
+def watermark(image_data, text, position=bottom_left, color=GREY, font=None):
     """Writes the respective text onto the image."""
 
     if font is None:
