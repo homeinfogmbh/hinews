@@ -242,7 +242,7 @@ class ArticleEditor(NewsModel):
     def to_dict(self):
         """Returns a JSON-ish dictionary."""
         return {
-            'account': self.account.to_dict(),
+            'account': {'id': self.account.id, 'email': self.account.email},
             'timestamp': self.timestamp}
 
 
