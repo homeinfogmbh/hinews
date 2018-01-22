@@ -10,7 +10,7 @@ from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.messages.public import MissingAccessToken, InvalidAccessToken
 from hinews.orm import Article, ArticleImage, AccessToken
-from hinews.watermark import write_image
+from hinews.watermark import write_img
 
 __all__ = ['ROUTES']
 
@@ -84,7 +84,7 @@ def get_image(ident):
     """Returns the respective image."""
 
     image = _get_image(ident)
-    return Binary(write_image(image.data, image.source))
+    return Binary(write_img(image.data, image.source))
 
 
 ROUTES = (

@@ -1,14 +1,20 @@
 """Write copyright text onto images."""
 
 from io import BytesIO
-from tempfile import NamedTemporaryFile
+from tempfile import TemporaryFile
 
 from PIL import Image, ImageDraw, ImageFont
 
-__all__ = ['TTF_DEJAVU', 'top_left', 'bottom_left', 'write_image']
+__all__ = [
+    'TTF_DEJAVU',
+    'YELLOW',
+    'top_left',
+    'bottom_left',
+    'write_img']
 
 
 TTF_DEJAVU = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+YELLOW = (255, 255, 0)
 
 
 def top_left(_, __):
@@ -21,8 +27,7 @@ def bottom_left(image, font):
     return (0, image.height - font.size)
 
 
-def write_image(image_data, text, position=bottom_left, font=None,
-                color=(255, 255, 0), suffix='.png'):
+def write_img(image_data, text, position=bottom_left, color=YELLOW, font=None):
     """Writes the respective text onto the image."""
 
     if font is None:
@@ -33,7 +38,7 @@ def write_image(image_data, text, position=bottom_left, font=None,
     draw.text(position(image, font), text, color, font=font)
     draw = ImageDraw.Draw(image)
 
-    with NamedTemporaryFile('w+b', suffix=suffix) as tmp:
-        image.save(tmp)
+    with TemporaryFile('w+b') as tmp:
+        image.save(tmp, format=image.format)
         tmp.seek(0)
         return tmp.read()
