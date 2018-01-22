@@ -173,7 +173,7 @@ class Article(NewsModel):
         """Returns a JSON-ish dictionary."""
         return {
             'id': self.id,
-            'author': self.author.to_dict(),
+            'author': {'id': self.author.id, 'email': self.author.email},
             'created': self.created,
             'active_from': self.active_from,
             'active_until': self.active_until,
