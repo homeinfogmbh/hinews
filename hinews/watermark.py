@@ -38,7 +38,6 @@ def watermark(image_data, text, position=bottom_left, color=YELLOW, font=None):
     image = Image.open(BytesIO(image_data))
     draw = ImageDraw.Draw(image)
     draw.text(position(image, font), text, fill=color, font=font)
-    draw = ImageDraw.Draw(image)
 
     with TemporaryFile('w+b') as tmp:
         image.save(tmp, format=image.format)
