@@ -37,7 +37,7 @@ def watermark(image_data, text, font=None):
     mask = wmark.convert('L').point(partial(max, 100))
     wmark.putalpha(mask)
     # Paste interim watermark image into original image.
-    image.paste(wmark, bottom_left(image, font), mask=watermark)
+    image.paste(wmark, bottom_left(image, font), mask=wmark)
 
     # Return new image data.
     with TemporaryFile('w+b') as tmp:
