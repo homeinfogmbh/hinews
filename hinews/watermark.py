@@ -28,7 +28,8 @@ def watermark(image_data, text, font=None):
 
     image = Image.open(BytesIO(image_data))
     # Create interim watermark image.
-    wmark = Image.new('RGBA', (image.width, 25 + 2*OFFSET), color=(0, 0, 0, 0))
+    wmark = Image.new(
+        'RGBA', (image.width, font.size + 2*OFFSET), color=(0, 0, 0, 0))
     # Write text on interim watermark image.
     draw = ImageDraw.Draw(wmark)
     draw.text((OFFSET, OFFSET), text, fill=(255, 255, 255), font=font)
