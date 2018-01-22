@@ -13,7 +13,7 @@ from homeinfo.crm import Customer
 from peeweeplus import MySQLDatabase
 
 from hinews.config import CONFIG
-from hinews.watermark import write_img
+from hinews.watermark import watermark
 
 __all__ = [
     'InvalidTag',
@@ -276,7 +276,7 @@ class ArticleImage(NewsModel):
     @property
     def watermarked(self):
         """Returns a watermarked image."""
-        return write_img(self.data, 'Quelle: {}'.format(self.source))
+        return watermark(self.data, 'Quelle: {}'.format(self.source))
 
     def patch(self, dictionary):
         """Patches the image metadata with the respective dictionary."""

@@ -10,7 +10,7 @@ __all__ = [
     'YELLOW',
     'top_left',
     'bottom_left',
-    'write_img']
+    'watermark']
 
 
 TTF_DEJAVU = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
@@ -19,15 +19,17 @@ YELLOW = (255, 255, 0)
 
 def top_left(_, __, offset=10):
     """Bottom left position in image."""
+
     return (offset, offset)
 
 
 def bottom_left(image, font, offset=10):
     """Bottom left position in image."""
+
     return (offset, image.height - font.size - offset)
 
 
-def write_img(image_data, text, position=bottom_left, color=YELLOW, font=None):
+def watermark(image_data, text, position=bottom_left, color=YELLOW, font=None):
     """Writes the respective text onto the image."""
 
     if font is None:
@@ -35,7 +37,7 @@ def write_img(image_data, text, position=bottom_left, color=YELLOW, font=None):
 
     image = Image.open(BytesIO(image_data))
     draw = ImageDraw.Draw(image)
-    draw.text(position(image, font), text, color, font=font)
+    draw.text(position(image, font), text, fill=color, font=font)
     draw = ImageDraw.Draw(image)
 
     with TemporaryFile('w+b') as tmp:
