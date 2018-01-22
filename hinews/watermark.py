@@ -18,13 +18,20 @@ OFFSET = 10
 Size = namedtuple('Size', ('width', 'height'))
 
 
+def write_text(image, text, font):
+    """Writes the text onto the respective image."""
+
+    position = (OFFSET, OFFSET)
+    fill = (255, 255, 255)
+    ImageDraw.Draw(image).text(position, text, fill=fill, font=font)
+
+
 def make_watermark(size, text, font):
     """Creates an interim watermark image."""
 
     image = Image.new('RGBA', size, color=(0, 0, 0, 0))
+    write_text(image, text, font)
     # Write text on interim watermark image.
-    draw = ImageDraw.Draw(image)
-    draw.text((OFFSET, OFFSET), text, fill=(255, 255, 255), font=font)
     # Calculate mask <https://gist.github.com/snay2/876425>.
     mask = image.convert('L').point(partial(max, 100))
     image.putalpha(mask)
