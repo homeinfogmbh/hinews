@@ -274,7 +274,7 @@ class ArticleImage(NewsModel):
         return article_image
 
     @property
-    def onliner(self):
+    def oneliner(self):
         """Returns the source text as a one-liner."""
         return ' '.join(self.source.split('\n'))
 
