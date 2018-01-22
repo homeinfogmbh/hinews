@@ -10,7 +10,7 @@ __all__ = ['watermark']
 
 
 TTF_DEJAVU = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-FONT_SIZE = 10
+FONT_SIZE = 12
 OFFSET = 10
 
 
