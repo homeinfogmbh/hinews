@@ -29,7 +29,8 @@ def write_text(image, text, font):
 def make_watermark(size, text, font):
     """Creates an interim watermark image."""
 
-    image = Image.new('RGBA', size, color=(0, 0, 0, 0))
+    color = (0, 0, 0, 0)
+    image = Image.new('RGBA', size, color=color)
     write_text(image, text, font)
     # Write text on interim watermark image.
     # Calculate mask <https://gist.github.com/snay2/876425>.
