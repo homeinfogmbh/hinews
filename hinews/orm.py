@@ -274,9 +274,14 @@ class ArticleImage(NewsModel):
         return article_image
 
     @property
+    def onliner(self):
+        """Returns the source text as a one-liner."""
+        return ' '.join(self.source.split('\n'))
+
+    @property
     def watermarked(self):
         """Returns a watermarked image."""
-        return watermark(self.data, 'Quelle: {}'.format(self.source))
+        return watermark(self.data, 'Quelle: {}'.format(self.oneliner))
 
     def patch(self, dictionary):
         """Patches the image metadata with the respective dictionary."""
