@@ -10,6 +10,7 @@ __all__ = ['watermark']
 
 
 TTF_DEJAVU = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+FONT_SIZE = 10
 OFFSET = 10
 
 
@@ -24,7 +25,7 @@ def watermark(image_data, text, font=None):
 
     # Set default font.
     if font is None:
-        font = ImageFont.truetype(TTF_DEJAVU, 25)
+        font = ImageFont.truetype(TTF_DEJAVU, FONT_SIZE)
 
     image = Image.open(BytesIO(image_data))
     # Create interim watermark image.
