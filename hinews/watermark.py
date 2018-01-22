@@ -1,45 +1,45 @@
 """Write watermark text onto images."""
 
+from functools import partial
 from io import BytesIO
 from tempfile import TemporaryFile
 
 from PIL import Image, ImageDraw, ImageFont
 
-__all__ = [
-    'TTF_DEJAVU',
-    'YELLOW',
-    'top_left',
-    'bottom_left',
-    'watermark']
+__all__ = ['watermark']
 
 
 TTF_DEJAVU = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-YELLOW = (255, 255, 0)
-GREY = (102, 102, 102)
+OFFSET = 10
 
 
-def top_left(_, __, offset=10):
+def bottom_left(image, font):
     """Bottom left position in image."""
 
-    return (offset, offset)
+    return (OFFSET, image.height - font.size - OFFSET)
 
 
-def bottom_left(image, font, offset=10):
-    """Bottom left position in image."""
-
-    return (offset, image.height - font.size - offset)
-
-
-def watermark(image_data, text, position=bottom_left, color=GREY, font=None):
+def watermark(image_data, text, font=None):
     """Writes the respective text onto the image."""
 
+    # Set default font.
     if font is None:
         font = ImageFont.truetype(TTF_DEJAVU, 25)
 
     image = Image.open(BytesIO(image_data))
-    draw = ImageDraw.Draw(image)
-    draw.text(position(image, font), text, fill=color, font=font)
+    # Create interim watermark image.
+    wmark = Image.new('RGBA', (image.width, 25 + 2*OFFSET), color=(0, 0, 0, 0))
+    # Write text on interim watermark image.
+    draw = ImageDraw.Draw(wmark)
+    draw.text((OFFSET, OFFSET), text, fill=(255, 255, 255), font=font)
+    del draw
+    # Calculate mask <https://gist.github.com/snay2/876425>.
+    mask = wmark.convert('L').point(partial(max, 100))
+    wmark.putalpha(mask)
+    # Paste interim watermark image into original image.
+    image.paste(wmark, bottom_left(image, font), mask=watermark)
 
+    # Return new image data.
     with TemporaryFile('w+b') as tmp:
         image.save(tmp, format=image.format)
         tmp.seek(0)
