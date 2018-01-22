@@ -14,34 +14,31 @@ FONT_SIZE = 12
 OFFSET = 10
 
 
-def bottom_left(image, font):
-    """Bottom left position in image."""
+def make_watermark(size, text, font):
+    """Creates an interim watermark image."""
 
-    return (0, image.height - font.size - 2*OFFSET)
+    image = Image.new('RGBA', size, color=(0, 0, 0, 0))
+    # Write text on interim watermark image.
+    draw = ImageDraw.Draw(image)
+    draw.text((OFFSET, OFFSET), text, fill=(255, 255, 255), font=font)
+    # Calculate mask <https://gist.github.com/snay2/876425>.
+    mask = image.convert('L').point(partial(max, 100))
+    image.putalpha(mask)
+    return image
 
 
 def watermark(image_data, text, font=None):
     """Writes the respective text onto the image."""
 
-    # Set default font.
     if font is None:
         font = ImageFont.truetype(TTF_DEJAVU, FONT_SIZE)
 
     image = Image.open(BytesIO(image_data))
-    # Create interim watermark image.
-    wmark = Image.new(
-        'RGBA', (image.width, font.size + 2*OFFSET), color=(0, 0, 0, 0))
-    # Write text on interim watermark image.
-    draw = ImageDraw.Draw(wmark)
-    draw.text((OFFSET, OFFSET), text, fill=(255, 255, 255), font=font)
-    del draw
-    # Calculate mask <https://gist.github.com/snay2/876425>.
-    mask = wmark.convert('L').point(partial(max, 100))
-    wmark.putalpha(mask)
-    # Paste interim watermark image into original image.
-    image.paste(wmark, bottom_left(image, font), mask=wmark)
+    watermark_size = (OFFSET, image.height - font.size - 2*OFFSET)
+    watermark_position = (0, image.height - font.size - 2*OFFSET)
+    watermark_image = make_watermark(watermark_size, text, font)
+    image.paste(watermark_image, watermark_position, mask=watermark_image)
 
-    # Return new image data.
     with TemporaryFile('w+b') as tmp:
         image.save(tmp, format=image.format)
         tmp.seek(0)
