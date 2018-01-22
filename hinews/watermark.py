@@ -34,7 +34,7 @@ def watermark(image_data, text, font=None):
         font = ImageFont.truetype(TTF_DEJAVU, FONT_SIZE)
 
     image = Image.open(BytesIO(image_data))
-    watermark_size = (OFFSET, image.height - font.size - 2*OFFSET)
+    watermark_size = (image.width, font.size + 2*OFFSET)
     watermark_position = (0, image.height - font.size - 2*OFFSET)
     watermark_image = make_watermark(watermark_size, text, font)
     image.paste(watermark_image, watermark_position, mask=watermark_image)
