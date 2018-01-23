@@ -56,7 +56,10 @@ def test(arg):
         return JSON({'left': account_left, 'right': account_right})
     elif arg == 'expr':
         expression = Account.id == ACCOUNT
-        return str(expression) + '\n\n' + repr(expression)
+        return JSON({
+            'str': str(expression),
+            'repr': repr(expression),
+            'type': type(expression)})
 
     return 'Invalid argument: {}.'.format(arg)
 
