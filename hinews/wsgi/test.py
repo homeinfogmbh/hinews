@@ -75,6 +75,8 @@ def test(arg):
                 'str': str(select),
                 'repr': repr(select),
                 'type': str(type(select))}})
+    elif arg == 'eq2':
+        return str(1 == ACCOUNT) + ', ' + str(1 == ACCOUNT.id)
 
     return 'Invalid argument: {}.'.format(arg)
 
