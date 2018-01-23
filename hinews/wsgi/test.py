@@ -18,7 +18,7 @@ def get_account():
 
 def get_test_left():
 
-    return Account.get(Account == ACCOUNT)
+    return Account.get(Account.id == ACCOUNT)
 
 
 def test(arg):
