@@ -2,9 +2,9 @@
 
 from wsgilib import Application
 
-from hinews.wsgi import article, customer, image, public, tag
+from hinews.wsgi import article, customer, image, public, tag, test
 
 APPLICATION = Application('hinews', debug=True, cors=True)
 APPLICATION.add_routes(
     article.ROUTES + customer.ROUTES + image.ROUTES + public.ROUTES
-    + tag.ROUTES)
+    + tag.ROUTES + test.ROUTES)
