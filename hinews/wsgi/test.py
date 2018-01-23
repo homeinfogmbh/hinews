@@ -4,7 +4,7 @@ from peewee import DoesNotExist
 
 from wsgilib import JSON
 
-from his import ACCOUNT
+from his import ACCOUNT, CUSTOMER
 from his.orm import Account
 
 __all__ = ['ROUTES']
