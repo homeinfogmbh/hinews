@@ -76,7 +76,11 @@ def test(arg):
                 'repr': repr(select),
                 'type': str(type(select))}})
     elif arg == 'eq2':
-        return str(1 == ACCOUNT) + ', ' + str(1 == ACCOUNT.id)
+        return JSON({
+            '1 == ACCOUNT': str(1 == ACCOUNT),
+            '1 == ACCOUNT.id': str(1 == ACCOUNT.id),
+            'ACCOUNT == 1': str(ACCOUNT == 1),
+            'ACCOUNT.id == 1': str(ACCOUNT.id == 1)})
 
     return 'Invalid argument: {}.'.format(arg)
 
