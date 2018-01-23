@@ -59,7 +59,7 @@ def test(arg):
         return JSON({
             'str': str(expression),
             'repr': repr(expression),
-            'type': type(expression)})
+            'type': str(type(expression))})
 
     return 'Invalid argument: {}.'.format(arg)
 
