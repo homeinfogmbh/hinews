@@ -56,12 +56,21 @@ def test(arg):
         return JSON({'left': account_left, 'right': account_right})
     elif arg == 'expr':
         expression = Account.id == ACCOUNT
+        expression2 = Account.id == ACCOUNT.id
         select = Account.select().where(expression)
         return JSON({
-            'expression': {
+            'expression1': {
                 'str': str(expression),
                 'repr': repr(expression),
                 'type': str(type(expression))},
+                'rhs': str(expression.rhs)},
+                'rhs_type': str(type(expression.rhs)}
+            'expression2': {
+                'str': str(expression2),
+                'repr': repr(expression2),
+                'type': str(type(expression2))},
+                'rhs': str(expression.rhs)},
+                'rhs_type': str(type(expression.rhs)},
             'select': {
                 'str': str(select),
                 'repr': repr(select),
