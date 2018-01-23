@@ -9,8 +9,6 @@ from his.orm import Account
 
 __all__ = ['ROUTES']
 
-CUSTOMER.__int__ = lambda x: x._get_current_object().id
-
 
 def get_account():
     """Returns the actual account ORM model's instance."""
