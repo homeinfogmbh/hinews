@@ -69,8 +69,8 @@ def test(arg):
                 'str': str(expression2),
                 'repr': repr(expression2),
                 'type': str(type(expression2)),
-                'rhs': str(expression.rhs),
-                'rhs_type': str(type(expression.rhs))},
+                'rhs': str(expression2.rhs),
+                'rhs_type': str(type(expression2.rhs))},
             'select': {
                 'str': str(select),
                 'repr': repr(select),
