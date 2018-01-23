@@ -62,15 +62,15 @@ def test(arg):
             'expression1': {
                 'str': str(expression),
                 'repr': repr(expression),
-                'type': str(type(expression))},
-                'rhs': str(expression.rhs)},
-                'rhs_type': str(type(expression.rhs)},
+                'type': str(type(expression)),
+                'rhs': str(expression.rhs),
+                'rhs_type': str(type(expression.rhs))},
             'expression2': {
                 'str': str(expression2),
                 'repr': repr(expression2),
-                'type': str(type(expression2))},
-                'rhs': str(expression.rhs)},
-                'rhs_type': str(type(expression.rhs)},
+                'type': str(type(expression2)),
+                'rhs': str(expression.rhs),
+                'rhs_type': str(type(expression.rhs))},
             'select': {
                 'str': str(select),
                 'repr': repr(select),
