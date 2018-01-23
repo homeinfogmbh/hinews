@@ -16,9 +16,9 @@ def get_account():
     return Account.get(Account.id == ACCOUNT.id)
 
 
-def get_test_left():
+def get_accounts():
 
-    return Account.get(Account.id == ACCOUNT)
+    return Account.select().where(Account.customer == CUSTOMER)
 
 
 def test(arg):
@@ -34,14 +34,7 @@ def test(arg):
             'ACCOUNT.id == account.id': ACCOUNT.id == account.id,
             'account.id == ACCOUNT.id': account.id == ACCOUNT.id})
     elif arg == 'get':
-        try:
-            account = get_test_left()
-        except DoesNotExist:
-            account = None
-        else:
-            account = account.to_dict()
-
-        return JSON(account)
+        return JSON([account.to_dict() for account in get_accounts()])
     elif arg == 'expr':
         expression = Account.id == ACCOUNT
         expression2 = Account.id == ACCOUNT.id
