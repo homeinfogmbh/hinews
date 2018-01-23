@@ -64,7 +64,7 @@ def test(arg):
                 'repr': repr(expression),
                 'type': str(type(expression))},
                 'rhs': str(expression.rhs)},
-                'rhs_type': str(type(expression.rhs)}
+                'rhs_type': str(type(expression.rhs)},
             'expression2': {
                 'str': str(expression2),
                 'repr': repr(expression2),
