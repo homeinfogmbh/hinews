@@ -74,7 +74,7 @@ def test(arg):
                 'str': str(co),
                 'repr': repr(co),
                 'type': str(type(co))}})
-    elif arg = 'acc':
+    elif arg == 'acc':
         return JSON(ACCOUNT.to_dict())
 
     return 'Invalid argument: {}.'.format(arg)
