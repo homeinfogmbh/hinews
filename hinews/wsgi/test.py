@@ -21,11 +21,6 @@ def get_test_left():
     return Account.get(Account.id == ACCOUNT)
 
 
-def get_test_right():
-
-    return Account.get(ACCOUNT == Account.id)
-
-
 def test(arg):
     """Runs tests."""
 
@@ -40,20 +35,13 @@ def test(arg):
             'account.id == ACCOUNT.id': account.id == ACCOUNT.id})
     elif arg == 'get':
         try:
-            account_left = get_test_left()
+            account = get_test_left()
         except DoesNotExist:
-            account_left = None
+            account = None
         else:
-            account_left = account_left.to_dict()
+            account = account.to_dict()
 
-        try:
-            account_right = get_test_right()
-        except DoesNotExist:
-            account_right = None
-        else:
-            account_right = account_left.to_dict()
-
-        return JSON({'left': account_left, 'right': account_right})
+        return JSON(account})
     elif arg == 'expr':
         expression = Account.id == ACCOUNT
         expression2 = Account.id == ACCOUNT.id
