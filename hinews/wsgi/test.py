@@ -76,12 +76,16 @@ def test(arg):
                 'repr': repr(select),
                 'type': str(type(select))}})
     elif arg == 'eq2':
+        co = ACCOUNT._get_current_object()
         return JSON({
             '1 == ACCOUNT': str(1 == ACCOUNT),
             '1 == ACCOUNT.id': str(1 == ACCOUNT.id),
             'ACCOUNT == 1': str(ACCOUNT == 1),
             'ACCOUNT.id == 1': str(ACCOUNT.id == 1),
-            'current_object': ACCOUNT._get_current_object()})
+            'current_object': {
+                'str': str(co),
+                'repr': repr(co),
+                'type': str(type(co))}})
 
     return 'Invalid argument: {}.'.format(arg)
 
