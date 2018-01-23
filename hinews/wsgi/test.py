@@ -41,7 +41,7 @@ def test(arg):
         else:
             account = account.to_dict()
 
-        return JSON(account})
+        return JSON(account)
     elif arg == 'expr':
         expression = Account.id == ACCOUNT
         expression2 = Account.id == ACCOUNT.id
