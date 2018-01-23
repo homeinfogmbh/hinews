@@ -54,6 +54,9 @@ def test(arg):
             account_right = account_left.to_dict()
 
         return JSON({'left': account_left, 'right': account_right})
+    elif atg == 'expr':
+        expression = Account.id == ACCOUNT
+        return str(expression) + '\n\n' + repr(expression)
 
     return 'Invalid argument: {}.'.format(arg)
 
