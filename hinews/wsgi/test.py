@@ -56,10 +56,16 @@ def test(arg):
         return JSON({'left': account_left, 'right': account_right})
     elif arg == 'expr':
         expression = Account.id == ACCOUNT
+        select = Account.select().where(expression)
         return JSON({
-            'str': str(expression),
-            'repr': repr(expression),
-            'type': str(type(expression))})
+            'expression': {
+                'str': str(expression),
+                'repr': repr(expression),
+                'type': str(type(expression))},
+            'select': {
+                'str': str(select),
+                'repr': repr(select),
+                'type': str(type(select))}})
 
     return 'Invalid argument: {}.'.format(arg)
 
