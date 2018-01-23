@@ -2,7 +2,7 @@
 
 from peewee import DoesNotExist
 
-from his import SESSION, DATA, authenticated, authorized
+from his import ACCOUNT, DATA, authenticated, authorized
 from his.messages import MissingData, InvalidData
 from wsgilib import JSON
 
@@ -72,7 +72,7 @@ def post():
     dictionary = DATA.json
 
     try:
-        article = Article.from_dict(SESSION.account, dictionary)
+        article = Article.from_dict(ACCOUNT, dictionary)
     except KeyError as key_error:
         raise MissingData(key=key_error.args[0])
     except ValueError as value_error:
@@ -105,7 +105,7 @@ def patch(ident):
     dictionary = DATA.json
     article.patch(dictionary)
     article.save()
-    article.editors.add(SESSION.account)
+    article.editors.add(ACCOUNT)
     invalid_tags = set_tags(article, dictionary)
     invalid_customers = set_customers(article, dictionary)
     return ArticlePatched(

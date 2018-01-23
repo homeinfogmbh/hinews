@@ -2,7 +2,7 @@
 
 from peewee import DoesNotExist
 
-from his import SESSION, DATA, authenticated, authorized
+from his import ACCOUNT, DATA, authenticated, authorized
 from his.messages import MissingData, InvalidData
 from wsgilib import Binary, JSON
 
@@ -66,7 +66,7 @@ def post(ident):
 
     try:
         image = get_article(ident).images.add(
-            image.bytes, metadata.json, SESSION.account)
+            image.bytes, metadata.json, ACCOUNT)
     except KeyError as key_error:
         raise MissingData(key=key_error.args[0])
     except ValueError as value_error:
