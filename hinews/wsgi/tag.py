@@ -15,7 +15,7 @@ __all__ = ['ROUTES']
 def lst():
     """Lists available tags."""
 
-    return JSON([tag.to_dict() for tag in TagList])
+    return JSON([tag.tag for tag in TagList])
 
 
 @authenticated
