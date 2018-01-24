@@ -3,7 +3,6 @@
 from collections import namedtuple
 from functools import partial
 from io import BytesIO
-from tempfile import TemporaryFile
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -38,6 +37,16 @@ def make_watermark(size, text, font):
     return image
 
 
+def dump(image):
+    """Dumps the image into the respective format."""
+
+    buf = BytesIO()
+    image.save(buf, format=image.format)
+    buf.flush()
+    buf.seek(0)
+    return buf.read()
+
+
 def watermark(image_data, text, font=None):
     """Writes the respective text onto the image."""
 
@@ -49,8 +58,4 @@ def watermark(image_data, text, font=None):
     watermark_position = Size(0, image.height - watermark_size.height)
     watermark_image = make_watermark(watermark_size, text, font)
     image.paste(watermark_image, watermark_position, mask=watermark_image)
-
-    with TemporaryFile('w+b') as tmp:
-        image.save(tmp, format=image.format)
-        tmp.seek(0)
-        return tmp.read()
+    return dump(image)
