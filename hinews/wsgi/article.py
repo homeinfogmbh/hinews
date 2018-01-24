@@ -72,7 +72,8 @@ def post():
     dictionary = DATA.json
 
     try:
-        article = Article.from_dict(ACCOUNT, dictionary)
+        article = Article.from_dict(
+            ACCOUNT, dictionary, allow=('tags', 'customers'))
     except KeyError as key_error:
         raise MissingData(key=key_error.args[0])
     except ValueError as value_error:
@@ -103,7 +104,7 @@ def patch(ident):
 
     article = get_article(ident)
     dictionary = DATA.json
-    article.patch(dictionary)
+    article.patch(dictionary, allow=('tags', 'customers'))
     article.save()
     article.editors.add(ACCOUNT)
     invalid_tags = set_tags(article, dictionary)
