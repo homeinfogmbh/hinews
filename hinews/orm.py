@@ -92,9 +92,9 @@ class Article(NewsModel):
     source = TextField()
 
     @classmethod
-    def from_dict(cls, author, dictionary):
+    def from_dict(cls, author, dictionary, **kwargs):
         """Creates a new article from the provided dictionary."""
-        article = super().from_dict(dictionary)
+        article = super().from_dict(dictionary, **kwargs)
         article.author = author
         return article
 
