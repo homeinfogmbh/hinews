@@ -266,6 +266,7 @@ class ArticleImage(NewsModel):
         """Returns a JSON-compliant integer."""
         dictionary = super().to_dict(ignore=['file'])
         dictionary['account'] = account_info(self.account)
+        return dictionary
 
     def delete_instance(self, recursive=False, delete_nullable=False):
         """Deltes the image."""
