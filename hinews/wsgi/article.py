@@ -4,6 +4,7 @@ from peewee import DoesNotExist
 
 from his import ACCOUNT, DATA, authenticated, authorized
 from his.messages import MissingData, InvalidData
+from peeweeplus import FieldValueError, FieldNotNullable
 from wsgilib import JSON
 
 from hinews.messages.article import NoSuchArticle, ArticleCreated, \
@@ -74,10 +75,10 @@ def post():
     try:
         article = Article.from_dict(
             ACCOUNT, dictionary, allow=('tags', 'customers'))
-    except KeyError as key_error:
-        raise MissingData(key=key_error.args[0])
-    except ValueError as value_error:
-        raise InvalidData(hint=value_error.args[0])
+    except FieldNotNullable as field_not_nullable:
+        raise MissingData(**field_not_nullable.to_dict())
+    except FieldValueError as field_value_error:
+        raise InvalidData(**field_value_error.to_dict())
 
     article.save()
     invalid_tags = set_tags(article, dictionary)
