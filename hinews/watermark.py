@@ -1,6 +1,5 @@
 """Write watermark text onto images."""
 
-from collections import namedtuple
 from functools import partial
 from io import BytesIO
 
@@ -12,9 +11,6 @@ __all__ = ['watermark']
 TTF_DEJAVU = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 FONT_SIZE = 12
 OFFSET = 10
-
-
-Size = namedtuple('Size', ('width', 'height'))
 
 
 def write_text(image, text, font):
@@ -54,8 +50,8 @@ def watermark(image_data, text, font=None):
         font = ImageFont.truetype(TTF_DEJAVU, FONT_SIZE)
 
     image = Image.open(BytesIO(image_data))
-    watermark_size = Size(image.width, font.size + 2*OFFSET)
-    watermark_position = Size(0, image.height - watermark_size.height)
+    watermark_size = (image.width, font.size + 2*OFFSET)
+    watermark_position = (0, image.height - watermark_size[1])
     watermark_image = make_watermark(watermark_size, text, font)
     image.paste(watermark_image, watermark_position, mask=watermark_image)
     return dump(image)
