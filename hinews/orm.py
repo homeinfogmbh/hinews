@@ -4,13 +4,13 @@ from contextlib import suppress
 from datetime import datetime
 from uuid import uuid4
 
-from peewee import DoesNotExist, Model, PrimaryKeyField, ForeignKeyField, \
-    DateField, DateTimeField, CharField, TextField, IntegerField
+from peewee import DoesNotExist, PrimaryKeyField, ForeignKeyField, DateField, \
+    DateTimeField, CharField, TextField, IntegerField
 
 from filedb import FileProperty
 from his.orm import Account
 from homeinfo.crm import Customer
-from peeweeplus import MySQLDatabase
+from peeweeplus import MySQLDatabase, JSONModel
 
 from hinews.config import CONFIG
 from hinews.watermark import watermark
@@ -62,7 +62,13 @@ def create_tables(fail_silently=False):
         model.create_table(fail_silently=fail_silently)
 
 
-class NewsModel(Model):
+def account_info(account):
+    """Returns brief JSON-ish account info."""
+
+    return {'id': account.id, 'email': account.email}
+
+
+class NewsModel(JSONModel):
     """Basic news database model."""
 
     class Meta:
@@ -77,7 +83,7 @@ class Article(NewsModel):
     """A news-related text."""
 
     author = ForeignKeyField(Account, db_column='author')
-    created = DateTimeField()
+    created = DateTimeField(default=datetime.now)
     active_from = DateField(null=True)
     active_until = DateField(null=True)
     title = CharField(255)
@@ -88,14 +94,8 @@ class Article(NewsModel):
     @classmethod
     def from_dict(cls, author, dictionary):
         """Creates a new article from the provided dictionary."""
-        article = cls()
+        article = super().from_dict(dictionary)
         article.author = author
-        article.created = datetime.now()
-        article.active_from = dictionary.get('active_from')
-        article.active_until = dictionary.get('active_until')
-        article.title = dictionary['title']
-        article.subtitle = dictionary.get('subtitle')
-        article.text = dictionary['text']
         return article
 
     @property
@@ -171,40 +171,14 @@ class Article(NewsModel):
 
     def to_dict(self):
         """Returns a JSON-ish dictionary."""
-        return {
-            'id': self.id,
-            'author': {'id': self.author.id, 'email': self.author.email},
-            'created': self.created,
-            'active_from': self.active_from,
-            'active_until': self.active_until,
-            'title': self.title,
-            'subtitle': self.subtitle,
-            'text': self.text,
-            'source': self.source,
+        dictionary = super().to_dict()
+        dictionary.update({
+            'author': account_info(self.author),
             'editors': [editor.to_dict() for editor in self.editors],
             'images': [image.to_dict() for image in self.images],
             'tags': [tag.to_dict() for tag in self.tags],
-            'customers': [customer.to_dict() for customer in self.customers]}
-
-    def patch(self, dictionary):
-        """Patches the article with the provided JSON-ish dictionary."""
-        with suppress(KeyError):
-            self.active_from = dictionary['active_from']
-
-        with suppress(KeyError):
-            self.active_until = dictionary['active_until']
-
-        with suppress(KeyError):
-            self.title = dictionary['title']
-
-        with suppress(KeyError):
-            self.subtitle = dictionary['subtitle']
-
-        with suppress(KeyError):
-            self.text = dictionary['text']
-
-        with suppress(KeyError):
-            self.source = dictionary['source']
+            'customers': [customer.to_dict() for customer in self.customers]})
+        return dictionary
 
     def delete_instance(self, recursive=False, delete_nullable=False):
         """Deletes the article."""
@@ -241,9 +215,9 @@ class ArticleEditor(NewsModel):
 
     def to_dict(self):
         """Returns a JSON-ish dictionary."""
-        return {
-            'account': {'id': self.account.id, 'email': self.account.email},
-            'timestamp': self.timestamp}
+        dictionary = super().to_dict()
+        dictionary['account'] = account_info(self.account)
+        return dictionary
 
 
 class ArticleImage(NewsModel):
@@ -290,7 +264,8 @@ class ArticleImage(NewsModel):
 
     def to_dict(self):
         """Returns a JSON-compliant integer."""
-        return {'id': self.id, 'source': self.source}
+        dictionary = super().to_dict(ignore=['file'])
+        dictionary['account'] = account_info(self.account)
 
     def delete_instance(self, recursive=False, delete_nullable=False):
         """Deltes the image."""
@@ -317,10 +292,6 @@ class TagList(NewsModel):
             tag_ = cls()
             tag_.tag = tag
             return tag_
-
-    def to_dict(self):
-        """Returns a JSON-compliant string."""
-        return self.tag
 
 
 class CustomerList(NewsModel):
@@ -366,10 +337,6 @@ class ArticleTag(NewsModel):
             article_tag.article = article
             article_tag.tag = tag
             return article_tag
-
-    def to_dict(self):
-        """Returns a JSON-ish dictionary."""
-        return {'id': self.id, 'tag': self.tag}
 
 
 class ArticleCustomer(NewsModel):
