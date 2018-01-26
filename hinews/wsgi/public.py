@@ -82,7 +82,10 @@ def get_article(ident):
 def get_image(ident):
     """Returns the respective image."""
 
-    return Binary(_get_image(ident).watermarked)
+    try:
+        return Binary(_get_image(ident).watermarked)
+    except OSError:     # Not an image.
+        return Binary(_get_image(ident).data)
 
 
 ROUTES = (
