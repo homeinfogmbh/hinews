@@ -1,7 +1,5 @@
 """Article handlers."""
 
-from peewee import DoesNotExist
-
 from his import ACCOUNT, DATA, authenticated, authorized
 from his.messages import MissingData, InvalidData
 from peeweeplus import FieldValueError, FieldNotNullable
@@ -19,7 +17,7 @@ def get_article(ident):
 
     try:
         return Article.get(Article.id == ident)
-    except DoesNotExist:
+    except Article.DoesNotExist:
         raise NoSuchArticle()
 
 

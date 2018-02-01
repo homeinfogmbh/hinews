@@ -1,7 +1,5 @@
 """Article image handlers."""
 
-from peewee import DoesNotExist
-
 from his import ACCOUNT, DATA, authenticated, authorized
 from his.messages import MissingData, InvalidData
 from wsgilib import Binary, JSON
@@ -19,7 +17,7 @@ def get_image(ident):
 
     try:
         return ArticleImage.get(ArticleImage.id == ident)
-    except DoesNotExist:
+    except ArticleImage.DoesNotExist:
         raise NoSuchImage()
 
 

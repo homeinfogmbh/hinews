@@ -4,8 +4,8 @@ from contextlib import suppress
 from datetime import datetime
 from uuid import uuid4
 
-from peewee import DoesNotExist, PrimaryKeyField, ForeignKeyField, DateField, \
-    DateTimeField, CharField, TextField, IntegerField
+from peewee import PrimaryKeyField, ForeignKeyField, DateField, DateTimeField,\
+    CharField, TextField, IntegerField
 
 from filedb import FileProperty
 from his.orm import Account
@@ -146,7 +146,7 @@ class Article(NewsModel):
         for cid in cids:
             try:
                 customer = Customer.get(Customer.id == cid)
-            except (ValueError, DoesNotExist):
+            except (ValueError, Customer.DoesNotExist):
                 invalid_customers.append(cid)
             else:
                 self.customers.add(customer)
@@ -289,7 +289,7 @@ class TagList(NewsModel):
         """Adds the respective tag."""
         try:
             return cls.get(cls.tag == tag)
-        except DoesNotExist:
+        except cls.DoesNotExist:
             tag_ = cls()
             tag_.tag = tag
             return tag_
@@ -328,12 +328,12 @@ class ArticleTag(NewsModel):
         if validate:
             try:
                 TagList.get(TagList.tag == tag)
-            except DoesNotExist:
+            except TagList.DoesNotExist:
                 raise InvalidTag(tag)
 
         try:
             return cls.get((cls.article == article) & (cls.tag == tag))
-        except DoesNotExist:
+        except cls.DoesNotExist:
             article_tag = cls()
             article_tag.article = article
             article_tag.tag = tag
@@ -357,14 +357,14 @@ class ArticleCustomer(NewsModel):
         """Adds the respective customer to the article."""
         try:
             CustomerList.get(CustomerList.customer == customer)
-        except DoesNotExist:
+        except CustomerList.DoesNotExist:
             raise InvalidCustomer(customer)
 
         try:
             return ArticleCustomer.get(
                 (ArticleCustomer.article == article)
                 & (ArticleCustomer.customer == customer))
-        except DoesNotExist:
+        except ArticleCustomer.DoesNotExist:
             article_customer = cls()
             article_customer.article = article
             article_customer.customer = customer
@@ -392,7 +392,7 @@ class AccessToken(NewsModel):
         """Adds an access token for the respective customer."""
         try:
             return cls.get(cls.customer == customer)
-        except DoesNotExist:
+        except cls.DoesNotExist:
             access_token = cls()
             access_token.customer = customer
             access_token.token = str(uuid4())
@@ -450,7 +450,7 @@ class ArticleImageProxy(ArticleProxy):
         try:
             article_image = self.model.get(
                 (self.model.article == self.target) & (self.model.id == ident))
-        except DoesNotExist:
+        except self.model.DoesNotExist:
             return False
 
         return article_image.delete_instance()
@@ -481,7 +481,7 @@ class ArticleTagProxy(ArticleProxy):
         try:
             article_tag = self.model.get(
                 (self.model.article == self.target) & selection)
-        except DoesNotExist:
+        except self.model.DoesNotExist:
             return False
 
         return article_tag.delete_instance()
@@ -520,7 +520,7 @@ class ArticleCustomerProxy(ArticleProxy):
             article_customer = self.model.get(
                 (self.model.article == self.target)
                 & (self.model.customer == customer))
-        except DoesNotExist:
+        except self.model.DoesNotExist:
             return False
 
         return article_customer.delete_instance()

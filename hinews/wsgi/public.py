@@ -2,7 +2,6 @@
 HIS authentication or authorization.
 """
 from flask import request
-from peewee import DoesNotExist
 
 from wsgilib import JSON, Binary
 
@@ -24,7 +23,7 @@ def _get_customer():
 
     try:
         access_token = AccessToken.get(AccessToken.token == access_token)
-    except DoesNotExist:
+    except AccessToken.DoesNotExist:
         raise InvalidAccessToken()
 
     return access_token.customer
@@ -43,7 +42,7 @@ def _get_article(ident):
 
     try:
         article = Article.get(Article.id == ident)
-    except DoesNotExist:
+    except Article.DoesNotExist:
         raise NoSuchArticle()
 
     if _get_customer() in article.customers:
@@ -57,7 +56,7 @@ def _get_image(ident):
 
     try:
         article_image = ArticleImage.get(ArticleImage.id == ident)
-    except DoesNotExist:
+    except ArticleImage.DoesNotExist:
         raise NoSuchImage()
 
     if _get_customer() in article_image.article.customers:

@@ -1,7 +1,5 @@
 """Article customer controller."""
 
-from peewee import DoesNotExist
-
 from his import DATA, authenticated, authorized
 from homeinfo.crm import Customer
 from wsgilib import JSON
@@ -19,7 +17,7 @@ def get_customer(cid):
 
     try:
         return Customer.get(Customer.id == cid)
-    except DoesNotExist:
+    except Customer.DoesNotExist:
         raise NoSuchCustomer()
 
 
