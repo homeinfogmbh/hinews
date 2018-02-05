@@ -32,7 +32,6 @@ def _get_customer():
 def _active_articles():
     """Yields active articles."""
 
-    now = datetime.now()
     return Article.select().where(article_active())
 
 
