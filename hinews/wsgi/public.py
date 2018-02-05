@@ -8,7 +8,7 @@ from wsgilib import JSON, Binary
 from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.messages.public import MissingAccessToken, InvalidAccessToken
-from hinews.orm import Article, ArticleImage, AccessToken
+from hinews.orm import ARTICLE_ACTIVE, Article, ArticleImage, AccessToken
 
 __all__ = ['ROUTES']
 
@@ -29,11 +29,18 @@ def _get_customer():
     return access_token.customer
 
 
+def _active_articles():
+    """Yields active articles."""
+
+    now = datetime.now()
+    return Article.select().where(ARTICLE_ACTIVE)
+
+
 def _get_articles(customer):
     """Yields articles of the querying customer."""
 
-    for article in Article:
-        if article.active and customer in article.customers:
+    for article in _active_articles():
+        if customer in article.customers:
             yield article
 
 
@@ -41,7 +48,7 @@ def _get_article(ident):
     """Yields articles of the querying customer."""
 
     try:
-        article = Article.get(Article.id == ident)
+        article = Article.get(ARTICLE_ACTIVE & (Article.id == ident))
     except Article.DoesNotExist:
         raise NoSuchArticle()
 
@@ -65,7 +72,7 @@ def _get_image(ident):
     raise NoSuchArticle()
 
 
-def lst():
+def list_():
     """Lists the respective news."""
 
     return JSON([article.to_dict() for article in _get_articles(
@@ -88,6 +95,6 @@ def get_image(ident):
 
 
 ROUTES = (
-    ('GET', '/pub/article', lst, 'list_customer_articles'),
+    ('GET', '/pub/article', list_, 'list_customer_articles'),
     ('GET', '/pub/article/<int:ident>', get_article, 'get_customer_article'),
     ('GET', '/pub/image/<int:ident>', get_image, 'get_customer_image'))

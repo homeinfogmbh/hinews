@@ -23,7 +23,7 @@ def get_customer(cid):
 
 @authenticated
 @authorized('hinews')
-def lst():
+def list_():
     """Lists available customers."""
 
     return JSON([customer.to_dict() for customer in CustomerList])
@@ -61,7 +61,7 @@ def delete(article_id, customer_id):
 
 
 ROUTES = (
-    ('GET', '/customers', lst, 'list_customers'),
+    ('GET', '/customers', list_, 'list_customers'),
     ('GET', '/article/<int:ident>/customers', get, 'get_customers'),
     ('POST', '/article/<int:ident>/customers', post, 'post_customer'),
     ('DELETE', '/article/<int:article_id>/customers/<customer_id>', delete,

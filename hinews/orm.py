@@ -16,6 +16,7 @@ from hinews.config import CONFIG
 from hinews.watermark import watermark
 
 __all__ = [
+    'ARTICLE_ACTIVE',
     'InvalidTag',
     'InvalidCustomer',
     'InvalidElements',
@@ -28,6 +29,9 @@ __all__ = [
 DATABASE = MySQLDatabase(
     CONFIG['db']['db'], host=CONFIG['db']['host'], user=CONFIG['db']['user'],
     passwd=CONFIG['db']['passwd'], closing=True)
+ARTICLE_ACTIVE = (
+    ((Article.active_from >> None) | (Article.active_from <= now))
+    & ((Article.active_until >> None) | (Article.active_until >= now)))
 
 
 class InvalidTag(Exception):

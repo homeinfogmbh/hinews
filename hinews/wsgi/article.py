@@ -49,7 +49,7 @@ def set_customers(article, dictionary):
 
 @authenticated
 @authorized('hinews')
-def lst():
+def list_():
     """Lists all available articles."""
 
     return JSON([article.to_dict() for article in Article])
@@ -113,7 +113,7 @@ def patch(ident):
 
 
 ROUTES = (
-    ('GET', '/article', lst, 'list_articles'),
+    ('GET', '/article', list_, 'list_articles'),
     ('GET', '/article/<int:ident>', get, 'get_article'),
     ('POST', '/article', post, 'post_article'),
     ('DELETE', '/article/<int:ident>', delete, 'delete_article'),

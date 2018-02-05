@@ -12,7 +12,7 @@ __all__ = ['ROUTES']
 
 @authenticated
 @authorized('hinews')
-def lst():
+def list_():
     """Lists available tags."""
 
     return JSON([tag.tag for tag in TagList])
@@ -49,7 +49,7 @@ def delete(article_id, tag_or_id):
 
 
 ROUTES = (
-    ('GET', '/tags', lst, 'list_tags'),
+    ('GET', '/tags', list_, 'list_tags'),
     ('GET', '/article/<int:ident>/tags', get, 'get_tags'),
     ('POST', '/article/<int:ident>/tags', post, 'post_tag'),
     ('DELETE', '/article/<int:article_id>/tags/<tag>', delete, 'delete_tag'))
