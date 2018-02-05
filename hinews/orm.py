@@ -16,12 +16,12 @@ from hinews.config import CONFIG
 from hinews.watermark import watermark
 
 __all__ = [
-    'ARTICLE_ACTIVE',
     'InvalidTag',
     'InvalidCustomer',
     'InvalidElements',
     'create_tables',
     'Article',
+    'ARTICLE_ACTIVE',
     'ArticleImage',
     'MODELS']
 
@@ -29,9 +29,6 @@ __all__ = [
 DATABASE = MySQLDatabase(
     CONFIG['db']['db'], host=CONFIG['db']['host'], user=CONFIG['db']['user'],
     passwd=CONFIG['db']['passwd'], closing=True)
-ARTICLE_ACTIVE = (
-    ((Article.active_from >> None) | (Article.active_from <= now))
-    & ((Article.active_until >> None) | (Article.active_until >= now)))
 
 
 class InvalidTag(Exception):
@@ -178,6 +175,11 @@ class Article(NewsModel):
 
         return super().delete_instance(
             recursive=recursive, delete_nullable=delete_nullable)
+
+
+ARTICLE_ACTIVE = (
+    ((Article.active_from >> None) | (Article.active_from <= now))
+    & ((Article.active_until >> None) | (Article.active_until >= now)))
 
 
 class ArticleEditor(NewsModel):
