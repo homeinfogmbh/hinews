@@ -13,6 +13,7 @@ from homeinfo.crm import Customer
 from peeweeplus import MySQLDatabase, JSONModel
 
 from hinews.config import CONFIG
+from hinews import dom
 from hinews.watermark import watermark
 
 __all__ = [
@@ -175,6 +176,21 @@ class Article(NewsModel):
             'customers': [customer.to_dict() for customer in self.customers]})
         return dictionary
 
+    def to_dom(self):
+        """Converts the article into a XML DOM model."""
+        article = dom.Article()
+        article.id = self.id
+        article.created = self.created
+        article.active_from = self.active_from
+        article.active_until = self.active_until
+        article.title = self.title
+        article.subtitle = self.subtitle
+        article.text = self.text
+        article.source = self.source
+        article.images = [image.to_dom() for image in self.images]
+        article.tags = [tag.tag for tag in self.tags]
+        return article
+
     def delete_instance(self, recursive=False, delete_nullable=False):
         """Deletes the article."""
         # Manually delete all referencing images to ensure
@@ -262,6 +278,14 @@ class ArticleImage(NewsModel):
         dictionary = super().to_dict(ignore=['file'])
         dictionary['account'] = account_info(self.account)
         return dictionary
+
+    def to_dom(self):
+        """Converts the image into a XML DOM model."""
+        image = dom.Image()
+        image.id = self.id
+        image.uploaded = self.uploaded
+        image.source = self.source
+        return image
 
     def delete_instance(self, recursive=False, delete_nullable=False):
         """Deltes the image."""
