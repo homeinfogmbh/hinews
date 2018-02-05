@@ -3,8 +3,9 @@ HIS authentication or authorization.
 """
 from flask import request
 
-from wsgilib import JSON, Binary
+from wsgilib import JSON, XML, Binary
 
+from hinews import dom
 from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.messages.public import MissingAccessToken, InvalidAccessToken
@@ -74,8 +75,16 @@ def _get_image(ident):
 def list_():
     """Lists the respective news."""
 
-    return JSON([article.to_dict() for article in _get_articles(
-        _get_customer())])
+    try:
+        request.args['xml']
+    except KeyError:
+        return JSON([article.to_dict() for article in _get_articles(
+            _get_customer())])
+
+    news = dom.news()
+    news.article = [article.to_dom() for article in _get_articles(
+        _get_customer())]
+    return XML(news)
 
 
 def get_article(ident):
