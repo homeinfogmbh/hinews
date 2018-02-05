@@ -8,7 +8,7 @@ from wsgilib import JSON, Binary
 from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.messages.public import MissingAccessToken, InvalidAccessToken
-from hinews.orm import ARTICLE_ACTIVE, Article, ArticleImage, AccessToken
+from hinews.orm import article_active, Article, ArticleImage, AccessToken
 
 __all__ = ['ROUTES']
 
@@ -33,7 +33,7 @@ def _active_articles():
     """Yields active articles."""
 
     now = datetime.now()
-    return Article.select().where(ARTICLE_ACTIVE)
+    return Article.select().where(article_active())
 
 
 def _get_articles(customer):
@@ -48,7 +48,7 @@ def _get_article(ident):
     """Yields articles of the querying customer."""
 
     try:
-        article = Article.get(ARTICLE_ACTIVE & (Article.id == ident))
+        article = Article.get(article_active() & (Article.id == ident))
     except Article.DoesNotExist:
         raise NoSuchArticle()
 

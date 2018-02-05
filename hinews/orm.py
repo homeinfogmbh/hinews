@@ -20,8 +20,8 @@ __all__ = [
     'InvalidCustomer',
     'InvalidElements',
     'create_tables',
+    'article_active',
     'Article',
-    'ARTICLE_ACTIVE',
     'ArticleImage',
     'MODELS']
 
@@ -67,6 +67,15 @@ def account_info(account):
     """Returns brief JSON-ish account info."""
 
     return {'id': account.id, 'email': account.email}
+
+
+def article_active():
+    """Yields article active query."""
+
+    now = datetime.now()
+    return (
+        ((Article.active_from >> None) | (Article.active_from <= now))
+        & ((Article.active_until >> None) | (Article.active_until >= now)))
 
 
 class NewsModel(JSONModel):
@@ -175,11 +184,6 @@ class Article(NewsModel):
 
         return super().delete_instance(
             recursive=recursive, delete_nullable=delete_nullable)
-
-
-ARTICLE_ACTIVE = (
-    ((Article.active_from >> None) | (Article.active_from <= now))
-    & ((Article.active_until >> None) | (Article.active_until >= now)))
 
 
 class ArticleEditor(NewsModel):
