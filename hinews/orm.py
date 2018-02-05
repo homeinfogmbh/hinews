@@ -158,21 +158,6 @@ class Article(NewsModel):
         if invalid_customers:
             raise InvalidElements(invalid_customers)
 
-    @property
-    def active(self):
-        """Determines whether the article is considered active."""
-        today = datetime.now().date()
-
-        if self.active_from is not None:
-            if self.active_until is not None:
-                return self.active_from <= today <= self.active_until
-
-            return self.active_from <= today
-        elif self.active_until is not None:
-            return today <= self.active_until
-
-        return True
-
     def to_dict(self):
         """Returns a JSON-ish dictionary."""
         dictionary = super().to_dict()
