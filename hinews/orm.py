@@ -187,8 +187,8 @@ class Article(NewsModel):
         article.subtitle = self.subtitle
         article.text = self.text
         article.source = self.source
-        article.images = [image.to_dom() for image in self.images]
-        article.tags = [tag.tag for tag in self.tags]
+        article.image = [image.to_dom() for image in self.images]
+        article.tag = [tag.tag for tag in self.tags]
         return article
 
     def delete_instance(self, recursive=False, delete_nullable=False):

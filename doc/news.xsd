@@ -39,14 +39,14 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="tags" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="tag" type="xs:string" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
                         The article's tags.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="images" type="Image" minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="image" type="Image" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
                         The article's images.
