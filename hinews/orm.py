@@ -7,7 +7,7 @@ from uuid import uuid4
 from peewee import PrimaryKeyField, ForeignKeyField, DateField, DateTimeField,\
     CharField, TextField, IntegerField
 
-from filedb import FileProperty
+from filedb import get, FileProperty
 from his.orm import Account
 from homeinfo.crm import Customer
 from peeweeplus import MySQLDatabase, JSONModel
@@ -93,7 +93,7 @@ class NewsModel(JSONModel):
 class Article(NewsModel):
     """A news-related text."""
 
-    author = ForeignKeyField(Account, db_column='author')
+    author = ForeignKeyField(Account, column_name='author')
     created = DateTimeField(default=datetime.now)
     active_from = DateField(null=True)
     active_until = DateField(null=True)
@@ -207,12 +207,12 @@ class ArticleEditor(NewsModel):
 
     class Meta:
         """Sets the table name."""
-        db_table = 'article_editor'
+        table_name = 'article_editor'
 
     article = ForeignKeyField(
-        Article, db_column='article', on_delete='CASCADE')
+        Article, column_name='article', on_delete='CASCADE')
     account = ForeignKeyField(
-        Account, db_column='account', on_delete='CASCADE')
+        Account, column_name='account', on_delete='CASCADE')
     timestamp = DateTimeField()
 
     @classmethod
@@ -236,16 +236,16 @@ class ArticleImage(NewsModel):
 
     class Meta:
         """Sets the table name."""
-        db_table = 'image'
+        table_name = 'image'
 
     article = ForeignKeyField(
-        Article, db_column='article', on_delete='CASCADE')
+        Article, column_name='article', on_delete='CASCADE')
     account = ForeignKeyField(
-        Account, db_column='account', on_delete='CASCADE')
-    file = IntegerField()
+        Account, column_name='account', on_delete='CASCADE')
+    _file = IntegerField(column_name='file')
     uploaded = DateTimeField()
     source = TextField(null=True)
-    data = FileProperty(file)
+    data = FileProperty(_file)
 
     @classmethod
     def add(cls, article, data, metadata, account):
@@ -257,6 +257,11 @@ class ArticleImage(NewsModel):
         article_image.uploaded = datetime.now()
         article_image.source = metadata['source']
         return article_image
+
+    @property
+    def file(self):
+        """Returns the respective file record."""
+        return get(self._file)
 
     @property
     def oneliner(self):
@@ -275,8 +280,9 @@ class ArticleImage(NewsModel):
 
     def to_dict(self):
         """Returns a JSON-compliant integer."""
-        dictionary = super().to_dict(ignore=['file'])
+        dictionary = super().to_dict()
         dictionary['account'] = account_info(self.account)
+        dictionary['file'] = self.file.to_dict(primary_key=False)
         return dictionary
 
     def to_dom(self):
@@ -299,7 +305,7 @@ class TagList(NewsModel):
 
     class Meta:
         """Sets the table name."""
-        db_table = 'tag_list'
+        table_name = 'tag_list'
 
     tag = CharField(255)
 
@@ -319,10 +325,10 @@ class CustomerList(NewsModel):
 
     class Meta:
         """Sets the table name."""
-        db_table = 'customer_list'
+        table_name = 'customer_list'
 
     customer = ForeignKeyField(
-        Customer, db_column='customer', on_delete='CASCADE',
+        Customer, column_name='customer', on_delete='CASCADE',
         on_update='CASCADE')
 
     def to_dict(self):
@@ -335,10 +341,10 @@ class ArticleTag(NewsModel):
 
     class Meta:
         """Sets the table name."""
-        db_table = 'article_tag'
+        table_name = 'article_tag'
 
     article = ForeignKeyField(
-        Article, db_column='article', on_delete='CASCADE')
+        Article, column_name='article', on_delete='CASCADE')
     tag = CharField(255)
 
     @classmethod
@@ -364,12 +370,12 @@ class ArticleCustomer(NewsModel):
 
     class Meta:
         """Sets the table name."""
-        db_table = 'article_customer'
+        table_name = 'article_customer'
 
     article = ForeignKeyField(
-        Article, db_column='article', on_delete='CASCADE')
+        Article, column_name='article', on_delete='CASCADE')
     customer = ForeignKeyField(
-        Customer, db_column='customer', on_delete='CASCADE')
+        Customer, column_name='customer', on_delete='CASCADE')
 
     @classmethod
     def add(cls, article, customer):
@@ -399,10 +405,10 @@ class AccessToken(NewsModel):
 
     class Meta:
         """Sets the table name."""
-        db_table = 'access_token'
+        table_name = 'access_token'
 
     customer = ForeignKeyField(
-        Customer, db_column='customer', on_delete='CASCADE',
+        Customer, column_name='customer', on_delete='CASCADE',
         on_update='CASCADE')
     token = CharField(36)   # UUID4
 
