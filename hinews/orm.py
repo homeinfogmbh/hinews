@@ -7,7 +7,7 @@ from uuid import uuid4
 from peewee import PrimaryKeyField, ForeignKeyField, DateField, DateTimeField,\
     CharField, TextField, IntegerField
 
-from filedb import get_metadata, FileProperty
+from filedb import mimetype, FileProperty
 from his.orm import Account
 from homeinfo.crm import Customer
 from peeweeplus import MySQLDatabase, JSONModel
@@ -277,7 +277,7 @@ class ArticleImage(NewsModel):
         """Returns a JSON-compliant integer."""
         dictionary = super().to_dict()
         dictionary['account'] = account_info(self.account)
-        dictionary['mimetype'] = get_metadata(self._file, 'mimetype')
+        dictionary['mimetype'] = mimetype(self._file)
         return dictionary
 
     def to_dom(self):
