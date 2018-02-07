@@ -7,7 +7,7 @@ from uuid import uuid4
 from peewee import PrimaryKeyField, ForeignKeyField, DateField, DateTimeField,\
     CharField, TextField, IntegerField
 
-from filedb import get, FileProperty
+from filedb import File, FileProperty
 from his.orm import Account
 from homeinfo.crm import Customer
 from peeweeplus import MySQLDatabase, JSONModel
@@ -261,7 +261,7 @@ class ArticleImage(NewsModel):
     @property
     def file(self):
         """Returns the respective file record."""
-        return get(self._file)
+        return File.get(File.id == self._file)
 
     @property
     def oneliner(self):
