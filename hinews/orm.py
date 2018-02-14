@@ -12,8 +12,8 @@ from his.orm import Account
 from homeinfo.crm import Customer
 from peeweeplus import MySQLDatabase, JSONModel
 
-from hinews.config import CONFIG
 from hinews import dom
+from hinews.config import CONFIG
 from hinews.watermark import watermark
 
 __all__ = [
