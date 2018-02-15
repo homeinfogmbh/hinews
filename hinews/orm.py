@@ -286,6 +286,7 @@ class ArticleImage(NewsModel):
         image.id = self.id
         image.uploaded = self.uploaded
         image.source = self.source
+        image.mimetype = mimetype(self._file)
         return image
 
     def delete_instance(self, recursive=False, delete_nullable=False):
