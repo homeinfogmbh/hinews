@@ -513,15 +513,13 @@ class ArticleCustomerProxy(ArticleProxy):
         """Determines whether the respective
         customer may use the respective article.
         """
-        empty = True
+        customers = 0
 
-        for article_customer in self:
-            empty = False
-
+        for customers, article_customer in enumerate(self, start=1):
             if article_customer.customer == customer:
                 return True
 
-        return empty
+        return not customers
 
     def add(self, customer):
         """Adds a customer to the respective article."""
