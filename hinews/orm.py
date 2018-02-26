@@ -377,10 +377,9 @@ class ArticleCustomer(NewsModel):
             raise InvalidCustomer(customer)
 
         try:
-            return ArticleCustomer.get(
-                (ArticleCustomer.article == article)
-                & (ArticleCustomer.customer == customer))
-        except ArticleCustomer.DoesNotExist:
+            return cls.get(
+                (cls.article == article) & (cls.customer == customer))
+        except cls.DoesNotExist:
             article_customer = cls()
             article_customer.article = article
             article_customer.customer = customer
