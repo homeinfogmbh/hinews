@@ -64,12 +64,6 @@ def create_tables(fail_silently=False):
         model.create_table(fail_silently=fail_silently)
 
 
-def account_info(account):
-    """Returns brief JSON-ish account info."""
-
-    return {'id': account.id, 'email': account.email}
-
-
 def article_active():
     """Yields article active query."""
 
@@ -169,7 +163,7 @@ class Article(NewsModel):
         """Returns a JSON-ish dictionary."""
         dictionary = super().to_dict()
         dictionary.update({
-            'author': account_info(self.author),
+            'author': self.author.info,
             'editors': [editor.to_dict() for editor in self.editors],
             'images': [image.to_dict() for image in self.images],
             'tags': [tag.to_dict() for tag in self.tags],
@@ -227,7 +221,7 @@ class ArticleEditor(NewsModel):
     def to_dict(self):
         """Returns a JSON-ish dictionary."""
         dictionary = super().to_dict()
-        dictionary['account'] = account_info(self.account)
+        dictionary['account'] = self.account.info
         return dictionary
 
 
@@ -276,7 +270,7 @@ class ArticleImage(NewsModel):
     def to_dict(self):
         """Returns a JSON-compliant integer."""
         dictionary = super().to_dict()
-        dictionary['account'] = account_info(self.account)
+        dictionary['account'] = self.account.info
         dictionary['mimetype'] = mimetype(self._file)
         return dictionary
 
