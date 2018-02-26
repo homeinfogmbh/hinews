@@ -30,16 +30,10 @@ def _get_customer():
     return access_token.customer
 
 
-def _active_articles():
-    """Yields active articles."""
-
-    return Article.select().where(article_active())
-
-
 def _get_articles(customer):
     """Yields articles of the querying customer."""
 
-    for article in _active_articles():
+    for article in Article.select().where(article_active()):
         if customer in article.customers:
             yield article
 
