@@ -21,9 +21,9 @@ class ArticleProxy(Proxy):
         """Yields sources of the respective article."""
         yield from self.model.select().where(self.model.article == self.target)
 
-    def add(self, rel_model):
+    def add(self, *args, **kwargs):
         """Adds the respective related model."""
-        record = self.model.add(self.target, rel_model)
+        record = self.model.add(self.target, *args, **kwargs)
         record.save()
         return record
 
