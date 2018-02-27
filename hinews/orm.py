@@ -409,6 +409,12 @@ class ArticleImageProxy(ArticleProxy):
         """Sets the model and target."""
         super().__init__(ArticleImage, target)
 
+    def add(self, data, metadata, account):
+        """Adds an image to the respective article."""
+        article_image = self.model.add(self.target, data, metadata, account)
+        article_image.save()
+        return article_image
+
 
 class ArticleTagProxy(ArticleProxy):
     """Proxies tags of articles."""
