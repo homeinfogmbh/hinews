@@ -23,7 +23,13 @@ __all__ = [
     'create_tables',
     'article_active',
     'Article',
+    'ArticleEditor',
     'ArticleImage',
+    'TagList',
+    'CustomerList',
+    'ArticleTag',
+    'ArticleCustomer',
+    'AccessToken',
     'MODELS']
 
 
