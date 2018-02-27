@@ -16,6 +16,7 @@ from peeweeplus import MySQLDatabase, JSONModel
 from hinews import dom
 from hinews.config import CONFIG
 from hinews.exceptions import InvalidCustomer, InvalidElements, InvalidTag
+from hinews.proxy import ArticleProxy
 from hinews.watermark import watermark
 
 __all__ = [
@@ -387,25 +388,6 @@ class AccessToken(NewsModel):
             return access_token
 
 
-class Proxy:
-    """Proxy.to transparently handle data
-    associated with the respective target.
-    """
-
-    def __init__(self, model, target):
-        """Sets the model and target."""
-        self.model = model
-        self.target = target
-
-
-class ArticleProxy(Proxy):
-    """An article-related proxy."""
-
-    def __iter__(self):
-        """Yields sources of the respective article."""
-        yield from self.model.select().where(self.model.article == self.target)
-
-
 class ArticleEditorProxy(ArticleProxy):
     """Proxies article authors."""
 
@@ -510,14 +492,6 @@ class ArticleCustomerProxy(ArticleProxy):
             return False
 
         return article_customer.delete_instance()
-
-
-class ImageProxy(Proxy):
-    """An image-related proxy."""
-
-    def __iter__(self):
-        """Yields records of the respective model, related tor the image."""
-        yield from self.model.select().where(self.model.image == self.target)
 
 
 MODELS = [
