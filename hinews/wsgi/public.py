@@ -39,7 +39,7 @@ def _get_articles(customer):
 
 
 def _get_article(ident):
-    """Yields articles of the querying customer."""
+    """Returns the respective article of the querying customer."""
 
     try:
         article = Article.get(article_active() & (Article.id == ident))

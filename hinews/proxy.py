@@ -20,3 +20,19 @@ class ArticleProxy(Proxy):
     def __iter__(self):
         """Yields sources of the respective article."""
         yield from self.model.select().where(self.model.article == self.target)
+
+    def add(self, rel_model):
+        """Adds the respective related model."""
+        record = self.model.add(self.target, rel_model)
+        record.save()
+        return record
+
+    def delete(self, ident):
+        """Deletes the respective instance."""
+        try:
+            record = self.model.get(
+                (self.model.article == self.target) & (self.model.id == ident))
+        except self.model.DoesNotExist:
+            return False
+
+        return record.delete_instance()

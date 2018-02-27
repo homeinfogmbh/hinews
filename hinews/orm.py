@@ -401,12 +401,6 @@ class ArticleEditorProxy(ArticleProxy):
         """Sets model and target."""
         super().__init__(ArticleEditor, target)
 
-    def add(self, author):
-        """Adds the respective author."""
-        article_author = self.model.add(self.target, author)
-        article_author.save()
-        return article_author
-
 
 class ArticleImageProxy(ArticleProxy):
     """Proxies images of articles."""
@@ -415,22 +409,6 @@ class ArticleImageProxy(ArticleProxy):
         """Sets the model and target."""
         super().__init__(ArticleImage, target)
 
-    def add(self, data, metadata, account):
-        """Adds an image to the respective article."""
-        article_image = self.model.add(self.target, data, metadata, account)
-        article_image.save()
-        return article_image
-
-    def delete(self, ident):
-        """Removes the respective article image."""
-        try:
-            article_image = self.model.get(
-                (self.model.article == self.target) & (self.model.id == ident))
-        except self.model.DoesNotExist:
-            return False
-
-        return article_image.delete_instance()
-
 
 class ArticleTagProxy(ArticleProxy):
     """Proxies tags of articles."""
@@ -438,12 +416,6 @@ class ArticleTagProxy(ArticleProxy):
     def __init__(self, target):
         """Sets the model and target."""
         super().__init__(ArticleTag, target)
-
-    def add(self, tag):
-        """Adds the respective tag."""
-        article_tag = self.model.add(self.target, tag)
-        article_tag.save()
-        return article_tag
 
     def delete(self, tag_or_id):
         """Deletes the respective tag."""
@@ -481,12 +453,6 @@ class ArticleCustomerProxy(ArticleProxy):
                 return True
 
         return not customers
-
-    def add(self, customer):
-        """Adds a customer to the respective article."""
-        article_customer = self.model.add(self.target, customer)
-        article_customer.save()
-        return article_customer
 
     def delete(self, customer):
         """Deletes the respective customer from the article."""

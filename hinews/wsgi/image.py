@@ -24,7 +24,7 @@ def get_image(ident):
 @authenticated
 @authorized('hinews')
 def list_():
-    """Lists all available articles."""
+    """Lists all available images."""
 
     return JSON([image.to_dict() for image in ArticleImage])
 
@@ -32,7 +32,7 @@ def list_():
 @authenticated
 @authorized('hinews')
 def list_article_images(ident):
-    """Lists all available articles."""
+    """Lists all images of the respective articles."""
 
     return JSON([image.to_dict() for image in get_article(ident).images])
 
@@ -40,7 +40,7 @@ def list_article_images(ident):
 @authenticated
 @authorized('hinews')
 def get(ident):
-    """Returns a specific article."""
+    """Returns a specific image."""
 
     return Binary(get_image(ident).data)
 
@@ -48,7 +48,7 @@ def get(ident):
 @authenticated
 @authorized('hinews')
 def post(ident):
-    """Adds a new article."""
+    """Adds a new image to the respective article."""
 
     files = DATA.files
 
@@ -76,7 +76,7 @@ def post(ident):
 @authenticated
 @authorized('hinews')
 def delete(ident):
-    """Adds a new article."""
+    """Deletes an image."""
 
     get_image(ident).delete_instance()
     return ImageDeleted()
@@ -85,7 +85,7 @@ def delete(ident):
 @authenticated
 @authorized('hinews')
 def patch(ident):
-    """Adds a new article."""
+    """Modifies image meta data."""
 
     image = get_image(ident)
     image.patch(DATA.json)
