@@ -15,12 +15,10 @@ from peeweeplus import MySQLDatabase, JSONModel
 
 from hinews import dom
 from hinews.config import CONFIG
+from hinews.exceptions import InvalidCustomer, InvalidElements, InvalidTag
 from hinews.watermark import watermark
 
 __all__ = [
-    'InvalidTag',
-    'InvalidCustomer',
-    'InvalidElements',
     'create_tables',
     'article_active',
     'Article',
@@ -31,31 +29,6 @@ __all__ = [
 DATABASE = MySQLDatabase(
     CONFIG['db']['db'], host=CONFIG['db']['host'], user=CONFIG['db']['user'],
     passwd=CONFIG['db']['passwd'], closing=True)
-
-
-class InvalidTag(Exception):
-    """Indicates that a respective tag is not registered."""
-
-    pass
-
-
-class InvalidCustomer(Exception):
-    """Indicates that a respective tag is not registered."""
-
-    pass
-
-
-class InvalidElements(Exception):
-    """Indicates that the respective elements are invalid."""
-
-    def __init__(self, elements):
-        """Sets the invalid elements."""
-        super().__init__(elements)
-        self.elements = elements
-
-    def __iter__(self):
-        """Yields the invalid elements."""
-        yield from self.elements
 
 
 def create_tables(fail_silently=False):

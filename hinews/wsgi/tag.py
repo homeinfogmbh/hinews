@@ -3,8 +3,9 @@
 from his import DATA, authenticated, authorized
 from wsgilib import JSON
 
+from hinews.exceptions import InvalidTag
 from hinews.messages.tag import NoSuchTag, TagAdded, TagDeleted
-from hinews.orm import InvalidTag, TagList
+from hinews.orm import TagList
 from hinews.wsgi.article import get_article
 
 __all__ = ['ROUTES']

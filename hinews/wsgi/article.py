@@ -5,9 +5,10 @@ from his.messages import MissingData, InvalidData
 from peeweeplus import FieldValueError, FieldNotNullable
 from wsgilib import JSON
 
+from hinews.exceptions import InvalidElements
 from hinews.messages.article import NoSuchArticle, ArticleCreated, \
     ArticleDeleted, ArticlePatched
-from hinews.orm import InvalidElements, Article
+from hinews.orm import Article
 
 __all__ = ['get_article', 'ROUTES']
 
