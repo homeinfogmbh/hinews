@@ -302,6 +302,17 @@ class CustomerList(NewsModel):
         Customer, column_name='customer', on_delete='CASCADE',
         on_update='CASCADE')
 
+    @classmethod
+    def add(cls, customer):
+        """Adds the respective customer."""
+        try:
+            return cls.get(cls.customer == customer)
+        except cls.DoesNotExist:
+            customer_list = cls()
+            customer_list.customer = customer
+            customer_list.save()
+            return customer_list
+
     def to_dict(self):
         """Returns the respective customer's dict."""
         return self.customer.to_dict(cascade=True)
