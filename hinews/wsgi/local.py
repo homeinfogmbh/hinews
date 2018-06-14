@@ -3,14 +3,17 @@ or authorization for previews.
 """
 from flask import request
 
-from wsgilib import JSON, XML, Binary
+from wsgilib import Application, JSON, XML, Binary
 
 from hinews import dom
 from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.orm import article_active, Article, ArticleImage
 
-__all__ = ['ROUTES']
+__all__ = ['APPLICATION']
+
+
+APPLICATION = Application('hinews', debug=True, cors=True)
 
 
 def _get_articles():
@@ -69,3 +72,4 @@ ROUTES = (
     ('GET', '/hinews/article', list_, 'list_articles'),
     ('GET', '/hinews/article/<int:ident>', get_article, 'get_article'),
     ('GET', '/hinews/image/<int:ident>', get_image, 'get_image'))
+APPLICATION.add_routes(ROUTES)
