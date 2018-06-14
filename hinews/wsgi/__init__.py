@@ -3,6 +3,10 @@
 from wsgilib import Application
 
 from hinews.wsgi import article, customer, image, public, tag
+from hinews.wsgi.local import APPLICATION as LOCAL_APPLICATION
+
+__all__ = ['APPLICATION', 'LOCAL_APPLICATION']
+
 
 APPLICATION = Application('hinews', debug=True, cors=True)
 APPLICATION.add_routes(

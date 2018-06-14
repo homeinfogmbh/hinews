@@ -1,0 +1,71 @@
+"""Local interface without authentication
+or authorization for previews.
+"""
+from flask import request
+
+from wsgilib import JSON, XML, Binary
+
+from hinews import dom
+from hinews.messages.article import NoSuchArticle
+from hinews.messages.image import NoSuchImage
+from hinews.orm import article_active, Article, ArticleImage
+
+__all__ = ['ROUTES']
+
+
+def _get_articles():
+    """Yields articles of the querying customer."""
+
+    return Article.select().where(article_active())
+
+
+def _get_article(ident):
+    """Returns the respective article of the querying customer."""
+
+    try:
+        return Article.get(article_active() & (Article.id == ident))
+    except Article.DoesNotExist:
+        raise NoSuchArticle()
+
+
+def _get_image(ident):
+    """Returns the respective image."""
+
+    try:
+        return ArticleImage.get(ArticleImage.id == ident)
+    except ArticleImage.DoesNotExist:
+        raise NoSuchImage()
+
+
+def list_():
+    """Lists the respective news."""
+
+    try:
+        request.args['xml']
+    except KeyError:
+        return JSON([article.to_dict() for article in _get_articles()])
+
+    news = dom.news()
+    news.article = [article.to_dom() for article in _get_articles()]
+    return XML(news)
+
+
+def get_article(ident):
+    """Returns the respective article."""
+
+    return JSON(_get_article(ident).to_dict())
+
+
+def get_image(ident):
+    """Returns the respective image."""
+
+    try:
+        return Binary(_get_image(ident).watermarked)
+    except OSError:     # Not an image.
+        return Binary(_get_image(ident).data)
+
+
+ROUTES = (
+    ('GET', '/hinews/article', list_, 'list_articles'),
+    ('GET', '/hinews/article/<int:ident>', get_article, 'get_article'),
+    ('GET', '/hinews/image/<int:ident>', get_image, 'get_image'))
