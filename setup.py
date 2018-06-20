@@ -12,5 +12,4 @@ setup(
     maintainer_email='<r dot neumann at homeinfo period de>',
     requires=['his'],
     packages=['hinews', 'hinews.messages', 'hinews.wsgi'],
-    data_files=[('/etc/his.d/locale', ['files/hinews.ini'])],
     description='HOMEINFO news API.')

@@ -1,0 +1,71 @@
+# Translations template for HINews."
+# Copyright (C) 2018 HOMEINFO Digitale Informationssysteme GmbH."
+# This file is distributed under the same license as the HINews project."
+# Richard Neumann <r.neumann@homeinfo.de>, 2018."
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: latest\n"
+"Report-Msgid-Bugs-To: info@homeinfo.de\n"
+"POT-Creation-Date: 2018-06-20 11:58+0100\n"
+"PO-Revision-Date: 2018-06-20 11:58+0100\n"
+"Last-Translator: Richard Neumann <r.neumann@homeinfo.de>\n"
+"Language-Team: English <info@homeinfo.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Hand\n"
+
+msgid "NoSuchArticle"
+msgstr "No such article."
+
+msgid "ArticleCreated"
+msgstr "Article created."
+
+msgid "ArticleDeleted"
+msgstr "Article deleted."
+
+msgid "ArticlePatched"
+msgstr "Article patched."
+
+msgid "NoSuchImage"
+msgstr "No such image."
+
+msgid "NoImageProvided"
+msgstr "No image provided."
+
+msgid "NoMetaDataProvided"
+msgstr "No meta data provided."
+
+msgid "ImageAdded"
+msgstr "Image added."
+
+msgid "ImageDeleted"
+msgstr "Image deleted."
+
+msgid "ImagePatched"
+msgstr "Image metadata patched."
+
+msgid "NoSuchTag"
+msgstr "No such tag."
+
+msgid "TagAdded"
+msgstr "Tag added."
+
+msgid "TagDeleted"
+msgstr "Tag deleted."
+
+msgid "NoSuchCustomer"
+msgstr "No such customer."
+
+msgid "CustomerAdded"
+msgstr "Customer added."
+
+msgid "CustomerDeleted"
+msgstr "Customer deleted."
+
+msgid "MissingAccessToken"
+msgstr "Missing access token."
+
+msgid "InvalidAccessToken"
+msgstr "Invalid access token."

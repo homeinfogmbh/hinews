@@ -8,4 +8,4 @@ __all__ = ['NewsMessage']
 class NewsMessage(Message):
     """A JSON-ish response."""
 
-    LOCALES = '/etc/his.d/locale/hinews.ini'
+    DOMAIN = 'hinews'
