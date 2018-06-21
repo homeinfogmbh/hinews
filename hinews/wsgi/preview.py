@@ -10,18 +10,27 @@ from hinews.orm import article_active, Article, ArticleTag, ArticleImage
 __all__ = ['ROUTES']
 
 
+PREVIEW_TAGS = ('CMS',)
+
+
 def _preview_article_ids():
     """Yields allowed preview articles."""
 
     return set(atag.article_id for atag in ArticleTag.select().where(
-        ArticleTag.tag == 'CMS'))
+        ArticleTag.tag << PREVIEW_TAGS))
+
+
+def _condition():
+    """Returns the article selection condition."""
+
+    return (Article.id << _preview_article_ids()) & article_active()
 
 
 def _preview_articles():
     """Yields allowed preview articles."""
 
-    condition = (Article.id << _preview_article_ids()) & article_active()
-    return Article.select().where(condition).order_by(Article.created).limit(4)
+    return Article.select().where(_condition()).order_by(
+        Article.created).limit(4)
 
 
 def _get_article(ident):
