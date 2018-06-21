@@ -63,7 +63,7 @@ def _get_image(ident):
     if _get_customer() in article_image.article.customers:
         return article_image
 
-    raise NoSuchArticle()
+    raise NoSuchImage()
 
 
 def list_():
