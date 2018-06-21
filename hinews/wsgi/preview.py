@@ -5,16 +5,23 @@ from wsgilib import JSON, Binary
 
 from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
-from hinews.orm import ArticleTag, ArticleImage
+from hinews.orm import article_active, Article, ArticleTag, ArticleImage
 
 __all__ = ['ROUTES']
+
+
+def _preview_article_ids():
+    """Yields allowed preview articles."""
+
+    return set(atag.article_id for atag in ArticleTag.select().where(
+        ArticleTag.tag == 'CMS'))
 
 
 def _preview_articles():
     """Yields allowed preview articles."""
 
-    for article_tag in ArticleTag.select().where(ArticleTag.tag == 'CMS'):
-        yield article_tag.article
+    condition = (Article.id << _preview_article_ids()) & article_active()
+    return Article.select().where(condition).order_by(Article.created).limit(4)
 
 
 def _get_article(ident):
