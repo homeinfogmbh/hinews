@@ -11,7 +11,7 @@ from filedb import mimetype, FileProperty
 from functoolsplus import datetimenow
 from his.orm import Account
 from homeinfo.crm import Customer
-from peeweeplus import MySQLDatabase, JSONModel
+from peeweeplus import MySQLDatabase, JSONModel, UUID4Field
 
 from hinews import dom
 from hinews.config import CONFIG
@@ -389,7 +389,7 @@ class AccessToken(NewsModel):
     customer = ForeignKeyField(
         Customer, column_name='customer', on_delete='CASCADE',
         on_update='CASCADE')
-    token = CharField(36)   # UUID4
+    token = UUID4Field()
 
     @classmethod
     def add(cls, customer):
@@ -399,7 +399,6 @@ class AccessToken(NewsModel):
         except cls.DoesNotExist:
             access_token = cls()
             access_token.customer = customer
-            access_token.token = str(uuid4())
             return access_token
 
 
