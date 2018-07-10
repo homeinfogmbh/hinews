@@ -1,6 +1,6 @@
 """Image authentication for dscms3."""
 
-from homeinfo.dscms3 import DSCMS3User
+from dscms3 import DSCMS3User
 from wsgilib import Binary
 
 from hinews.messages.image import NoSuchImage
