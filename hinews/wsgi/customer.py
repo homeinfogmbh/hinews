@@ -1,7 +1,7 @@
 """Article customer controller."""
 
 from his import DATA, authenticated, authorized
-from homeinfo.crm import Customer
+from mdb import Customer
 from wsgilib import JSON
 
 from hinews.exceptions import InvalidCustomer
