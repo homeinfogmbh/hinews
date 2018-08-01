@@ -1,6 +1,10 @@
 """Article image handlers."""
 
-from his import ACCOUNT, DATA, authenticated, authorized
+from json import load
+
+from flask import request
+
+from his import ACCOUNT, authenticated, authorized
 from his.messages import MissingData, InvalidData
 from wsgilib import Binary, JSON
 
@@ -50,21 +54,24 @@ def get(ident):
 def post(ident):
     """Adds a new image to the respective article."""
 
-    files = DATA.files
-
     try:
-        image = files['image']
+        image = request.files['image']
     except KeyError:
         raise NoImageProvided()
 
     try:
-        metadata = files['metadata']
+        metadata = request.files['metadata']
     except KeyError:
         raise NoMetaDataProvided()
 
+    with image.stream as stream:
+        data = stream.read()
+
+    with metadata.stream as stream:
+        metadata = load(stream)
+
     try:
-        image = get_article(ident).images.add(
-            image.bytes, metadata.json, ACCOUNT)
+        image = get_article(ident).images.add(data, metadata, ACCOUNT)
     except KeyError as key_error:
         raise MissingData(key=key_error.args[0])
     except ValueError as value_error:
@@ -88,7 +95,7 @@ def patch(ident):
     """Modifies image meta data."""
 
     image = get_image(ident)
-    image.patch(DATA.json)
+    image.patch(request.json)
     image.save()
     return ImagePatched()
 

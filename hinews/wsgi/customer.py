@@ -1,6 +1,8 @@
 """Article customer controller."""
 
-from his import DATA, authenticated, authorized
+from flask import request
+
+from his import authenticated, authorized
 from mdb import Customer
 from wsgilib import JSON
 
@@ -45,7 +47,7 @@ def post(ident):
     """Adds a customer to the respective article."""
 
     try:
-        get_article(ident).customers.add(get_customer(DATA.text))
+        get_article(ident).customers.add(get_customer(request.data.decode()))
     except InvalidCustomer:
         return NoSuchCustomer()
 

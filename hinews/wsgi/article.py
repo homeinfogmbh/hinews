@@ -1,6 +1,8 @@
 """Article handlers."""
 
-from his import ACCOUNT, DATA, authenticated, authorized
+from flask import request
+
+from his import ACCOUNT, authenticated, authorized
 from his.messages import MissingData, InvalidData
 from peeweeplus import FieldValueError, FieldNotNullable
 from wsgilib import JSON
@@ -69,19 +71,17 @@ def get(ident):
 def post():
     """Adds a new article."""
 
-    dictionary = DATA.json
-
     try:
         article = Article.from_dict(
-            ACCOUNT, dictionary, allow=('tags', 'customers'))
+            ACCOUNT, request.json, allow=('tags', 'customers'))
     except FieldNotNullable as field_not_nullable:
         raise MissingData(**field_not_nullable.to_dict())
     except FieldValueError as field_value_error:
         raise InvalidData(**field_value_error.to_dict())
 
     article.save()
-    invalid_tags = set_tags(article, dictionary)
-    invalid_customers = set_customers(article, dictionary)
+    invalid_tags = set_tags(article, request.json)
+    invalid_customers = set_customers(article, request.json)
 
     return ArticleCreated(
         id=article.id, invalid_tags=invalid_tags,
@@ -103,12 +103,11 @@ def patch(ident):
     """Adds a new article."""
 
     article = get_article(ident)
-    dictionary = DATA.json
-    article.patch(dictionary, allow=('tags', 'customers'))
+    article.patch(request.json, allow=('tags', 'customers'))
     article.save()
     article.editors.add(ACCOUNT)
-    invalid_tags = set_tags(article, dictionary)
-    invalid_customers = set_customers(article, dictionary)
+    invalid_tags = set_tags(article, request.json)
+    invalid_customers = set_customers(article, request.json)
     return ArticlePatched(
         invalid_tags=invalid_tags, invalid_customers=invalid_customers)
 

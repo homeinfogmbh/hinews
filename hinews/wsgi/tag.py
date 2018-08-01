@@ -1,6 +1,6 @@
 """Tag handlers."""
 
-from his import DATA, authenticated, authorized
+from his import authenticated, authorized
 from wsgilib import JSON
 
 from hinews.exceptions import InvalidTag
@@ -33,7 +33,7 @@ def post(ident):
     """Adds a tag to the respective article."""
 
     try:
-        get_article(ident).tags.add(DATA.text)
+        get_article(ident).tags.add(request.data.decode())
     except InvalidTag:
         return NoSuchTag()
 
