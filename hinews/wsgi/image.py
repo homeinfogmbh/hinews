@@ -1,6 +1,6 @@
 """Article image handlers."""
 
-from json import load
+from json import loads
 
 from flask import request
 
@@ -68,7 +68,9 @@ def post(ident):
         data = stream.read()
 
     with metadata.stream as stream:
-        metadata = load(stream)
+        metadata = stream.read()
+
+    metadata = loads(metadata.decode())
 
     try:
         image = get_article(ident).images.add(data, metadata, ACCOUNT)
