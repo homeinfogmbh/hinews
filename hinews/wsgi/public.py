@@ -35,7 +35,7 @@ def _get_customer():
 def _get_articles(customer):
     """Yields articles of the querying customer."""
 
-    for article in Article.select().where(article_active() & select_options()):
+    for article in Article.select().where(select_options()):
         if customer in article.customers:
             yield article
 

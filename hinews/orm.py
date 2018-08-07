@@ -7,7 +7,6 @@ from peewee import PrimaryKeyField, ForeignKeyField, DateField, DateTimeField,\
     CharField, TextField, IntegerField
 
 from filedb import mimetype, FileProperty
-from functoolsplus import datetimenow
 from his.orm import Account
 from mdb import Customer
 from peeweeplus import MySQLDatabase, JSONModel, UUID4Field
@@ -43,10 +42,10 @@ def create_tables(fail_silently=False):
         model.create_table(fail_silently=fail_silently)
 
 
-@datetimenow
-def article_active(now):
+def article_active():
     """Yields article active query."""
 
+    now = datetime.now()
     return (
         ((Article.active_from >> None) | (Article.active_from <= now))
         & ((Article.active_until >> None) | (Article.active_until >= now)))

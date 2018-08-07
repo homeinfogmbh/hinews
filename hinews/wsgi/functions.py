@@ -7,7 +7,7 @@ from flask import request
 from timelib import strpdate
 from wsgilib import Error
 
-from hinews.orm import Article, ArticleTag
+from hinews.orm import article_active, Article, ArticleTag
 
 
 __all__ = ['select_options']
@@ -17,6 +17,10 @@ def select_options():
     """Returns a selection expression for the articles."""
 
     selection = True
+
+    if 'active' in request.args:
+        selection &= article_active()
+
     since = request.args.get('since')
 
     if since is not None:
