@@ -2,6 +2,7 @@
 
 from hinews.messages.common import NewsMessage
 
+
 __all__ = ['NoSuchTag', 'TagAdded', 'TagDeleted']
 
 

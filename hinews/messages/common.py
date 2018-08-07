@@ -2,6 +2,7 @@
 
 from his import Message
 
+
 __all__ = ['NewsMessage']
 
 
