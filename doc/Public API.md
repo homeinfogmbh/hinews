@@ -12,7 +12,7 @@ bereit:
 
 1. `GET /article`                 Listet vorhandene Artikel auf.
 2. `GET /article/<int:ident>`     Gibt den angegebenen Artikel zurück.
-3. `GET /image/<int:ident>`  Gibt den angegebenen Anhang zurück.
+3. `GET /image/<int:ident>`       Gibt den angegebenen Anhang zurück.
 
 Zur Authentifizierung des entsprechenden Kunden muss des Weiteren unbedingt das
 Berechtigungstoken über den URL Parameter `access_token=<token>` angegeben
