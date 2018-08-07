@@ -1,5 +1,6 @@
 """ORM proxies."""
 
+
 __all__ = ['Proxy', 'ArticleProxy']
 
 

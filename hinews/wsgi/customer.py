@@ -12,6 +12,7 @@ from hinews.messages.customer import NoSuchCustomer, CustomerAdded, \
 from hinews.orm import CustomerList
 from hinews.wsgi.article import get_article
 
+
 __all__ = ['ROUTES']
 
 

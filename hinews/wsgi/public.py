@@ -11,6 +11,7 @@ from hinews.messages.image import NoSuchImage
 from hinews.messages.public import MissingAccessToken, InvalidAccessToken
 from hinews.orm import article_active, Article, ArticleImage, AccessToken
 
+
 __all__ = ['ROUTES']
 
 

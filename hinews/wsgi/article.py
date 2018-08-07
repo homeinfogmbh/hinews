@@ -12,6 +12,7 @@ from hinews.messages.article import NoSuchArticle, ArticleCreated, \
     ArticleDeleted, ArticlePatched
 from hinews.orm import Article
 
+
 __all__ = ['get_article', 'ROUTES']
 
 
@@ -55,7 +56,7 @@ def set_customers(article, dictionary):
 def list_():
     """Lists all available articles."""
 
-    return JSON([article.to_dict() for article in Article])
+    return JSON([article.to_dict(verbose=True) for article in Article])
 
 
 @authenticated
@@ -63,7 +64,7 @@ def list_():
 def get(ident):
     """Returns a specific article."""
 
-    return JSON(get_article(ident).to_dict())
+    return JSON(get_article(ident).to_dict(verbose=True))
 
 
 @authenticated

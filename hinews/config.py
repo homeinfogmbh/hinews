@@ -2,6 +2,7 @@
 
 from configlib import INIParser
 
+
 __all__ = ['CONFIG']
 
 

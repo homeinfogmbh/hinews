@@ -7,6 +7,7 @@ from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.orm import article_active, Article, ArticleTag, ArticleImage
 
+
 __all__ = ['ROUTES']
 
 

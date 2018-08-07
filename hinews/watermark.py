@@ -5,6 +5,7 @@ from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont
 
+
 __all__ = ['watermark']
 
 

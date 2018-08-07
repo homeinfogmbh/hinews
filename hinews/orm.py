@@ -2,7 +2,6 @@
 
 from contextlib import suppress
 from datetime import datetime
-from uuid import uuid4
 
 from peewee import PrimaryKeyField, ForeignKeyField, DateField, DateTimeField,\
     CharField, TextField, IntegerField
@@ -18,6 +17,7 @@ from hinews.config import CONFIG
 from hinews.exceptions import InvalidCustomer, InvalidElements, InvalidTag
 from hinews.proxy import ArticleProxy
 from hinews.watermark import watermark
+
 
 __all__ = [
     'create_tables',
@@ -138,15 +138,20 @@ class Article(NewsModel):
         if invalid_customers:
             raise InvalidElements(invalid_customers)
 
-    def to_dict(self):
+    def to_dict(self, verbose=False):
         """Returns a JSON-ish dictionary."""
         dictionary = super().to_dict()
-        dictionary.update({
-            'author': self.author.info,
-            'editors': [editor.to_dict() for editor in self.editors],
-            'images': [image.to_dict() for image in self.images],
-            'tags': [tag.to_dict() for tag in self.tags],
-            'customers': [customer.to_dict() for customer in self.customers]})
+
+        if verbose:
+            dictionary['author'] = self.author.info
+            dictionary['editors'] = [
+                editor.to_dict() for editor in self.editors]
+
+        dictionary['images'] = [
+            image.to_dict(verbose=verbose) for image in self.images]
+        dictionary['tags'] = [tag.to_dict() for tag in self.tags]
+        dictionary['customers'] = [
+            customer.to_dict() for customer in self.customers]
         return dictionary
 
     def to_dom(self):
@@ -246,10 +251,13 @@ class ArticleImage(NewsModel):
         with suppress(KeyError):
             self.source = dictionary['source']
 
-    def to_dict(self):
+    def to_dict(self, verbose=False):
         """Returns a JSON-compliant integer."""
         dictionary = super().to_dict()
-        dictionary['account'] = self.account.info
+
+        if verbose:
+            dictionary['account'] = self.account.info
+
         dictionary['mimetype'] = mimetype(self._file)
         return dictionary
 
