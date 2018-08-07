@@ -9,6 +9,7 @@ from hinews import dom
 from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.messages.public import MissingAccessToken, InvalidAccessToken
+from hinews.wsgi.functions import select_options
 from hinews.orm import article_active, Article, ArticleImage, AccessToken
 
 
@@ -34,7 +35,7 @@ def _get_customer():
 def _get_articles(customer):
     """Yields articles of the querying customer."""
 
-    for article in Article.select().where(article_active()):
+    for article in Article.select().where(article_active() & select_options()):
         if customer in article.customers:
             yield article
 
