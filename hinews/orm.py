@@ -152,7 +152,7 @@ class Article(NewsModel):
         dictionary['tags'] = [
             tag.to_dict(fk_fields=False) for tag in self.tags]
         dictionary['customers'] = [
-            customer.to_dict(fk_fields=False) for customer in self.customers]
+            customer.to_dict() for customer in self.customers]
         return dictionary
 
     def to_dom(self):
@@ -463,13 +463,15 @@ class ArticleCustomerProxy(ArticleProxy):
         """Determines whether the respective
         customer may use the respective article.
         """
-        customers = 0
+        empty = True
 
-        for customers, article_customer in enumerate(self, start=1):
+        for article_customer in self:
+            empty = False
+
             if article_customer.customer == customer:
                 return True
 
-        return not customers
+        return empty
 
     def delete(self, customer):
         """Deletes the respective customer from the article."""
