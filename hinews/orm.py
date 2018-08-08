@@ -137,22 +137,21 @@ class Article(NewsModel):
         if invalid_customers:
             raise InvalidElements(invalid_customers)
 
-    def to_dict(self, verbose=False, **kwargs):
+    def to_dict(self, preview=False, **kwargs):
         """Returns a JSON-ish dictionary."""
         dictionary = super().to_dict(fk_fields=False, **kwargs)
+        dictionary['images'] = [
+            image.to_dict(preview=preview) for image in self.images]
+        dictionary['tags'] = [
+            tag.to_dict(preview=preview) for tag in self.tags]
 
-        if verbose:
+        if not preview:
             dictionary['author'] = self.author.info
             dictionary['editors'] = [
                 editor.to_dict() for editor in self.editors]
+            dictionary['customers'] = [
+                customer.to_dict() for customer in self.customers]
 
-        dictionary['images'] = [
-            image.to_dict(verbose=verbose, fk_fields=False)
-            for image in self.images]
-        dictionary['tags'] = [
-            tag.to_dict(fk_fields=False) for tag in self.tags]
-        dictionary['customers'] = [
-            customer.to_dict() for customer in self.customers]
         return dictionary
 
     def to_dom(self):
@@ -252,11 +251,14 @@ class ArticleImage(NewsModel):
         with suppress(KeyError):
             self.source = dictionary['source']
 
-    def to_dict(self, verbose=False, **kwargs):
+    def to_dict(self, preview=False, fk_fields=True, **kwargs):
         """Returns a JSON-compliant integer."""
-        dictionary = super().to_dict(**kwargs)
+        if preview:
+            fk_fields = False
 
-        if verbose:
+        dictionary = super().to_dict(fk_fields=fk_fields, **kwargs)
+
+        if not preview:
             dictionary['account'] = self.account.info
 
         dictionary['mimetype'] = mimetype(self._file)
@@ -352,6 +354,13 @@ class ArticleTag(NewsModel):
             article_tag.article = article
             article_tag.tag = tag
             return article_tag
+
+    def to_dict(self, preview=False, **kwargs):
+        """Returns a JSON-ish representation."""
+        if preview:
+            return self.tag
+
+        return super().to_dict(**kwargs)
 
 
 class ArticleCustomer(NewsModel):
