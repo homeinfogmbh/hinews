@@ -137,9 +137,12 @@ class Article(NewsModel):
         if invalid_customers:
             raise InvalidElements(invalid_customers)
 
-    def to_dict(self, preview=False, **kwargs):
+    def to_dict(self, preview=False, fk_fields=True, **kwargs):
         """Returns a JSON-ish dictionary."""
-        dictionary = super().to_dict(fk_fields=False, **kwargs)
+        if preview:
+            fk_fields = False
+
+        dictionary = super().to_dict(fk_fields=fk_fields, **kwargs)
         dictionary['images'] = [
             image.to_dict(preview=preview) for image in self.images]
         dictionary['tags'] = [
