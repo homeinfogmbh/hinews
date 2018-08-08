@@ -139,7 +139,7 @@ class Article(NewsModel):
 
     def to_dict(self, verbose=False):
         """Returns a JSON-ish dictionary."""
-        dictionary = super().to_dict()
+        dictionary = super().to_dict(fk_fields=False)
 
         if verbose:
             dictionary['author'] = self.author.info
@@ -148,7 +148,8 @@ class Article(NewsModel):
 
         dictionary['images'] = [
             image.to_dict(verbose=verbose) for image in self.images]
-        dictionary['tags'] = [tag.to_dict() for tag in self.tags]
+        dictionary['tags'] = [
+            tag.to_dict(fk_fields=False) for tag in self.tags]
         dictionary['customers'] = [
             customer.to_dict() for customer in self.customers]
         return dictionary
