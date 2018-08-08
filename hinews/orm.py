@@ -137,9 +137,9 @@ class Article(NewsModel):
         if invalid_customers:
             raise InvalidElements(invalid_customers)
 
-    def to_dict(self, verbose=False):
+    def to_dict(self, verbose=False, **kwargs):
         """Returns a JSON-ish dictionary."""
-        dictionary = super().to_dict(fk_fields=False)
+        dictionary = super().to_dict(fk_fields=False, **kwargs)
 
         if verbose:
             dictionary['author'] = self.author.info
@@ -147,11 +147,12 @@ class Article(NewsModel):
                 editor.to_dict() for editor in self.editors]
 
         dictionary['images'] = [
-            image.to_dict(verbose=verbose) for image in self.images]
+            image.to_dict(verbose=verbose, fk_fields=False)
+            for image in self.images]
         dictionary['tags'] = [
             tag.to_dict(fk_fields=False) for tag in self.tags]
         dictionary['customers'] = [
-            customer.to_dict() for customer in self.customers]
+            customer.to_dict(fk_fields=False) for customer in self.customers]
         return dictionary
 
     def to_dom(self):
@@ -251,9 +252,9 @@ class ArticleImage(NewsModel):
         with suppress(KeyError):
             self.source = dictionary['source']
 
-    def to_dict(self, verbose=False):
+    def to_dict(self, verbose=False, **kwargs):
         """Returns a JSON-compliant integer."""
-        dictionary = super().to_dict()
+        dictionary = super().to_dict(**kwargs)
 
         if verbose:
             dictionary['account'] = self.account.info
