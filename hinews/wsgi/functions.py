@@ -16,10 +16,10 @@ __all__ = ['select_options']
 def select_options():
     """Returns a selection expression for the articles."""
 
-    selection = True
-
-    if 'active' in request.args:
-        selection &= article_active()
+    if 'all' in request.args:
+        selection = True
+    else:
+        selection = article_active()
 
     since = request.args.get('since')
 
