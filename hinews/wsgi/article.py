@@ -73,8 +73,7 @@ def post():
     """Adds a new article."""
 
     try:
-        article = Article.from_dict(
-            ACCOUNT, request.json, allow=('tags', 'customers'))
+        article = Article.from_dict(ACCOUNT, request.json, strict=False)
     except FieldNotNullable as field_not_nullable:
         raise MissingData(**field_not_nullable.to_dict())
     except FieldValueError as field_value_error:
