@@ -104,7 +104,7 @@ def patch(ident):
     """Adds a new article."""
 
     article = get_article(ident)
-    article.patch(request.json, allow=('tags', 'customers'))
+    article.patch(request.json, fk_fields=False, strict=False)
     article.save()
     article.editors.add(ACCOUNT)
     invalid_tags = set_tags(article, request.json)
