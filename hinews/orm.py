@@ -349,7 +349,7 @@ class ArticleCustomer(_NewsModel):
 
     class Meta:
         """Sets the table name."""
-        table_name = 'customer'
+        table_name = 'article_customer'
 
     article = ForeignKeyField(
         Article, column_name='article', backref='customers',
