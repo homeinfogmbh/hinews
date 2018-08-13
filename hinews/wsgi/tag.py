@@ -1,11 +1,13 @@
 """Tag handlers."""
 
+from flask import request
+
 from his import authenticated, authorized
 from wsgilib import JSON
 
 from hinews.exceptions import InvalidTag
 from hinews.messages.tag import NoSuchTag, TagAdded, TagDeleted
-from hinews.orm import TagList
+from hinews.orm import TagList, Tag
 from hinews.wsgi.article import get_article
 
 
@@ -33,12 +35,15 @@ def get(ident):
 def post(ident):
     """Adds a tag to the respective article."""
 
+    article = get_article(ident)
+
     try:
-        get_article(ident).tags.add(request.data.decode())
+        tag = Tag.add(article, request.data.decode())
     except InvalidTag:
         return NoSuchTag()
 
-    return TagAdded()
+    tag.save()
+    return TagAdded(id=tag.id)
 
 
 @authenticated
@@ -46,7 +51,19 @@ def post(ident):
 def delete(article_id, tag_or_id):
     """Deletes the respective tag."""
 
-    get_article(article_id).tags.delete(tag_or_id)
+    try:
+        ident = int(tag_or_id)
+    except ValueError:
+        selection = (Tag.article == article_id) & (Tag.tag == tag_or_id)
+    else:
+        selection = (Tag.id == ident)
+
+    try:
+        tag = Tag.get(selection)
+    except Tag.DoesNotExist:
+        return TagDeleted()
+
+    tag.delete_instance()
     return TagDeleted()
 
 

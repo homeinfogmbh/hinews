@@ -8,13 +8,12 @@ from peewee import PrimaryKeyField, ForeignKeyField, DateField, DateTimeField,\
 
 from filedb import mimetype, FileProperty
 from his.orm import Account
-from mdb import Customer
+from mdb import ArticleCustomer as Customer
 from peeweeplus import MySQLDatabase, JSONModel, UUID4Field
 
 from hinews import dom
 from hinews.config import CONFIG
-from hinews.exceptions import InvalidCustomer, InvalidElements, InvalidTag
-from hinews.proxy import ArticleProxy
+from hinews.exceptions import InvalidCustomer, InvalidTag
 from hinews.watermark import watermark
 
 
@@ -22,11 +21,11 @@ __all__ = [
     'create_tables',
     'article_active',
     'Article',
-    'ArticleEditor',
-    'ArticleImage',
+    'Editor',
+    'Image',
     'TagList',
     'CustomerList',
-    'ArticleTag',
+    'Tag',
     'ArticleCustomer',
     'AccessToken',
     'MODELS']
@@ -51,7 +50,7 @@ def article_active():
         & ((Article.active_until >> None) | (Article.active_until >= now)))
 
 
-class NewsModel(JSONModel):
+class _NewsModel(JSONModel):
     """Basic news database model."""
 
     class Meta:
@@ -62,7 +61,7 @@ class NewsModel(JSONModel):
     id = PrimaryKeyField()
 
 
-class Article(NewsModel):
+class Article(_NewsModel):
     """A news-related text."""
 
     author = ForeignKeyField(Account, column_name='author')
@@ -77,65 +76,49 @@ class Article(NewsModel):
     @classmethod
     def from_dict(cls, author, dictionary, **kwargs):
         """Creates a new article from the provided dictionary."""
+        tags = dictionary.pop('tags', None)
+        customers = dictionary.pop('customers', None)
         article = super().from_dict(dictionary, **kwargs)
         article.author = author
-        return article
+        yield article
+        yield from article.update_tags(tags)
+        yield from article.update_customers(customers)
 
-    @property
-    def editors(self):
-        """Yields article editors."""
-        return ArticleEditorProxy(self)
+    def patch(self, dictionary, **kwargs):
+        """Patches article from the provided dictionary."""
+        tags = dictionary.pop('tags', None)
+        customers = dictionary.pop('customers', None)
+        yield super().patch(dictionary, **kwargs)
+        yield from self.update_tags(tags)
+        yield from self.update_customers(customers)
 
-    @property
-    def images(self):
-        """Yields images of this article."""
-        return ArticleImageProxy(self)
+    def update_tags(self, tags):
+        """Updates the respective tags."""
+        if tags is None:
+            return
 
-    @property
-    def tags(self):
-        """Yields tags of this article."""
-        return ArticleTagProxy(self)
-
-    @tags.setter
-    def tags(self, tags):
-        """Sets the respective tags."""
         for tag in self.tags:
             tag.delete_instance()
 
-        invalid_tags = []
+        if not tags:
+            return
 
         for tag in tags:
-            try:
-                self.tags.add(tag)
-            except InvalidTag:
-                invalid_tags.append(tag)
+            yield Tag.add(self, tag)
 
-        if invalid_tags:
-            raise InvalidElements(invalid_tags)
+    def update_customers(self, cids):
+        """Updates the respective customers."""
+        if cids is None:
+            return
 
-    @property
-    def customers(self):
-        """Yields customers of this article."""
-        return ArticleCustomerProxy(self)
-
-    @customers.setter
-    def customers(self, cids):
-        """Sets the respective customers."""
         for customer in self.customers:
             customer.delete_instance()
 
-        invalid_customers = []
+        if not cids:
+            return
 
         for cid in cids:
-            try:
-                customer = Customer.get(Customer.id == cid)
-            except (ValueError, Customer.DoesNotExist):
-                invalid_customers.append(cid)
-            else:
-                self.customers.add(customer)
-
-        if invalid_customers:
-            raise InvalidElements(invalid_customers)
+            yield ArticleCustomer.add(self, cid)
 
     def to_dict(self, preview=False, fk_fields=True, **kwargs):
         """Returns a JSON-ish dictionary."""
@@ -183,27 +166,26 @@ class Article(NewsModel):
             recursive=recursive, delete_nullable=delete_nullable)
 
 
-class ArticleEditor(NewsModel):
+class Editor(_NewsModel):
     """An article's editor."""
 
     class Meta:
         """Sets the table name."""
-        table_name = 'article_editor'
+        table_name = 'editor'
 
     article = ForeignKeyField(
-        Article, column_name='article', on_delete='CASCADE')
+        Article, column_name='article', backref='editors', on_delete='CASCADE')
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    timestamp = DateTimeField()
+    timestamp = DateTimeField(default=datetime.now)
 
     @classmethod
-    def add(cls, article, account, timestamp=None):
+    def add(cls, article, account):
         """Adds a new author record to the respective article."""
-        article_author = cls()
-        article_author.article = article
-        article_author.account = account
-        article_author.timestamp = timestamp or datetime.now()
-        return article_author
+        try:
+            return cls.get((cls.article == article) & (cls.account == account))
+        except cls.DoesNotExist:
+            return cls(article=article, account=account)
 
     def to_dict(self):
         """Returns a JSON-ish dictionary."""
@@ -212,7 +194,7 @@ class ArticleEditor(NewsModel):
         return dictionary
 
 
-class ArticleImage(NewsModel):
+class Image(_NewsModel):
     """An image of an article."""
 
     class Meta:
@@ -220,7 +202,7 @@ class ArticleImage(NewsModel):
         table_name = 'image'
 
     article = ForeignKeyField(
-        Article, column_name='article', on_delete='CASCADE')
+        Article, column_name='article', backref='images', on_delete='CASCADE')
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
     _file = IntegerField(column_name='file')
@@ -283,7 +265,7 @@ class ArticleImage(NewsModel):
             recursive=recursive, delete_nullable=delete_nullable)
 
 
-class TagList(NewsModel):
+class TagList(_NewsModel):
     """An tag for articles."""
 
     class Meta:
@@ -303,7 +285,7 @@ class TagList(NewsModel):
             return tag_
 
 
-class CustomerList(NewsModel):
+class CustomerList(_NewsModel):
     """Csutomers enabled for gettings news."""
 
     class Meta:
@@ -330,15 +312,11 @@ class CustomerList(NewsModel):
         return self.customer.to_dict(company=True)
 
 
-class ArticleTag(NewsModel):
+class Tag(_NewsModel):
     """Article <> Tag mappings."""
 
-    class Meta:
-        """Sets the table name."""
-        table_name = 'article_tag'
-
     article = ForeignKeyField(
-        Article, column_name='article', on_delete='CASCADE')
+        Article, column_name='article', backref='tags', on_delete='CASCADE')
     tag = CharField(255)
 
     @classmethod
@@ -366,15 +344,16 @@ class ArticleTag(NewsModel):
         return super().to_dict(**kwargs)
 
 
-class ArticleCustomer(NewsModel):
+class ArticleCustomer(_NewsModel):
     """Article <> Customer mappings."""
 
     class Meta:
         """Sets the table name."""
-        table_name = 'article_customer'
+        table_name = 'customer'
 
     article = ForeignKeyField(
-        Article, column_name='article', on_delete='CASCADE')
+        Article, column_name='article', backref='customers',
+        on_delete='CASCADE')
     customer = ForeignKeyField(
         Customer, column_name='customer', on_delete='CASCADE')
 
@@ -400,7 +379,7 @@ class ArticleCustomer(NewsModel):
         return {'id': self.id, 'customer': self.customer.id}
 
 
-class AccessToken(NewsModel):
+class AccessToken(_NewsModel):
     """Customers' access tokens."""
 
     class Meta:
@@ -423,80 +402,5 @@ class AccessToken(NewsModel):
             return access_token
 
 
-class ArticleEditorProxy(ArticleProxy):
-    """Proxies article authors."""
-
-    def __init__(self, target):
-        """Sets model and target."""
-        super().__init__(ArticleEditor, target)
-
-
-class ArticleImageProxy(ArticleProxy):
-    """Proxies images of articles."""
-
-    def __init__(self, target):
-        """Sets the model and target."""
-        super().__init__(ArticleImage, target)
-
-
-class ArticleTagProxy(ArticleProxy):
-    """Proxies tags of articles."""
-
-    def __init__(self, target):
-        """Sets the model and target."""
-        super().__init__(ArticleTag, target)
-
-    def delete(self, tag_or_id):
-        """Deletes the respective tag."""
-        try:
-            ident = int(tag_or_id)
-        except ValueError:
-            selection = self.model.tag == tag_or_id
-        else:
-            selection = self.model.id == ident
-
-        try:
-            article_tag = self.model.get(
-                (self.model.article == self.target) & selection)
-        except self.model.DoesNotExist:
-            return False
-
-        return article_tag.delete_instance()
-
-
-class ArticleCustomerProxy(ArticleProxy):
-    """Proxies customers of the respective article."""
-
-    def __init__(self, target):
-        """Sets the model and target."""
-        super().__init__(ArticleCustomer, target)
-
-    def __contains__(self, customer):
-        """Determines whether the respective
-        customer may use the respective article.
-        """
-        empty = True
-
-        for article_customer in self:
-            empty = False
-
-            if article_customer.customer == customer:
-                return True
-
-        return empty
-
-    def delete(self, customer):
-        """Deletes the respective customer from the article."""
-        try:
-            article_customer = self.model.get(
-                (self.model.article == self.target)
-                & (self.model.customer == customer))
-        except self.model.DoesNotExist:
-            return False
-
-        return article_customer.delete_instance()
-
-
 MODELS = [
-    Article, ArticleEditor, ArticleImage, TagList, CustomerList, ArticleTag,
-    ArticleCustomer, AccessToken]
+    Article, Editor, Image, TagList, CustomerList, Tag, ArticleCustomer, AccessToken]

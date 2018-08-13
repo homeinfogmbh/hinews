@@ -5,7 +5,7 @@ from wsgilib import JSON, Binary
 
 from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
-from hinews.orm import article_active, Article, ArticleTag, ArticleImage
+from hinews.orm import article_active, Article, Tag, Image
 
 
 __all__ = ['ROUTES']
@@ -17,8 +17,8 @@ PREVIEW_TAGS = ('CMS',)
 def _preview_article_ids():
     """Yields allowed preview articles."""
 
-    return set(atag.article_id for atag in ArticleTag.select().where(
-        ArticleTag.tag << PREVIEW_TAGS))
+    return set(atag.article_id for atag in Tag.select().where(
+        Tag.tag << PREVIEW_TAGS))
 
 
 def _condition():
@@ -48,8 +48,8 @@ def _get_image(ident):
     """Returns the respective image."""
 
     try:
-        article_image = ArticleImage.get(ArticleImage.id == ident)
-    except ArticleImage.DoesNotExist:
+        article_image = Image.get(Image.id == ident)
+    except Image.DoesNotExist:
         raise NoSuchImage()
 
     if article_image.article in _preview_articles():

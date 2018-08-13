@@ -4,7 +4,7 @@ from dscms3 import DSCMS3User
 from wsgilib import Binary
 
 from hinews.messages.image import NoSuchImage
-from hinews.orm import ArticleImage
+from hinews.orm import Image
 
 
 __all__ = ['ROUTES']
@@ -15,8 +15,8 @@ def get_image(ident):
     """Returns the respective image."""
 
     try:
-        image = ArticleImage.get(ArticleImage.id == ident)
-    except ArticleImage.DoesNotExist:
+        image = Image.get(Image.id == ident)
+    except Image.DoesNotExist:
         raise NoSuchImage()
 
     try:

@@ -10,7 +10,7 @@ from wsgilib import Binary, JSON
 
 from hinews.messages.image import NoSuchImage, NoImageProvided, \
     NoMetaDataProvided, ImageAdded, ImageDeleted, ImagePatched
-from hinews.orm import ArticleImage
+from hinews.orm import Image
 from hinews.wsgi.article import get_article
 
 
@@ -21,8 +21,8 @@ def get_image(ident):
     """Returns the respective image."""
 
     try:
-        return ArticleImage.get(ArticleImage.id == ident)
-    except ArticleImage.DoesNotExist:
+        return Image.get(Image.id == ident)
+    except Image.DoesNotExist:
         raise NoSuchImage()
 
 
@@ -31,7 +31,7 @@ def get_image(ident):
 def list_():
     """Lists all available images."""
 
-    return JSON([image.to_dict() for image in ArticleImage])
+    return JSON([image.to_dict() for image in Image])
 
 
 @authenticated
@@ -55,6 +55,8 @@ def get(ident):
 def post(ident):
     """Adds a new image to the respective article."""
 
+    article = get_article(ident)
+
     try:
         image = request.files['image']
     except KeyError:
@@ -74,12 +76,13 @@ def post(ident):
     metadata = loads(metadata.decode())
 
     try:
-        image = get_article(ident).images.add(data, metadata, ACCOUNT)
+        image = Image.add(article, data, metadata, ACCOUNT.id)
     except KeyError as key_error:
         raise MissingData(key=key_error.args[0])
     except ValueError as value_error:
         raise InvalidData(hint=value_error.args[0])
 
+    image.save()
     return ImageAdded(id=image.id)
 
 

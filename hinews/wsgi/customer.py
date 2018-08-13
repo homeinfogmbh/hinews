@@ -3,26 +3,16 @@
 from flask import request
 
 from his import authenticated, authorized
-from mdb import Customer
 from wsgilib import JSON
 
 from hinews.exceptions import InvalidCustomer
 from hinews.messages.customer import NoSuchCustomer, CustomerAdded, \
     CustomerDeleted
-from hinews.orm import CustomerList
+from hinews.orm import CustomerList, ArticleCustomer
 from hinews.wsgi.article import get_article
 
 
 __all__ = ['ROUTES']
-
-
-def get_customer(cid):
-    """Returns the respective customer."""
-
-    try:
-        return Customer.get(Customer.id == cid)
-    except Customer.DoesNotExist:
-        raise NoSuchCustomer()
 
 
 @authenticated
@@ -47,12 +37,15 @@ def get(ident):
 def post(ident):
     """Adds a customer to the respective article."""
 
+    article = get_article(ident)
+
     try:
-        get_article(ident).customers.add(get_customer(request.data.decode()))
+        customer = ArticleCustomer.add(article, request.data.decode())
     except InvalidCustomer:
         return NoSuchCustomer()
 
-    return CustomerAdded()
+    customer.save()
+    return CustomerAdded(id=customer.id)
 
 
 @authenticated
@@ -60,8 +53,15 @@ def post(ident):
 def delete(article_id, customer_id):
     """Deletes the respective customer from the article."""
 
-    get_article(article_id).customers.delete(get_customer(customer_id))
-    return CustomerDeleted()
+    ids = []
+
+    for customer in ArticleCustomer.select().where(
+            (ArticleCustomer.article == article_id)
+            & (ArticleCustomer.customer == customer_id)):
+        ids.append(customer.id)
+        customer.delete_instance()
+
+    return CustomerDeleted(ids=ids)
 
 
 ROUTES = (

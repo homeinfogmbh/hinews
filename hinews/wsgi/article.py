@@ -7,10 +7,9 @@ from his.messages import MissingData, InvalidData
 from peeweeplus import FieldValueError, FieldNotNullable
 from wsgilib import JSON
 
-from hinews.exceptions import InvalidElements
 from hinews.messages.article import NoSuchArticle, ArticleCreated, \
     ArticleDeleted, ArticlePatched
-from hinews.orm import Article
+from hinews.orm import Article, Editor
 
 
 __all__ = ['get_article', 'ROUTES']
@@ -23,32 +22,6 @@ def get_article(ident):
         return Article.get(Article.id == ident)
     except Article.DoesNotExist:
         raise NoSuchArticle()
-
-
-def set_tags(article, dictionary):
-    """Sets the respective tags of the article iff specified."""
-
-    try:
-        article.tags = dictionary['tags']
-    except KeyError:
-        return []
-    except InvalidElements as invalid_elements:
-        return list(invalid_elements)
-
-    return []
-
-
-def set_customers(article, dictionary):
-    """Sets the respective customers of the article iff specified."""
-
-    try:
-        article.customers = dictionary['customers']
-    except KeyError:
-        return []
-    except InvalidElements as invalid_elements:
-        return list(invalid_elements)
-
-    return []
 
 
 @authenticated
@@ -73,20 +46,18 @@ def post():
     """Adds a new article."""
 
     try:
-        article = Article.from_dict(
-            ACCOUNT, request.json, fk_fields=False, strict=False)
+        article, *related_records = Article.from_dict(
+            ACCOUNT.id, request.json, fk_fields=False)
+        article.save()
+
+        for record in related_records:
+            record.save()
     except FieldNotNullable as field_not_nullable:
         raise MissingData(**field_not_nullable.to_dict())
     except FieldValueError as field_value_error:
         raise InvalidData(**field_value_error.to_dict())
 
-    article.save()
-    invalid_tags = set_tags(article, request.json)
-    invalid_customers = set_customers(article, request.json)
-
-    return ArticleCreated(
-        id=article.id, invalid_tags=invalid_tags,
-        invalid_customers=invalid_customers)
+    return ArticleCreated(id=article.id)
 
 
 @authenticated
@@ -104,13 +75,15 @@ def patch(ident):
     """Adds a new article."""
 
     article = get_article(ident)
-    article.patch(request.json, fk_fields=False, strict=False)
+    article, *related_records = article.patch(request.json, fk_fields=False)
     article.save()
-    article.editors.add(ACCOUNT)
-    invalid_tags = set_tags(article, request.json)
-    invalid_customers = set_customers(article, request.json)
-    return ArticlePatched(
-        invalid_tags=invalid_tags, invalid_customers=invalid_customers)
+
+    for record in related_records:
+        record.save()
+
+    new_editor = Editor.add(article, ACCOUNT.id)
+    new_editor.save()
+    return ArticlePatched()
 
 
 ROUTES = (

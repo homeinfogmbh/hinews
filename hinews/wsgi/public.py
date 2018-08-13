@@ -10,7 +10,7 @@ from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.messages.public import MissingAccessToken, InvalidAccessToken
 from hinews.wsgi.functions import select_options
-from hinews.orm import article_active, Article, ArticleImage, AccessToken
+from hinews.orm import article_active, Article, Image, AccessToken
 
 
 __all__ = ['ROUTES']
@@ -58,8 +58,8 @@ def _get_image(ident):
     """Returns the respective image."""
 
     try:
-        article_image = ArticleImage.get(ArticleImage.id == ident)
-    except ArticleImage.DoesNotExist:
+        article_image = Image.get(Image.id == ident)
+    except Image.DoesNotExist:
         raise NoSuchImage()
 
     if _get_customer() in article_image.article.customers:

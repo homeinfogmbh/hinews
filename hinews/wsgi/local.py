@@ -8,7 +8,7 @@ from wsgilib import Application, JSON, XML, Binary
 from hinews import dom
 from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
-from hinews.orm import article_active, Article, ArticleImage
+from hinews.orm import article_active, Article, Image
 
 
 __all__ = ['APPLICATION']
@@ -36,8 +36,8 @@ def _get_image(ident):
     """Returns the respective image."""
 
     try:
-        return ArticleImage.get(ArticleImage.id == ident)
-    except ArticleImage.DoesNotExist:
+        return Image.get(Image.id == ident)
+    except Image.DoesNotExist:
         raise NoSuchImage()
 
 
