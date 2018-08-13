@@ -8,7 +8,7 @@ from peewee import PrimaryKeyField, ForeignKeyField, DateField, DateTimeField,\
 
 from filedb import mimetype, FileProperty
 from his.orm import Account
-from mdb import ArticleCustomer as Customer
+from mdb import Customer
 from peeweeplus import MySQLDatabase, JSONModel, UUID4Field
 
 from hinews import dom
