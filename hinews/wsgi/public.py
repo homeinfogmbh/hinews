@@ -44,28 +44,23 @@ def _get_article(ident):
     """Returns the respective article of the querying customer."""
 
     try:
-        article = Article.get(article_active() & (Article.id == ident))
+        return Article.select().join(ArticleCustomer).where(
+            (Article.id == ident)
+            & (ArticleCustomer.customer == _get_customer())
+            & article_active()).get()
     except Article.DoesNotExist:
         raise NoSuchArticle()
-
-    if _get_customer() in article.customers:
-        return article
-
-    raise NoSuchArticle()
 
 
 def _get_image(ident):
     """Returns the respective image."""
 
     try:
-        article_image = Image.get(Image.id == ident)
+        return Image.select().join(Article).join(ArticleCustomer).where(
+            (Image.id == ident)
+            & (ArticleCustomer.customer == _get_customer())).get()
     except Image.DoesNotExist:
         raise NoSuchImage()
-
-    if _get_customer() in article_image.article.customers:
-        return article_image
-
-    raise NoSuchImage()
 
 
 def list_():
