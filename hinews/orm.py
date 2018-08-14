@@ -2,14 +2,15 @@
 
 from contextlib import suppress
 from datetime import datetime
+from uuid import uuid4
 
 from peewee import AutoField, ForeignKeyField, DateField, DateTimeField, \
-    CharField, TextField, IntegerField
+    CharField, TextField, IntegerField, UUIDField
 
 from filedb import mimetype, FileProperty
 from his.orm import Account
 from mdb import Customer
-from peeweeplus import MySQLDatabase, JSONModel, UUID4Field
+from peeweeplus import MySQLDatabase, JSONModel, JSONField
 
 from hinews import dom
 from hinews.config import CONFIG
@@ -65,17 +66,13 @@ class Article(_NewsModel):
     """A news-related text."""
 
     author = ForeignKeyField(Account, column_name='author')
-    created = DateTimeField(default=datetime.now)
-    active_from = DateField(null=True)
-    active_until = DateField(null=True)
-    title = CharField(255)
-    subtitle = CharField(255, null=True)
-    text = TextField()
-    source = TextField()
-    JSON_FIELDS = {
-        created: 'created', active_from: 'activeFrom',
-        active_until: 'activeUntil', title: 'title', subtitle: 'subtitle',
-        text: 'text', source: 'source'}
+    created = JSONField(DateTimeField, default=datetime.now)
+    active_from = JSONField(DateField, null=True, key='activeFrom')
+    active_until = JSONField(DateField, null=True, key='activeUntil')
+    title = JSONField(CharField, 255)
+    subtitle = JSONField(CharField, 255, null=True)
+    text = JSONField(TextField)
+    source = JSONField(TextField)
 
     @classmethod
     def from_dict(cls, author, dictionary, **kwargs):
@@ -184,12 +181,12 @@ class Editor(_NewsModel):
         """Sets the table name."""
         table_name = 'editor'
 
-    article = ForeignKeyField(
-        Article, column_name='article', backref='editors', on_delete='CASCADE')
+    article = JSONField(
+        ForeignKeyField, Article, column_name='article', backref='editors',
+        on_delete='CASCADE')
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    timestamp = DateTimeField(default=datetime.now)
-    JSON_FIELDS = {article: 'article', timestamp: 'timestamp'}
+    timestamp = JSONField(DateTimeField, default=datetime.now)
 
     @classmethod
     def add(cls, article, account):
@@ -213,15 +210,15 @@ class Image(_NewsModel):
         """Sets the table name."""
         table_name = 'image'
 
-    article = ForeignKeyField(
-        Article, column_name='article', backref='images', on_delete='CASCADE')
+    article = JSONField(
+        ForeignKeyField, Article, column_name='article', backref='images',
+        on_delete='CASCADE')
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
     _file = IntegerField(column_name='file')
-    uploaded = DateTimeField()
-    source = TextField(null=True)
+    uploaded = JSONField(DateTimeField)
+    source = JSONField(TextField, null=True)
     data = FileProperty(_file)
-    JSON_FIELDS = {article: 'article', uploaded: 'uploaded', source: 'source'}
 
     @classmethod
     def add(cls, article, data, metadata, account):
@@ -285,8 +282,7 @@ class TagList(_NewsModel):
         """Sets the table name."""
         table_name = 'tag_list'
 
-    tag = CharField(255)
-    JSON_FIELDS = {tag: 'tag'}
+    tag = JSONField(CharField, 255)
 
     @classmethod
     def add(cls, tag):
@@ -302,10 +298,10 @@ class TagList(_NewsModel):
 class Tag(_NewsModel):
     """Article <> Tag mappings."""
 
-    article = ForeignKeyField(
-        Article, column_name='article', backref='tags', on_delete='CASCADE')
-    tag = CharField(255)
-    JSON_FIELDS = {article: 'article', tag: 'tag'}
+    article = JSONField(
+        ForeignKeyField, Article, column_name='article', backref='tags',
+        on_delete='CASCADE')
+    tag = JSONField(CharField, 255)
 
     @classmethod
     def add(cls, article, tag, validate=True):
@@ -338,9 +334,8 @@ class Whitelist(_NewsModel):
     article = ForeignKeyField(
         Article, column_name='article', backref='whitelist',
         on_delete='CASCADE')
-    customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE')
-    JSON_FIELDS = {customer: 'customer'}
+    customer = JSONField(
+        ForeignKeyField, Customer, column_name='customer', on_delete='CASCADE')
 
     @classmethod
     def add(cls, article, customer):
@@ -362,11 +357,10 @@ class AccessToken(_NewsModel):
         """Sets the table name."""
         table_name = 'access_token'
 
-    customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE',
+    customer = JSONField(
+        ForeignKeyField, Customer, column_name='customer', on_delete='CASCADE',
         on_update='CASCADE')
-    token = UUID4Field()
-    JSON_FIELDS = {customer: 'customer', token: 'token'}
+    token = JSONField(UUIDField, default=uuid4)
 
     @classmethod
     def add(cls, customer):
