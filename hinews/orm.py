@@ -58,8 +58,7 @@ class _NewsModel(JSONModel):
         database = DATABASE
         schema = database.database
 
-    id = AutoField()
-    JSON_FIELDS = {id: 'id'}
+    id = JSONField(AutoField)
 
 
 class Article(_NewsModel):
