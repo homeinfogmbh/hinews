@@ -8,7 +8,7 @@ from wsgilib import JSON
 from hinews.exceptions import InvalidCustomer
 from hinews.messages.customer import NoSuchCustomer, CustomerAdded, \
     CustomerDeleted
-from hinews.orm import CustomerList, ArticleCustomer
+from hinews.orm import Customers, Whitelist
 from hinews.wsgi.article import get_article
 
 
@@ -20,7 +20,7 @@ __all__ = ['ROUTES']
 def list_():
     """Lists available customers."""
 
-    return JSON([customer.to_dict() for customer in CustomerList])
+    return JSON([customer.to_dict() for customer in Customers])
 
 
 @authenticated
@@ -40,7 +40,7 @@ def post(ident):
     article = get_article(ident)
 
     try:
-        customer = ArticleCustomer.add(article, request.data.decode())
+        customer = Whitelist.add(article, request.data.decode())
     except InvalidCustomer:
         return NoSuchCustomer()
 
@@ -55,9 +55,9 @@ def delete(article_id, customer_id):
 
     ids = []
 
-    for customer in ArticleCustomer.select().where(
-            (ArticleCustomer.article == article_id)
-            & (ArticleCustomer.customer == customer_id)):
+    for customer in Whitelist.select().where(
+            (Whitelist.article == article_id)
+            & (Whitelist.customer == customer_id)):
         ids.append(customer.id)
         customer.delete_instance()
 

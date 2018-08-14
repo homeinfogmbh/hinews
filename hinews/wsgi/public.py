@@ -10,8 +10,7 @@ from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.messages.public import MissingAccessToken, InvalidAccessToken
 from hinews.wsgi.functions import select_options
-from hinews.orm import article_active, Article, Image, AccessToken, \
-    ArticleCustomer
+from hinews.orm import article_active, Article, Image, AccessToken
 
 
 __all__ = ['ROUTES']
@@ -36,31 +35,49 @@ def _get_customer():
 def _get_articles(customer):
     """Yields articles of the querying customer."""
 
-    return Article.select().join(ArticleCustomer).where(
-        (ArticleCustomer.customer == customer) & select_options())
+    customer = _get_customer()
+
+    for article in Article.select().where(select_options()):
+        customers = frozenset(ac.customer for ac in article.customers)
+
+        if not customers or customer in customers:
+            yield article
 
 
 def _get_article(ident):
     """Returns the respective article of the querying customer."""
 
+    customer = _get_customer()
+
     try:
-        return Article.select().join(ArticleCustomer).where(
-            (Article.id == ident)
-            & (ArticleCustomer.customer == _get_customer())
-            & article_active()).get()
+        article = Article.get(Article.id == ident)
     except Article.DoesNotExist:
         raise NoSuchArticle()
+
+    customers = image.article.customers
+
+    if not customers or customer in customers:
+        return image
+
+    raise NoSuchArticle()
 
 
 def _get_image(ident):
     """Returns the respective image."""
 
+    customer = _get_customer()
+
     try:
-        return Image.select().join(Article).join(ArticleCustomer).where(
-            (Image.id == ident)
-            & (ArticleCustomer.customer == _get_customer())).get()
+        image = Image.get(Image.id == ident)
     except Image.DoesNotExist:
         raise NoSuchImage()
+
+    customers = image.article.customers
+
+    if not customers or customer in customers:
+        return image
+
+    raise NoSuchImage()
 
 
 def list_():

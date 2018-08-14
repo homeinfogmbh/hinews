@@ -24,9 +24,9 @@ __all__ = [
     'Editor',
     'Image',
     'TagList',
-    'CustomerList',
+    'Customers',
     'Tag',
-    'ArticleCustomer',
+    'Whitelist',
     'AccessToken',
     'MODELS']
 
@@ -84,6 +84,13 @@ class Article(_NewsModel):
         yield from article.update_tags(tags)
         yield from article.update_customers(customers)
 
+    @property
+    def customers(self):
+        """Returns a frozen set of customers that
+        are whitelisted for this article.
+        """
+        return frozenset(whitelist.customer for whitelist in self.whitelist)
+
     def patch(self, dictionary, **kwargs):
         """Patches article from the provided dictionary."""
         tags = dictionary.pop('tags', None)
@@ -118,7 +125,7 @@ class Article(_NewsModel):
             return
 
         for cid in cids:
-            yield ArticleCustomer.add(self, cid)
+            yield Whitelist.add(self, cid)
 
     def to_dict(self, preview=False, fk_fields=True, **kwargs):
         """Returns a JSON-ish dictionary."""
@@ -285,12 +292,8 @@ class TagList(_NewsModel):
             return tag_
 
 
-class CustomerList(_NewsModel):
+class Customers(_NewsModel):
     """Csutomers enabled for gettings news."""
-
-    class Meta:
-        """Sets the table name."""
-        table_name = 'customer_list'
 
     customer = ForeignKeyField(
         Customer, column_name='customer', on_delete='CASCADE',
@@ -344,15 +347,11 @@ class Tag(_NewsModel):
         return super().to_dict(**kwargs)
 
 
-class ArticleCustomer(_NewsModel):
+class Whitelist(_NewsModel):
     """Article <> Customer mappings."""
 
-    class Meta:
-        """Sets the table name."""
-        table_name = 'article_customer'
-
     article = ForeignKeyField(
-        Article, column_name='article', backref='customers',
+        Article, column_name='article', backref='whitelist',
         on_delete='CASCADE')
     customer = ForeignKeyField(
         Customer, column_name='customer', on_delete='CASCADE')
@@ -361,8 +360,8 @@ class ArticleCustomer(_NewsModel):
     def add(cls, article, customer):
         """Adds the respective customer to the article."""
         try:
-            CustomerList.get(CustomerList.customer == customer)
-        except CustomerList.DoesNotExist:
+            Customers.get(Customers.customer == customer)
+        except Customers.DoesNotExist:
             raise InvalidCustomer(customer)
 
         try:
@@ -403,4 +402,4 @@ class AccessToken(_NewsModel):
 
 
 MODELS = [
-    Article, Editor, Image, TagList, CustomerList, Tag, ArticleCustomer, AccessToken]
+    Article, Editor, Image, TagList, Customers, Tag, Whitelist, AccessToken]
