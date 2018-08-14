@@ -10,7 +10,8 @@ from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.messages.public import MissingAccessToken, InvalidAccessToken
 from hinews.wsgi.functions import select_options
-from hinews.orm import article_active, Article, Image, AccessToken
+from hinews.orm import article_active, Article, Image, AccessToken, \
+    ArticleCustomer
 
 
 __all__ = ['ROUTES']
@@ -35,9 +36,8 @@ def _get_customer():
 def _get_articles(customer):
     """Yields articles of the querying customer."""
 
-    for article in Article.select().where(select_options()):
-        if customer in article.customers:
-            yield article
+    return Article.select().join(ArticleCustomer).where(
+        (ArticleCustomer.customer == customer) & select_options())
 
 
 def _get_article(ident):
@@ -71,17 +71,15 @@ def _get_image(ident):
 def list_():
     """Lists the respective news."""
 
-    try:
-        request.args['xml']
-    except KeyError:
-        return JSON([
-            article.to_dict(preview=True) for article in _get_articles(
-                _get_customer())])
+    if 'xml' in request.args:
+        news = dom.news()
+        news.article = [article.to_dom() for article in _get_articles(
+            _get_customer())]
+        return XML(news)
 
-    news = dom.news()
-    news.article = [article.to_dom() for article in _get_articles(
-        _get_customer())]
-    return XML(news)
+    return JSON([
+        article.to_dict(preview=True) for article in _get_articles(
+            _get_customer())])
 
 
 def get_article(ident):
