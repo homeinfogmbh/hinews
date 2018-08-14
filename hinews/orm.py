@@ -3,7 +3,7 @@
 from contextlib import suppress
 from datetime import datetime
 
-from peewee import PrimaryKeyField, ForeignKeyField, DateField, DateTimeField,\
+from peewee import AutoField, ForeignKeyField, DateField, DateTimeField, \
     CharField, TextField, IntegerField
 
 from filedb import mimetype, FileProperty
@@ -57,7 +57,8 @@ class _NewsModel(JSONModel):
         database = DATABASE
         schema = database.database
 
-    id = PrimaryKeyField()
+    id = AutoField()
+    JSON_FIELDS = {id: 'id'}
 
 
 class Article(_NewsModel):
@@ -71,6 +72,10 @@ class Article(_NewsModel):
     subtitle = CharField(255, null=True)
     text = TextField()
     source = TextField()
+    JSON_FIELDS = {
+        created: 'created', active_from: 'activeFrom',
+        active_until: 'activeUntil', title: 'title', subtitle: 'subtitle',
+        text: 'text', source: 'source'}
 
     @classmethod
     def from_dict(cls, author, dictionary, **kwargs):
@@ -184,6 +189,7 @@ class Editor(_NewsModel):
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
     timestamp = DateTimeField(default=datetime.now)
+    JSON_FIELDS = {article: 'article', timestamp: 'timestamp'}
 
     @classmethod
     def add(cls, article, account):
@@ -193,9 +199,9 @@ class Editor(_NewsModel):
         except cls.DoesNotExist:
             return cls(article=article, account=account)
 
-    def to_dict(self):
+    def to_dict(self, *args, **kwargs):
         """Returns a JSON-ish dictionary."""
-        dictionary = super().to_dict()
+        dictionary = super().to_dict(*args, **kwargs)
         dictionary['account'] = self.account.info
         return dictionary
 
@@ -215,6 +221,7 @@ class Image(_NewsModel):
     uploaded = DateTimeField()
     source = TextField(null=True)
     data = FileProperty(_file)
+    JSON_FIELDS = {article: 'article', uploaded: 'uploaded', source: 'source'}
 
     @classmethod
     def add(cls, article, data, metadata, account):
@@ -279,6 +286,7 @@ class TagList(_NewsModel):
         table_name = 'tag_list'
 
     tag = CharField(255)
+    JSON_FIELDS = {tag: 'tag'}
 
     @classmethod
     def add(cls, tag):
@@ -297,6 +305,7 @@ class Tag(_NewsModel):
     article = ForeignKeyField(
         Article, column_name='article', backref='tags', on_delete='CASCADE')
     tag = CharField(255)
+    JSON_FIELDS = {article: 'article', tag: 'tag'}
 
     @classmethod
     def add(cls, article, tag, validate=True):
@@ -331,6 +340,7 @@ class Whitelist(_NewsModel):
         on_delete='CASCADE')
     customer = ForeignKeyField(
         Customer, column_name='customer', on_delete='CASCADE')
+    JSON_FIELDS = {customer: 'customer'}
 
     @classmethod
     def add(cls, article, customer):
@@ -344,10 +354,6 @@ class Whitelist(_NewsModel):
             article_customer.customer = customer
             return article_customer
 
-    def to_dict(self):
-        """Returns a JSON-ish representation of the article customer."""
-        return {'id': self.id, 'customer': self.customer.id}
-
 
 class AccessToken(_NewsModel):
     """Customers' access tokens."""
@@ -360,6 +366,7 @@ class AccessToken(_NewsModel):
         Customer, column_name='customer', on_delete='CASCADE',
         on_update='CASCADE')
     token = UUID4Field()
+    JSON_FIELDS = {customer: 'customer', token: 'token'}
 
     @classmethod
     def add(cls, customer):
