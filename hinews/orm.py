@@ -13,7 +13,7 @@ from peeweeplus import MySQLDatabase, JSONModel, UUID4Field
 
 from hinews import dom
 from hinews.config import CONFIG
-from hinews.exceptions import InvalidCustomer, InvalidTag
+from hinews.exceptions import InvalidTag
 from hinews.watermark import watermark
 
 
@@ -24,7 +24,6 @@ __all__ = [
     'Editor',
     'Image',
     'TagList',
-    'Customers',
     'Tag',
     'Whitelist',
     'AccessToken',
@@ -292,29 +291,6 @@ class TagList(_NewsModel):
             return tag_
 
 
-class Customers(_NewsModel):
-    """Csutomers enabled for gettings news."""
-
-    customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE',
-        on_update='CASCADE')
-
-    @classmethod
-    def add(cls, customer):
-        """Adds the respective customer."""
-        try:
-            return cls.get(cls.customer == customer)
-        except cls.DoesNotExist:
-            customer_list = cls()
-            customer_list.customer = customer
-            customer_list.save()
-            return customer_list
-
-    def to_dict(self):
-        """Returns the respective customer's dict."""
-        return self.customer.to_dict(company=True)
-
-
 class Tag(_NewsModel):
     """Article <> Tag mappings."""
 
@@ -360,11 +336,6 @@ class Whitelist(_NewsModel):
     def add(cls, article, customer):
         """Adds the respective customer to the article."""
         try:
-            Customers.get(Customers.customer == customer)
-        except Customers.DoesNotExist:
-            raise InvalidCustomer(customer)
-
-        try:
             return cls.get(
                 (cls.article == article) & (cls.customer == customer))
         except cls.DoesNotExist:
@@ -401,5 +372,4 @@ class AccessToken(_NewsModel):
             return access_token
 
 
-MODELS = [
-    Article, Editor, Image, TagList, Customers, Tag, Whitelist, AccessToken]
+MODELS = [Article, Editor, Image, TagList, Tag, Whitelist, AccessToken]

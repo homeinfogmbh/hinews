@@ -5,10 +5,9 @@ from flask import request
 from his import authenticated, authorized
 from wsgilib import JSON
 
-from hinews.exceptions import InvalidCustomer
 from hinews.messages.customer import NoSuchCustomer, CustomerAdded, \
     CustomerDeleted
-from hinews.orm import Customers, Whitelist
+from hinews.orm import AccessToken, Whitelist
 from hinews.wsgi.article import get_article
 
 
@@ -20,7 +19,8 @@ __all__ = ['ROUTES']
 def list_():
     """Lists available customers."""
 
-    return JSON([customer.to_dict() for customer in Customers])
+    customers = set(access_token.customer for access_token in AccessToken)
+    return JSON([customer.to_dict() for customer in customers])
 
 
 @authenticated
@@ -38,12 +38,7 @@ def post(ident):
     """Adds a customer to the respective article."""
 
     article = get_article(ident)
-
-    try:
-        customer = Whitelist.add(article, request.data.decode())
-    except InvalidCustomer:
-        return NoSuchCustomer()
-
+    customer = Whitelist.add(article, request.data.decode())
     customer.save()
     return CustomerAdded(id=customer.id)
 

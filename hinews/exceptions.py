@@ -1,13 +1,7 @@
 """Exceptions."""
 
 
-__all__ = ['InvalidCustomer', 'InvalidElements', 'InvalidTag']
-
-
-class InvalidCustomer(Exception):
-    """Indicates that a respective tag is not registered."""
-
-    pass
+__all__ = ['InvalidElements', 'InvalidTag']
 
 
 class InvalidElements(Exception):

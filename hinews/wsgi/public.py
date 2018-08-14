@@ -10,7 +10,7 @@ from hinews.messages.article import NoSuchArticle
 from hinews.messages.image import NoSuchImage
 from hinews.messages.public import MissingAccessToken, InvalidAccessToken
 from hinews.wsgi.functions import select_options
-from hinews.orm import article_active, Article, Image, AccessToken
+from hinews.orm import Article, Image, AccessToken
 
 
 __all__ = ['ROUTES']
@@ -54,10 +54,10 @@ def _get_article(ident):
     except Article.DoesNotExist:
         raise NoSuchArticle()
 
-    customers = image.article.customers
+    customers = article.customers
 
     if not customers or customer in customers:
-        return image
+        return article
 
     raise NoSuchArticle()
 
