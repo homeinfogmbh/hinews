@@ -227,7 +227,7 @@ class Image(_NewsModel):
     def patch_json(self, dictionary):
         """Patches the image metadata with the respective dictionary."""
         return super().patch_json(
-            dictionary, skip=('uploaded', '_file'), fk_fields=False)
+            dictionary, skip=('uploaded',), fk_fields=False)
 
     def to_json(self, preview=False, fk_fields=True, **kwargs):
         """Returns a JSON-compliant integer."""
