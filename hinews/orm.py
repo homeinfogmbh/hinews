@@ -1,16 +1,15 @@
 """ORM models."""
 
-from contextlib import suppress
 from datetime import datetime
 from uuid import uuid4
 
-from peewee import AutoField, ForeignKeyField, DateField, DateTimeField, \
-    CharField, TextField, IntegerField, UUIDField
+from peewee import ForeignKeyField, DateField, DateTimeField, CharField, \
+    TextField, IntegerField, UUIDField
 
 from filedb import mimetype, FileProperty
 from his.orm import Account
 from mdb import Customer
-from peeweeplus import MySQLDatabase, JSONModel, JSONField
+from peeweeplus import MySQLDatabase, JSONModel
 
 from hinews import dom
 from hinews.config import CONFIG
@@ -58,31 +57,26 @@ class _NewsModel(JSONModel):
         database = DATABASE
         schema = database.database
 
-    id = JSONField(AutoField)
-
 
 class Article(_NewsModel):
     """A news-related text."""
 
     author = ForeignKeyField(Account, column_name='author')
-    created = JSONField(DateTimeField, default=datetime.now)
-    active_from = JSONField(DateField, null=True, key='activeFrom')
-    active_until = JSONField(DateField, null=True, key='activeUntil')
-    title = JSONField(CharField, 255)
-    subtitle = JSONField(CharField, 255, null=True)
-    text = JSONField(TextField)
-    source = JSONField(TextField)
+    created = DateTimeField(default=datetime.now)
+    active_from = DateField(null=True)
+    active_until = DateField(null=True)
+    title = CharField(255)
+    subtitle = CharField(255, null=True)
+    text = TextField()
+    source = TextField()
+    JSON_KEYS = {'activeFrom': active_from, 'activeUntil': active_until}
 
     @classmethod
-    def from_dict(cls, author, dictionary, **kwargs):
+    def from_json(cls, dictionary, author, **kwargs):
         """Creates a new article from the provided dictionary."""
-        tags = dictionary.pop('tags', None)
-        customers = dictionary.pop('customers', None)
-        article = super().from_dict(dictionary, **kwargs)
+        article = super().from_json(dictionary, **kwargs)
         article.author = author
-        yield article
-        yield from article.update_tags(tags)
-        yield from article.update_customers(customers)
+        return article
 
     @property
     def customers(self):
@@ -90,14 +84,6 @@ class Article(_NewsModel):
         are whitelisted for this article.
         """
         return frozenset(whitelist.customer for whitelist in self.whitelist)
-
-    def patch(self, dictionary, **kwargs):
-        """Patches article from the provided dictionary."""
-        tags = dictionary.pop('tags', None)
-        customers = dictionary.pop('customers', None)
-        yield super().patch(dictionary, **kwargs)
-        yield from self.update_tags(tags)
-        yield from self.update_customers(customers)
 
     def update_tags(self, tags):
         """Updates the respective tags."""
@@ -127,23 +113,23 @@ class Article(_NewsModel):
         for cid in cids:
             yield Whitelist.add(self, cid)
 
-    def to_dict(self, preview=False, fk_fields=True, **kwargs):
+    def to_json(self, preview=False, fk_fields=True, **kwargs):
         """Returns a JSON-ish dictionary."""
         if preview:
             fk_fields = False
 
-        dictionary = super().to_dict(fk_fields=fk_fields, **kwargs)
+        dictionary = super().to_json(fk_fields=fk_fields, **kwargs)
         dictionary['images'] = [
-            image.to_dict(preview=preview) for image in self.images]
+            image.to_json(preview=preview) for image in self.images]
         dictionary['tags'] = [
-            tag.to_dict(preview=preview) for tag in self.tags]
+            tag.to_json(preview=preview) for tag in self.tags]
 
         if not preview:
             dictionary['author'] = self.author.info
             dictionary['editors'] = [
-                editor.to_dict() for editor in self.editors]
+                editor.to_json() for editor in self.editors]
             dictionary['customers'] = [
-                customer.to_dict() for customer in self.customers]
+                customer.to_json() for customer in self.customers]
 
         return dictionary
 
@@ -180,12 +166,11 @@ class Editor(_NewsModel):
         """Sets the table name."""
         table_name = 'editor'
 
-    article = JSONField(
-        ForeignKeyField, Article, column_name='article', backref='editors',
-        on_delete='CASCADE')
+    article = ForeignKeyField(
+        Article, column_name='article', backref='editors', on_delete='CASCADE')
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    timestamp = JSONField(DateTimeField, default=datetime.now)
+    timestamp = DateTimeField(default=datetime.now)
 
     @classmethod
     def add(cls, article, account):
@@ -195,9 +180,9 @@ class Editor(_NewsModel):
         except cls.DoesNotExist:
             return cls(article=article, account=account)
 
-    def to_dict(self, *args, **kwargs):
+    def to_json(self, *args, **kwargs):
         """Returns a JSON-ish dictionary."""
-        dictionary = super().to_dict(*args, **kwargs)
+        dictionary = super().to_json(*args, **kwargs)
         dictionary['account'] = self.account.info
         return dictionary
 
@@ -209,14 +194,13 @@ class Image(_NewsModel):
         """Sets the table name."""
         table_name = 'image'
 
-    article = JSONField(
-        ForeignKeyField, Article, column_name='article', backref='images',
-        on_delete='CASCADE')
+    article = ForeignKeyField(
+        Article, column_name='article', backref='images', on_delete='CASCADE')
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
     _file = IntegerField(column_name='file')
-    uploaded = JSONField(DateTimeField)
-    source = JSONField(TextField, null=True)
+    uploaded = DateTimeField()
+    source = TextField(null=True)
     data = FileProperty(_file)
 
     @classmethod
@@ -240,17 +224,17 @@ class Image(_NewsModel):
         """Returns a watermarked image."""
         return watermark(self.data, 'Quelle: {}'.format(self.oneliner))
 
-    def patch(self, dictionary):
+    def patch_json(self, dictionary):
         """Patches the image metadata with the respective dictionary."""
-        with suppress(KeyError):
-            self.source = dictionary['source']
+        return super().patch_json(
+            dictionary, skip=('uploaded', '_file'), fk_fields=False)
 
-    def to_dict(self, preview=False, fk_fields=True, **kwargs):
+    def to_json(self, preview=False, fk_fields=True, **kwargs):
         """Returns a JSON-compliant integer."""
         if preview:
             fk_fields = False
 
-        dictionary = super().to_dict(fk_fields=fk_fields, **kwargs)
+        dictionary = super().to_json(fk_fields=fk_fields, **kwargs)
 
         if not preview:
             dictionary['account'] = self.account.info
@@ -281,7 +265,7 @@ class TagList(_NewsModel):
         """Sets the table name."""
         table_name = 'tag_list'
 
-    tag = JSONField(CharField, 255)
+    tag = CharField(255)
 
     @classmethod
     def add(cls, tag):
@@ -297,10 +281,9 @@ class TagList(_NewsModel):
 class Tag(_NewsModel):
     """Article <> Tag mappings."""
 
-    article = JSONField(
-        ForeignKeyField, Article, column_name='article', backref='tags',
-        on_delete='CASCADE')
-    tag = JSONField(CharField, 255)
+    article = ForeignKeyField(
+        Article, column_name='article', backref='tags', on_delete='CASCADE')
+    tag = CharField(255)
 
     @classmethod
     def add(cls, article, tag, validate=True):
@@ -319,12 +302,12 @@ class Tag(_NewsModel):
             article_tag.tag = tag
             return article_tag
 
-    def to_dict(self, preview=False, **kwargs):
+    def to_json(self, preview=False, **kwargs):
         """Returns a JSON-ish representation."""
         if preview:
             return self.tag
 
-        return super().to_dict(**kwargs)
+        return super().to_json(**kwargs)
 
 
 class Whitelist(_NewsModel):
@@ -333,8 +316,8 @@ class Whitelist(_NewsModel):
     article = ForeignKeyField(
         Article, column_name='article', backref='whitelist',
         on_delete='CASCADE')
-    customer = JSONField(
-        ForeignKeyField, Customer, column_name='customer', on_delete='CASCADE')
+    customer = ForeignKeyField(
+        Customer, column_name='customer', on_delete='CASCADE')
 
     @classmethod
     def add(cls, article, customer):
@@ -356,10 +339,10 @@ class AccessToken(_NewsModel):
         """Sets the table name."""
         table_name = 'access_token'
 
-    customer = JSONField(
-        ForeignKeyField, Customer, column_name='customer', on_delete='CASCADE',
+    customer = ForeignKeyField(
+        Customer, column_name='customer', on_delete='CASCADE',
         on_update='CASCADE')
-    token = JSONField(UUIDField, default=uuid4)
+    token = UUIDField(default=uuid4)
 
     @classmethod
     def add(cls, customer):

@@ -5,8 +5,7 @@ from flask import request
 from his import authenticated, authorized
 from wsgilib import JSON
 
-from hinews.messages.customer import NoSuchCustomer, CustomerAdded, \
-    CustomerDeleted
+from hinews.messages.customer import CustomerAdded, CustomerDeleted
 from hinews.orm import AccessToken, Whitelist
 from hinews.wsgi.article import get_article
 
@@ -20,7 +19,7 @@ def list_():
     """Lists available customers."""
 
     customers = set(access_token.customer for access_token in AccessToken)
-    return JSON([customer.to_dict() for customer in customers])
+    return JSON([customer.to_json() for customer in customers])
 
 
 @authenticated
@@ -29,7 +28,7 @@ def get(ident):
     """Lists customer of the respective article."""
 
     return JSON([
-        customer.to_dict() for customer in get_article(ident).customers])
+        customer.to_json() for customer in get_article(ident).customers])
 
 
 @authenticated

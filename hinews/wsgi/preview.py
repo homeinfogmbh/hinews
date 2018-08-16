@@ -63,14 +63,14 @@ def list_():
     """Lists the respective news."""
 
     return JSON([
-        article.to_dict(preview=True) for article in _preview_articles()])
+        article.to_json(preview=True) for article in _preview_articles()])
 
 
 @authenticated
 def get_article(ident):
     """Returns the respective article."""
 
-    return JSON(_get_article(ident).to_dict(preview=True))
+    return JSON(_get_article(ident).to_json(preview=True))
 
 
 @authenticated

@@ -27,7 +27,7 @@ def list_():
 def get(ident):
     """Lists tags of the respective article."""
 
-    return JSON([tag.to_dict() for tag in get_article(ident).tags])
+    return JSON([tag.to_json() for tag in get_article(ident).tags])
 
 
 @authenticated

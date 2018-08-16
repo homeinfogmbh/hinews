@@ -31,7 +31,7 @@ def get_image(ident):
 def list_():
     """Lists all available images."""
 
-    return JSON([image.to_dict() for image in Image])
+    return JSON([image.to_json() for image in Image])
 
 
 @authenticated
@@ -39,7 +39,7 @@ def list_():
 def list_article_images(ident):
     """Lists all images of the respective articles."""
 
-    return JSON([image.to_dict() for image in get_article(ident).images])
+    return JSON([image.to_json() for image in get_article(ident).images])
 
 
 @authenticated
@@ -101,7 +101,7 @@ def patch(ident):
     """Modifies image meta data."""
 
     image = get_image(ident)
-    image.patch(request.json)
+    image.patch_json(request.json)
     image.save()
     return ImagePatched()
 

@@ -90,14 +90,14 @@ def list_():
         return XML(news)
 
     return JSON([
-        article.to_dict(preview=True) for article in _get_articles(
+        article.to_json(preview=True) for article in _get_articles(
             _get_customer())])
 
 
 def get_article(ident):
     """Returns the respective article."""
 
-    return JSON(_get_article(ident).to_dict(preview=True))
+    return JSON(_get_article(ident).to_json(preview=True))
 
 
 def get_image(ident):

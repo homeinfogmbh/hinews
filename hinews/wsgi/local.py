@@ -47,7 +47,7 @@ def list_():
     try:
         request.args['xml']
     except KeyError:
-        return JSON([article.to_dict() for article in _get_articles()])
+        return JSON([article.to_json() for article in _get_articles()])
 
     news = dom.news()
     news.article = [article.to_dom() for article in _get_articles()]
@@ -57,7 +57,7 @@ def list_():
 def get_article(ident):
     """Returns the respective article."""
 
-    return JSON(_get_article(ident).to_dict())
+    return JSON(_get_article(ident).to_json())
 
 
 def get_image(ident):

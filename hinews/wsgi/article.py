@@ -3,8 +3,6 @@
 from flask import request
 
 from his import ACCOUNT, authenticated, authorized
-from his.messages import MissingData, InvalidData
-from peeweeplus import FieldValueError, FieldNotNullable
 from wsgilib import JSON
 
 from hinews.messages.article import NoSuchArticle, ArticleCreated, \
@@ -29,7 +27,7 @@ def get_article(ident):
 def list_():
     """Lists all available articles."""
 
-    return JSON([article.to_dict() for article in Article])
+    return JSON([article.to_json() for article in Article])
 
 
 @authenticated
@@ -37,7 +35,7 @@ def list_():
 def get(ident):
     """Returns a specific article."""
 
-    return JSON(get_article(ident).to_dict())
+    return JSON(get_article(ident).to_json())
 
 
 @authenticated
@@ -45,17 +43,17 @@ def get(ident):
 def post():
     """Adds a new article."""
 
-    try:
-        article, *related_records = Article.from_dict(
-            ACCOUNT.id, request.json, fk_fields=False)
-        article.save()
+    json = request.json
+    tags = json.pop('tags', None)
+    customers = json.pop('customers', None)
+    article = Article.from_json(json, ACCOUNT.id, fk_fields=False)
+    article.save()
 
-        for record in related_records:
-            record.save()
-    except FieldNotNullable as field_not_nullable:
-        raise MissingData(**field_not_nullable.to_dict())
-    except FieldValueError as field_value_error:
-        raise InvalidData(**field_value_error.to_dict())
+    for tag in article.update_tags(tags):
+        tag.save()
+
+    for customer in article.update_customers(customers):
+        customer.save()
 
     return ArticleCreated(id=article.id)
 
@@ -75,11 +73,17 @@ def patch(ident):
     """Adds a new article."""
 
     article = get_article(ident)
-    article, *related_records = article.patch(request.json, fk_fields=False)
+    json = request.json
+    tags = json.pop('tags', None)
+    customers = json.pop('customers', None)
+    article.patch_json(json, fk_fields=False)
     article.save()
 
-    for record in related_records:
-        record.save()
+    for tag in article.update_tags(tags):
+        tag.save()
+
+    for customer in article.update_customers(customers):
+        customer.save()
 
     new_editor = Editor.add(article, ACCOUNT.id)
     new_editor.save()
