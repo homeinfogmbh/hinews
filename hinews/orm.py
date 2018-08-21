@@ -104,8 +104,8 @@ class Article(_NewsModel):
         if cids is None:
             return
 
-        for customer in self.customers:
-            customer.delete_instance()
+        for whitelist in self.whitelist:
+            whitelist.delete_instance()
 
         if not cids:
             return
