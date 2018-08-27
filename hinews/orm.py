@@ -119,13 +119,13 @@ class Article(_NewsModel):
             fk_fields = False
 
         dictionary = super().to_json(fk_fields=fk_fields, **kwargs)
-        dictionary['author'] = self.author.info
         dictionary['images'] = [
             image.to_json(preview=preview) for image in self.images]
         dictionary['tags'] = [
             tag.to_json(preview=preview) for tag in self.tags]
 
         if not preview:
+            dictionary['author'] = self.author.info
             dictionary['editors'] = [
                 editor.to_json() for editor in self.editors]
             dictionary['customers'] = [
