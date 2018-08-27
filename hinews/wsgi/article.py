@@ -1,11 +1,9 @@
 """Article handlers."""
 
-from datetime import datetime
-
 from flask import request
 
 from his import ACCOUNT, authenticated, authorized
-from wsgilib import JSON
+from wsgilib import browse, JSON
 
 from hinews.messages.article import NoSuchArticle, ArticleCreated, \
     ArticleDeleted, ArticlePatched
@@ -29,14 +27,7 @@ def get_article(ident):
 def list_():
     """Lists all available articles."""
 
-    if 'all' in request.args:
-        articles = Article
-    else:
-        articles = Article.select().where(
-            (Article.active_until >> None)
-            | (Article.active_until >= datetime.now()))
-
-    return JSON([article.to_json() for article in articles])
+    return JSON([article.to_json() for article in browse(Article)])
 
 
 @authenticated
