@@ -51,10 +51,10 @@ def article_active():
 
 
 @lru_cache()
-def _account_by_id(ident):
+def _cached_account_info(ident):
     """Returns the respective author by its ID."""
 
-    return Account.get(Account.id == ident)
+    return Account.get(Account.id == ident).to_json()
 
 
 class _NewsModel(JSONModel):
@@ -133,7 +133,7 @@ class Article(_NewsModel):
             tag.to_json(preview=preview) for tag in self.tags]
 
         if not preview:
-            dictionary['author'] = _account_by_id(self.author_id).info
+            dictionary['author'] = _cached_account_info(self.author_id)
             dictionary['editors'] = [
                 editor.to_json() for editor in self.editors]
             dictionary['customers'] = [
@@ -245,7 +245,7 @@ class Image(_NewsModel):
         dictionary = super().to_json(fk_fields=fk_fields, **kwargs)
 
         if not preview:
-            dictionary['account'] = _account_by_id(self.account_id).info
+            dictionary['account'] = _cached_account_info(self.account_id)
 
         dictionary['mimetype'] = mimetype(self._file)
         return dictionary
