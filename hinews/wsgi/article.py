@@ -1,5 +1,7 @@
 """Article handlers."""
 
+from datetime import datetime
+
 from flask import request
 
 from his import ACCOUNT, authenticated, authorized
@@ -27,7 +29,14 @@ def get_article(ident):
 def list_():
     """Lists all available articles."""
 
-    return JSON([article.to_json() for article in Article])
+    if 'all' in request.args:
+        articles = Article
+    else:
+        articles = Article.select().where(
+            (Article.active_until >> None)
+            | (Article.active_until >= datetime.now()))
+
+    return JSON([article.to_json() for article in articles])
 
 
 @authenticated
