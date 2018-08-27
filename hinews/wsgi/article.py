@@ -7,7 +7,7 @@ from wsgilib import browse, JSON
 
 from hinews.messages.article import NoSuchArticle, ArticleCreated, \
     ArticleDeleted, ArticlePatched
-from hinews.orm import Article, Editor
+from hinews.orm import article_active, Article, Editor
 
 
 __all__ = ['get_article', 'ROUTES']
@@ -27,7 +27,9 @@ def get_article(ident):
 def list_():
     """Lists all available articles."""
 
-    return JSON([article.to_json() for article in browse(Article)])
+    articles = Article if 'all' in request.args else Article.select().where(
+        article_active())
+    return JSON([article.to_json() for article in browse(articles)])
 
 
 @authenticated
