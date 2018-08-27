@@ -1,6 +1,7 @@
 """ORM models."""
 
 from datetime import datetime
+from functools import lru_cache
 from uuid import uuid4
 
 from peewee import ForeignKeyField, DateField, DateTimeField, CharField, \
@@ -47,6 +48,13 @@ def article_active():
     return (
         ((Article.active_from >> None) | (Article.active_from <= now))
         & ((Article.active_until >> None) | (Article.active_until >= now)))
+
+
+@lru_cache()
+def _account_by_id(ident):
+    """Returns the respective author by its ID."""
+
+    return Account.get(Account.id == ident)
 
 
 class _NewsModel(JSONModel):
@@ -125,7 +133,7 @@ class Article(_NewsModel):
             tag.to_json(preview=preview) for tag in self.tags]
 
         if not preview:
-            dictionary['author'] = self.author.info
+            dictionary['author'] = _account_by_id(self.author_id).info
             dictionary['editors'] = [
                 editor.to_json() for editor in self.editors]
             dictionary['customers'] = [
@@ -237,7 +245,7 @@ class Image(_NewsModel):
         dictionary = super().to_json(fk_fields=fk_fields, **kwargs)
 
         if not preview:
-            dictionary['account'] = self.account.info
+            dictionary['account'] = _account_by_id(self.account_id).info
 
         dictionary['mimetype'] = mimetype(self._file)
         return dictionary
