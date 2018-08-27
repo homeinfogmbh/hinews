@@ -27,7 +27,7 @@ def get_article(ident):
 def list_():
     """Lists all available articles."""
 
-    return JSON([article.to_json(preview=True) for article in Article])
+    return JSON([article.to_json() for article in Article])
 
 
 @authenticated
