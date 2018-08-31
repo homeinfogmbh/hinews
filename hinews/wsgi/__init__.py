@@ -1,6 +1,6 @@
 """WSGI application."""
 
-from wsgilib import Application
+from his import Application
 
 from hinews.wsgi import article, customer, dscms3, image, preview, public, tag
 from hinews.wsgi.local import APPLICATION as LOCAL_APPLICATION
