@@ -27,8 +27,13 @@ def get_article(ident):
 def list_():
     """Lists all available articles."""
 
-    articles = Article if 'all' in request.args else Article.select().where(
-        article_active())
+    if 'all' in request.args:
+        articles = Article
+    elif 'inactive' in request.args:
+        articles = Article.select().where(~ article_active())
+    else:
+        articles = Article.select().where(article_active())
+
     return JSON([article.to_json() for article in browse(
         articles, default_size=20)])
 
