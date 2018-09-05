@@ -29,7 +29,8 @@ def list_():
 
     articles = Article if 'all' in request.args else Article.select().where(
         article_active())
-    return JSON([article.to_json() for article in browse(articles)])
+    return JSON([article.to_json() for article in browse(
+        articles, default_size=20)])
 
 
 @authenticated
