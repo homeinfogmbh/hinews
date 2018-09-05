@@ -3,7 +3,7 @@
 from flask import request
 
 from his import ACCOUNT, authenticated, authorized
-from wsgilib import browse, JSON
+from wsgilib import JSON, Browser
 
 from hinews.messages.article import NoSuchArticle, ArticleCreated, \
     ArticleDeleted, ArticlePatched
@@ -11,6 +11,9 @@ from hinews.orm import article_active, Article, Editor
 
 
 __all__ = ['get_article', 'ROUTES']
+
+
+BROWSER = Browser(default_size=20)
 
 
 def get_article(ident):
@@ -34,8 +37,10 @@ def list_():
     else:
         articles = Article.select().where(article_active())
 
-    return JSON([article.to_json() for article in browse(
-        articles, default_size=20)])
+    if BROWSER.info:
+        return JSON(BROWSER.pages(articles).to_json())
+
+    return JSON([article.to_json() for article in BROWSER.browse(articles)])
 
 
 @authenticated
