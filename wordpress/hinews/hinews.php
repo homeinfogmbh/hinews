@@ -42,7 +42,10 @@ function hinews_shortcode(){
         $result .= '<br/>';
 
         foreach ($news->images as $image) {
-            $image_url = plugins_url('images.php?id=' . $image->id . '&mimetype=' . image->mimetype, __FILE__);
+            $php_file = 'images.php';
+            $args = {'id' => $image->id, 'mimetype' => $image.mimetype};
+            $url_args = '?' . http_build_query($args);
+            $image_url = plugins_url($php_file . $url_args, __FILE__);
             $result .= '<img src="' . $image_url . '" alt="' . $image->source . '">';
             $result .= '<br/>';
         }
