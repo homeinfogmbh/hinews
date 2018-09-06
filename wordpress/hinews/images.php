@@ -6,7 +6,7 @@ if (! function_exists('add_action')) {
 }
 
 
-function hinews_get_image($id. $mimetype) {
+function hinews_get_image($id, $mimetype) {
     $options = get_option('homeinfo_news_options');
     $parm_token = '?access_token=' . $options['token'];
     $base_url = 'https://backend.homeinfo.de/hinews/pub/image/';
