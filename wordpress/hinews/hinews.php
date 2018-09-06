@@ -23,7 +23,6 @@ function hinews_shortcode(){
     wp_enqueue_style('hinews.css', plugins_url('hinews.css', __FILE__));
     wp_enqueue_script('hinews.js', plugins_url('hinews.js', __FILE__));
     $options = get_option('homeinfo_news_options');
-    wp_localize_script('hinews.js', 'php_vars', $options);
     $parm_token = '?access_token=' . $options['token'];
     $base_url = 'https://backend.homeinfo.de/hinews/pub/article';
     $articles_url = $base_url . $parm_token;
