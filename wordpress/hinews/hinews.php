@@ -48,6 +48,6 @@ function hinews_shortcode(){
         }
     }
 
-    return $result
+    return $result;
 }
 ?>
