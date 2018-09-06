@@ -21,7 +21,7 @@ add_shortcode('hinews', 'hinews_shortcode');
 
 function hinews_shortcode(){
 	wp_enqueue_style('hinews.css', plugins_url('hinews.css', __FILE__));
-    wp_enqueue_script('hinews.js', plugins_url('js/hinews.js', __FILE__));
+    wp_enqueue_script('hinews.js', plugins_url('hinews.js', __FILE__));
 
 	$options = get_option('homeinfo_news');
 	wp_localize_script('hinews.js', 'php_vars', $options);

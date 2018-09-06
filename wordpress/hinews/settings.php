@@ -14,7 +14,7 @@ class HomeinfoNewsSettings {
         add_action('admin_menu', array($this, 'add_plugin_page') );
         add_action('admin_init', array($this, 'page_init'));
 	    //fill current options
-	    $this->options = get_option('homeinfo_news');
+	    $this->options = get_option('homeinfo_news_options');
     }
 
     //fuegt Einstellungsseite hinzu
@@ -24,7 +24,7 @@ class HomeinfoNewsSettings {
             'Settings Admin',
             'HOMEINFO News',
             'manage_options',
-            'homeinfo_news',
+            'homeinfo_news_settings_page',
             array($this, 'create_admin_page')
         );
     }
@@ -41,8 +41,8 @@ class HomeinfoNewsSettings {
         echo '<form method="post" action="options.php">';
 
         // This prints out all hidden setting fields
-        settings_fields('homeinfo_news');
-        do_settings_sections('homeinfo_news');
+        settings_fields('homeinfo_news_options');
+        do_settings_sections('homeinfo_news_settings_page');
         submit_button();
 
         echo '</form></div>';
@@ -53,23 +53,23 @@ class HomeinfoNewsSettings {
     {
         register_setting(
             'HOMEINFO', // Option group
-            'homeinfo_news', // Option name
+            'homeinfo_news_options', // Option name
             array( $this, 'sanitize' ) // Sanitize
         );
 
         add_settings_section(
-            'setting_section_1', // ID
+            'homeinfo_news_settings_section', // ID
             'Kundenspezifische Einstellungen', // Title
             array( $this, '' ), // Callback
-            'homeinfo_news' // Page
+            'homeinfo_news_settings_page' // Page
         );
 
         add_settings_field(
             'homeinfo_news_token', // ID
             'Token', // Title
             array($this, 'token_callback'), // Callback
-            'homeinfo_news', // Page
-            'setting_section_1' // Section
+            'homeinfo_news_settings_page', // Page
+            'homeinfo_news_settings_section' // Section
         );
     }
 
@@ -94,7 +94,7 @@ class HomeinfoNewsSettings {
      * Get the settings option array and print one of its values
      */
     public function token_callback() {
-	    echo '<input type="text" id="homeinfo_news_token" name="homeinfo_news[token]" value="'.$this->options['token'].'"/>';
+	    echo '<input type="text" id="homeinfo_news_token" name="homeinfo_news_options[token]" value="'.$this->options['token'].'"/>';
     }
 }
 
