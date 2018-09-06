@@ -77,7 +77,6 @@ class Article(_NewsModel):
     subtitle = CharField(255, null=True)
     text = TextField()
     source = TextField()
-    JSON_KEYS = {'activeFrom': active_from, 'activeUntil': active_until}
 
     @classmethod
     def from_json(cls, dictionary, author, **kwargs):
