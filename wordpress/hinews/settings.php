@@ -1,7 +1,7 @@
 <?php
 
 // Make sure we don't expose any info if called directly
-if ( !function_exists( 'add_action' ) ) {
+if (! function_exists('add_action')) {
         echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
         exit;
 }
@@ -13,8 +13,8 @@ class HomeinfoNewsSettings {
     public function __construct() {
         add_action('admin_menu', array($this, 'add_plugin_page') );
         add_action('admin_init', array($this, 'page_init'));
-	    //fill current options
-	    $this->options = get_option('homeinfo_news_options');
+        //fill current options
+        $this->options = get_option('homeinfo_news_options');
     }
 
     //fuegt Einstellungsseite hinzu
@@ -33,10 +33,10 @@ class HomeinfoNewsSettings {
     public function create_admin_page() {
         echo '<div class="wrap"><h1>HOMEINFO News Einstellungen</h1>';
 
-	    if (isset( $_GET['settings-updated'])) {
-		    // add settings saved message with the class of "updated"
-		    add_settings_error('wporg_messages', 'wporg_message', __('Settings Saved', 'wporg'), 'updated');
-	    }
+        if (isset( $_GET['settings-updated'])) {
+            // add settings saved message with the class of "updated"
+            add_settings_error('wporg_messages', 'wporg_message', __('Settings Saved', 'wporg'), 'updated');
+        }
 
         echo '<form method="post" action="options.php">';
 
@@ -54,13 +54,13 @@ class HomeinfoNewsSettings {
         register_setting(
             'HOMEINFO', // Option group
             'homeinfo_news_options', // Option name
-            array( $this, 'sanitize' ) // Sanitize
+            array($this, 'sanitize') // Sanitize
         );
 
         add_settings_section(
             'homeinfo_news_settings_section', // ID
             'Kundenspezifische Einstellungen', // Title
-            array( $this, '' ), // Callback
+            array($this, ''), // Callback
             'homeinfo_news_settings_page' // Page
         );
 
@@ -78,14 +78,12 @@ class HomeinfoNewsSettings {
      *
      * @param array $input Contains all settings fields as array keys
      */
-    public function sanitize( $input ) {
+    public function sanitize($input) {
         $new_input = array();
 
-        if( isset( $input['customerId'] ) )
-            $new_input['customerId'] = absint( $input['customerId'] );
-
-	    if( isset( $input['recaptcha'] ) )
-	        $new_input['recaptcha'] = htmlentities($input['recaptcha']);
+        if (isset($input['token'])) {
+            $new_input['token'] = htmlentities($input['token']);
+        }
 
         return $new_input;
     }
@@ -94,9 +92,10 @@ class HomeinfoNewsSettings {
      * Get the settings option array and print one of its values
      */
     public function token_callback() {
-	    echo '<input type="text" id="homeinfo_news_token" name="homeinfo_news_options[token]" value="'.$this->options['token'].'"/>';
+        echo '<input type="text" id="homeinfo_news_token" name="homeinfo_news_options[token]" value="'.$this->options['token'].'"/>';
     }
 }
 
-if( is_admin() )
+if (is_admin()) {
     $homeinfo_news_settings = new HomeinfoNewsSettings();
+}
