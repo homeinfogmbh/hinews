@@ -6,12 +6,13 @@ if (! function_exists('add_action')) {
 }
 
 
-function hinews_get_image($id) {
+function hinews_get_image($id. $mimetype) {
     $options = get_option('homeinfo_news_options');
     $parm_token = '?access_token=' . $options['token'];
     $base_url = 'https://backend.homeinfo.de/hinews/pub/image/';
     $image_url = $base_url . $id . $parm_token;
-    $image file_get_contents($articles_url);
+    header('Content-type: ' . $mimetype);
+    $image = file_get_contents($articles_url);
 
     if ($image === FALSE) {
         return 'Could not retrieve image.';
@@ -21,6 +22,5 @@ function hinews_get_image($id) {
 }
 
 
-hinews_get_image($_GET['id']);
-
+hinews_get_image($_GET['id'], $_GET['mimetype']);
 ?>
