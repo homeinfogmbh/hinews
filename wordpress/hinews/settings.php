@@ -7,7 +7,7 @@ if (! function_exists('add_action')) {
 }
 
 class HomeinfoNewsSettings {
-    // Holds the values to be used in the fields callbacks
+    // Holds the values to be used in the fields callbacks.
     private $options;
 
     public function __construct() {
@@ -17,7 +17,7 @@ class HomeinfoNewsSettings {
         $this->options = get_option('homeinfo_news_options');
     }
 
-    //fuegt Einstellungsseite hinzu
+    // Add settings page.
     public function add_plugin_page() {
         // This page will be under "Settings"
         add_options_page(
@@ -29,7 +29,7 @@ class HomeinfoNewsSettings {
         );
     }
 
-    //Einstellungsseite befuellen
+    // Fill settings page.
     public function create_admin_page() {
         echo '<div class="wrap"><h1>HOMEINFO News Einstellungen</h1>';
 
@@ -52,7 +52,7 @@ class HomeinfoNewsSettings {
     public function page_init()
     {
         register_setting(
-            'HOMEINFO', // Option group
+            'homeinfo_news_options', // Option group
             'homeinfo_news_options', // Option name
             array($this, 'sanitize') // Sanitize
         );
