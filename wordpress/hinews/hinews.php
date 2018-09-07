@@ -3,7 +3,7 @@
 * Plugin Name: HOMEINFO News
 * Plugin URI: https://www.homeinfo.de/
 * Description: News articles provided by HOMEINFO.
-* Version: 1.0.7
+* Version: 1.0.8
 **/
 
 // Make sure we don't expose any info if called directly.
@@ -41,6 +41,8 @@ function hinews_articles() {
 
     foreach ($news_list as $news) {
         $images = '';
+        $title = html_entity_decode($news->title);
+        $text = html_entity_decode($news->text);
 
         foreach ($news->images as $image) {
             $args = array('id' => $image->id, 'mimetype' => $image->mimetype);
@@ -49,7 +51,7 @@ function hinews_articles() {
             $images .= sprintf($image_template, $image_url, $image->source);
         }
 
-        $articles .= sprintf($article_template, $news->title, $news->text, $images);
+        $articles .= sprintf($article_template, $title, $text, $images);
     }
 
     return $articles;
