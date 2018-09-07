@@ -20,7 +20,6 @@ add_shortcode('hinews', 'hinews_shortcode');
 
 
 function hinews_articles() {
-    global $wp;
     wp_enqueue_style('hinews.css', plugins_url('hinews.css', __FILE__));
     wp_enqueue_script('hinews.js', plugins_url('hinews.js', __FILE__));
     $options = get_option('homeinfo_news_options');
@@ -43,7 +42,8 @@ function hinews_articles() {
 
         foreach ($news->images as $image) {
             $args = array('id' => $image->id, 'mimetype' => $image->mimetype);
-            $image_url = home_url(add_query_arg($args, $wp->request));
+            $query_parms = '?' . http_build_query($args);
+            $image_url = plugins_url('images.php' . $query_parms, __FILE__);
             $result .= '<img src="' . $image_url . '" alt="' . $image->source . '">';
             $result .= '<br/>';
         }
@@ -53,33 +53,7 @@ function hinews_articles() {
 }
 
 
-function hinews_get_image($image_id) {
-    if (array_key_exists('mimetype', $_GET) {
-        $mimetype = $_GET['mimetype'];
-    } else {
-        return 'No MIME type specified.';
-    }
-
-    $options = get_option('homeinfo_news_options');
-    $parm_token = '?access_token=' . $options['token'];
-    $base_url = 'https://backend.homeinfo.de/hinews/pub/image/';
-    $image_url = $base_url . $image_id . $parm_token;
-    header('Content-type: ' . $mimetype);
-    $image = file_get_contents($articles_url);
-
-    if ($image === FALSE) {
-        return 'Could not retrieve image.';
-    }
-
-    return $image;
-}
-
-
 function hinews_shortcode() {
-    if (array_key_exists('image', $_GET) {
-        return hinews_get_image($_GET['image']);
-    }
-
     return hinews_articles();
 }
 ?>
