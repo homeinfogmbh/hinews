@@ -6,6 +6,10 @@ if (! function_exists('add_action')) {
         exit;
 }
 
+
+require_once("settings.php");
+
+
 class HomeinfoNewsSettings {
     // Holds the values to be used in the fields callbacks.
     private $options;
@@ -48,9 +52,7 @@ class HomeinfoNewsSettings {
         echo '</form></div>';
     }
 
-
-    public function page_init()
-    {
+    public function page_init() {
         register_setting(
             'homeinfo_news_options', // Option group
             'homeinfo_news_options', // Option name
