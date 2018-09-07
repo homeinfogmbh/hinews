@@ -7,9 +7,6 @@ if (! function_exists('add_action')) {
 }
 
 
-require_once("settings.php");
-
-
 class HomeinfoNewsSettings {
     // Holds the values to be used in the fields callbacks.
     private $options;
