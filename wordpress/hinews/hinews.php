@@ -32,21 +32,26 @@ function hinews_articles() {
         return 'Could not load data from API. Check your credentials.';
     }
 
+    $article_template_file = plugins_url('article.html', __FILE__);
+    $article_template = file_get_contents($article_template_file);
+    $image_template_file = plugins_url('image.html', __FILE__);
+    $image_template = file_get_contents($image_template_file);
     $news_list = json_decode($response);
-    $result = '';
+    $articles = '';
 
     foreach ($news_list as $news) {
-        $result .= '<h2>' . $news->title . '</h2>';
-        $result .= '<p>' . $news->text . '</p>';
-        $result .= '<br/>';
+        $images = '';
 
         foreach ($news->images as $image) {
             $args = array('id' => $image->id, 'mimetype' => $image->mimetype);
             $query_parms = '?' . http_build_query($args);
             $image_url = plugins_url('images.php' . $query_parms, __FILE__);
-            $result .= '<img src="' . $image_url . '" alt="' . $image->source . '">';
-            $result .= '<br/>';
+            $image .= sprintf($image_template, $image_url, $image->source);
+            $images .= $image;
         }
+
+        $article = sprintf($article_template, $news->title, $news->text, $images);
+        $articles .= $article;
     }
 
     return $result;
