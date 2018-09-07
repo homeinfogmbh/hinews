@@ -1,12 +1,13 @@
 <?php
-require_once("../../../../wp-load.php");
+// Import wordpress API.
+require_once('../../../wp-load.php');
 
 
 function hinews_get_image($id) {
     if (array_key_exists('mimetype', $_GET)) {
         $mimetype = $_GET['mimetype'];
     } else {
-        return ;
+        return 'No MIME type specified.';
     }
 
     $options = get_option('homeinfo_news_options');
@@ -25,8 +26,8 @@ function hinews_get_image($id) {
 
 
 if (array_key_exists('id', $_GET)) {
-    return hinews_get_image($_GET['id']);
+    echo hinews_get_image($_GET['id']);
 }
 
-return 'No image ID specified.'
+echo 'No image ID specified.'
 ?>
