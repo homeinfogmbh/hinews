@@ -3,7 +3,7 @@
 * Plugin Name: HOMEINFO News
 * Plugin URI: https://www.homeinfo.de/
 * Description: News articles provided by HOMEINFO.
-* Version: 1.1.2
+* Version: 1.1.3
 **/
 
 // Make sure we don't expose any info if called directly.
@@ -19,6 +19,23 @@ require_once("settings.php");
 add_shortcode('hinews', 'hinews_shortcode');
 
 
+function hinews_get_images() {
+    $image_template_file = plugins_url('image.html', __FILE__);
+    $image_template = file_get_contents($image_template_file);
+    $images = array();
+
+    foreach ($news->images as $image) {
+        $args = array('id' => $image->id, 'mimetype' => $image->mimetype);
+        $query_parms = '?' . http_build_query($args);
+        $image_url = plugins_url('images.php' . $query_parms, __FILE__);
+        $image = sprintf($image_template, $image_url, $image->source);
+        array_push($images, $image);
+    }
+
+    return $images;
+}
+
+
 function hinews_articles() {
     wp_enqueue_style('hinews.css', plugins_url('hinews.css', __FILE__));
     wp_enqueue_script('hinews.js', plugins_url('hinews.js', __FILE__));
@@ -32,29 +49,41 @@ function hinews_articles() {
         return 'Could not load data from API. Check your credentials.';
     }
 
+    $article_row_template_file = plugins_url('article_row.html', __FILE__);
+    $article_row_template = file_get_contents($article_row_template_file);
+    $article_col_template_file = plugins_url('article_col.html', __FILE__);
+    $article_col_template = file_get_contents($article_col_template_file);
     $article_template_file = plugins_url('article.html', __FILE__);
     $article_template = file_get_contents($article_template_file);
-    $image_template_file = plugins_url('image.html', __FILE__);
-    $image_template = file_get_contents($image_template_file);
     $news_list = json_decode($response);
     $articles = '';
+    $column_count = 3;
+    $columns = array();
 
     foreach ($news_list as $news) {
-        $images = '';
+        $images = hinews_get_images();
+        $images = implode("\n", $images);
         $title = html_entity_decode($news->title);
         $text = html_entity_decode($news->text);
+        $article = sprintf($article_template, $title, $text, $images);
+        $column = sprintf($article_col_template, $article);
 
-        foreach ($news->images as $image) {
-            $args = array('id' => $image->id, 'mimetype' => $image->mimetype);
-            $query_parms = '?' . http_build_query($args);
-            $image_url = plugins_url('images.php' . $query_parms, __FILE__);
-            $images .= sprintf($image_template, $image_url, $image->source);
+        if (count($columns) == $column_count) {
+            $columns = implode("\n", $columns);
+            $article_row = sprintf($article_row_template, ...$columns);
+            array_push($articles, article_row);
+            $columns = array();
         }
-
-        $articles .= sprintf($article_template, $title, $text, $images);
     }
 
-    return $articles;
+    if (count($columns) > 0) {
+        $columns = implode("\n", $columns);
+        $article_row = sprintf($article_row_template, ...$columns);
+        array_push($articles, article_row);
+        $columns = array();
+    }
+
+    return implode("\n", $articles);
 }
 
 
