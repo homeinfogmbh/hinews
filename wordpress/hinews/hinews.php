@@ -3,7 +3,7 @@
 * Plugin Name: HOMEINFO News
 * Plugin URI: https://www.homeinfo.de/
 * Description: News articles provided by HOMEINFO.
-* Version: 1.1.3
+* Version: 1.1.8
 **/
 
 // Make sure we don't expose any info if called directly.
@@ -19,7 +19,7 @@ require_once("settings.php");
 add_shortcode('hinews', 'hinews_shortcode');
 
 
-function hinews_get_images() {
+function hinews_get_images($news) {
     $image_template_file = plugins_url('image.html', __FILE__);
     $image_template = file_get_contents($image_template_file);
     $images = array();
@@ -56,30 +56,31 @@ function hinews_articles() {
     $article_template_file = plugins_url('article.html', __FILE__);
     $article_template = file_get_contents($article_template_file);
     $news_list = json_decode($response);
-    $articles = '';
+    $articles = array();
     $column_count = 3;
     $columns = array();
 
     foreach ($news_list as $news) {
-        $images = hinews_get_images();
+        if (count($columns) == $column_count) {
+            $columns = implode("\n", $columns);
+            $article_row = sprintf($article_row_template, $columns);
+            array_push($articles, $article_row);
+            $columns = array();
+        }
+
+        $images = hinews_get_images($news);
         $images = implode("\n", $images);
         $title = html_entity_decode($news->title);
         $text = html_entity_decode($news->text);
-        $article = sprintf($article_template, $title, $text, $images);
+        $article = sprintf($article_template, $title, $images, $text);
         $column = sprintf($article_col_template, $article);
-
-        if (count($columns) == $column_count) {
-            $columns = implode("\n", $columns);
-            $article_row = sprintf($article_row_template, ...$columns);
-            array_push($articles, article_row);
-            $columns = array();
-        }
+        array_push($columns, $column);
     }
 
     if (count($columns) > 0) {
         $columns = implode("\n", $columns);
-        $article_row = sprintf($article_row_template, ...$columns);
-        array_push($articles, article_row);
+        $article_row = sprintf($article_row_template, $columns);
+        array_push($articles, $article_row);
         $columns = array();
     }
 
