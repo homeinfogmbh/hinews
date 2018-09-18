@@ -38,7 +38,7 @@ def _get_articles(customer):
     customer = _get_customer()
 
     for article in Article.select().where(select_options()):
-        customers = frozenset(ac.customer for ac in article.customers)
+        customers = article.customers
 
         if not customers or customer in customers:
             yield article
