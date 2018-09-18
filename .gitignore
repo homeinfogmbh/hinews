@@ -7,3 +7,4 @@ setup.cfg
 dist
 .buildconfig
 hinews/dom.py
+wordpress/hinews.zip
