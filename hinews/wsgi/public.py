@@ -93,7 +93,7 @@ def list_():
         news.article = [article.to_dom() for article in articles]
         return XML(news)
 
-    if 'browse' in request.args:
+    if 'page' in request.args:
         articles = BROWSER.browse(articles)
 
     return JSON([article.to_json(preview=True) for article in articles])
