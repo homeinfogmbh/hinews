@@ -36,13 +36,18 @@ function hinews_get_images($news) {
 }
 
 
-function hinews_articles() {
+function hinews_articles($index) {
     wp_enqueue_style('hinews.css', plugins_url('hinews.css', __FILE__));
     wp_enqueue_script('hinews.js', plugins_url('hinews.js', __FILE__));
     $options = get_option('homeinfo_news_options');
     $parm_token = '?access_token=' . $options['token'];
     $base_url = 'https://backend.homeinfo.de/hinews/pub/article';
     $articles_url = $base_url . $parm_token;
+
+    if ($index !== null) {
+        $articles_url .= '&page=' . $index . '&size=1';
+    }
+
     $response = file_get_contents($articles_url);
 
     if ($response === FALSE) {
@@ -93,7 +98,13 @@ function hinews_articles_preview() {
 }
 
 
-function hinews_shortcode() {
-    return hinews_articles();
+function hinews_shortcode($atts = [], $content = null, $tag = '') {
+    if (array_key_exists('index', $atts)) {
+        $index = $atts['index'];
+    } else {
+        $index = null;
+    }
+
+    return hinews_articles($index);
 }
 ?>
