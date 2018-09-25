@@ -50,7 +50,7 @@ function hinews_articles($index) {
 
     $response = file_get_contents($articles_url);
 
-    if ($response === FALSE) {
+    if ($response === false) {
         return 'Could not load data from API. Check your credentials.';
     }
 
