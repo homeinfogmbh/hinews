@@ -3,7 +3,7 @@ HIS authentication or authorization.
 """
 from flask import request
 
-from wsgilib import JSON, XML, Binary
+from wsgilib import JSON, XML, Binary, Browser
 
 from hinews import dom
 from hinews.messages.article import NoSuchArticle
@@ -14,6 +14,9 @@ from hinews.orm import Article, Image, AccessToken
 
 
 __all__ = ['ROUTES']
+
+
+BROWSER = Browser()
 
 
 def _get_customer():
@@ -83,15 +86,17 @@ def _get_image(ident):
 def list_():
     """Lists the respective news."""
 
+    articles = _get_articles(_get_customer())
+
     if 'xml' in request.args:
         news = dom.news()
-        news.article = [article.to_dom() for article in _get_articles(
-            _get_customer())]
+        news.article = [article.to_dom() for article in articles]
         return XML(news)
 
-    return JSON([
-        article.to_json(preview=True) for article in _get_articles(
-            _get_customer())])
+    if 'browse' in request.args:
+        articles = BROWSER.browse(articles)
+
+    return JSON([article.to_json(preview=True) for article in articles])
 
 
 def get_article(ident):
