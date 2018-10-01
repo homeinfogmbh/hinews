@@ -36,7 +36,7 @@ function hinews_get_images($news) {
 }
 
 
-function hinews_articles($index) {
+function hinews_articles($index, $short) {
     wp_enqueue_style('hinews.css', plugins_url('hinews.css', __FILE__));
     wp_enqueue_script('hinews.js', plugins_url('hinews.js', __FILE__));
     $options = get_option('homeinfo_news_options');
@@ -77,6 +77,11 @@ function hinews_articles($index) {
         $images = implode("\n", $images);
         $title = html_entity_decode($news->title);
         $text = html_entity_decode($news->text);
+
+        if ($short) {
+            $test = explode('.', $text)[0] . '.';
+        }
+
         $article = sprintf($article_template, $title, $images, $text);
         $column = sprintf($article_col_template, $article);
         array_push($columns, $column);
@@ -105,6 +110,12 @@ function hinews_shortcode($atts = [], $content = null, $tag = '') {
         $index = null;
     }
 
-    return hinews_articles($index);
+    if (array_key_exists('short', $atts)) {
+        $short = $atts['short'];
+    } else {
+        $short = false;
+    }
+
+    return hinews_articles($index, $short);
 }
 ?>
