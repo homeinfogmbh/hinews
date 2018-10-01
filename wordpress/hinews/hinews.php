@@ -3,7 +3,7 @@
 * Plugin Name: HOMEINFO News
 * Plugin URI: https://www.homeinfo.de/
 * Description: News articles provided by HOMEINFO.
-* Version: 1.1.11
+* Version: 1.1.12
 **/
 
 // Make sure we don't expose any info if called directly.
@@ -58,7 +58,13 @@ function hinews_articles($index, $short) {
     $article_row_template = file_get_contents($article_row_template_file);
     $article_col_template_file = plugins_url('article_col.html', __FILE__);
     $article_col_template = file_get_contents($article_col_template_file);
-    $article_template_file = plugins_url('article.html', __FILE__);
+
+    if ($short) {
+        $article_template_file = plugins_url('article_short.html', __FILE__);
+    } else {
+        $article_template_file = plugins_url('article.html', __FILE__);
+    }
+
     $article_template = file_get_contents($article_template_file);
     $news_list = json_decode($response);
     $articles = array();
@@ -77,9 +83,12 @@ function hinews_articles($index, $short) {
         $images = implode("\n", $images);
         $title = html_entity_decode($news->title);
         $text = html_entity_decode($news->text);
+        error_log('Short is: ' . $short . '.');
 
         if ($short) {
+            error_log('Cropping text: ' . $text);
             $text = explode('.', $text)[0] . '.';
+            error_log('Cropped text to: ' . $text);
         }
 
         $article = sprintf($article_template, $title, $images, $text);
@@ -98,12 +107,9 @@ function hinews_articles($index, $short) {
 }
 
 
-function hinews_articles_preview() {
-    return 'Not implemented.';
-}
-
-
 function hinews_shortcode($atts = [], $content = null, $tag = '') {
+    error_log('### Begin shorcode render ###');
+
     if (array_key_exists('index', $atts)) {
         $index = $atts['index'];
     } else {
@@ -111,8 +117,10 @@ function hinews_shortcode($atts = [], $content = null, $tag = '') {
     }
 
     if (array_key_exists('short', $atts)) {
+        error_log('Short is in attrs.');
         $short = true;
     } else {
+        error_log('Short is NOT in attrs.');
         $short = false;
     }
 
