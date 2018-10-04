@@ -67,7 +67,7 @@ function hinews_rss_article($index, $short, $link) {
     $channel['language'] = 'de-de';
 
     if (! is_null($link) && ! empty($link) && $link !== '') {
-        $channel['link'] = $link;
+        $channel['link'] = get_site_url() . '/' . $link;
     } else {
         $channel['link'] = 'https://hinews.homeinfo.de/';
     }
