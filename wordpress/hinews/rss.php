@@ -34,7 +34,7 @@ function hinews_get_image_urls($news) {
 }
 
 
-function hinews_rss_article($index, $short) {
+function hinews_rss_article($index, $short, $link) {
     $options = get_option('homeinfo_news_options');
     $parm_token = '?access_token=' . $options['token'];
     $base_url = 'https://backend.homeinfo.de/hinews/pub/article';
@@ -65,7 +65,13 @@ function hinews_rss_article($index, $short) {
     $image['link'] = $images[0];    // Makes no sense here.
     $channel['image'] = $image;
     $channel['language'] = 'de-de';
-    $channel['link'] = 'https://hinews.homeinfo.de/';     // TODO: dummy.
+
+    if (! is_null($link) && ! empty($link) && $link !== '') {
+        $channel['link'] = $link;
+    } else {
+        $channel['link'] = 'https://hinews.homeinfo.de/';
+    }
+
     $rss['channel'] = $channel;
     $xml = new SimpleXMLElement('<?xml version="1.0"?><rss></rss>');
     $xml->addAttribute('version', '2.0');
@@ -88,8 +94,14 @@ function hinews_rss_main() {
         $short = false;
     }
 
+    if (array_key_exists('link', $_GET)) {
+        $link = $_GET['link'];
+    } else {
+        $link = null;
+    }
+
     header('Content-Type: text/css');
-    return hinews_rss_article($index, $short);
+    return hinews_rss_article($index, $short, $link);
 }
 
 
