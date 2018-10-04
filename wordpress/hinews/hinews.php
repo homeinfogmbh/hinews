@@ -83,12 +83,9 @@ function hinews_articles($index, $short) {
         $images = implode("\n", $images);
         $title = html_entity_decode($news->title);
         $text = html_entity_decode($news->text);
-        error_log('Short is: ' . $short . '.');
 
         if ($short) {
-            error_log('Cropping text: ' . $text);
             $text = explode('.', $text)[0] . '.';
-            error_log('Cropped text to: ' . $text);
         }
 
         $article = sprintf($article_template, $title, $images, $text);
@@ -108,8 +105,6 @@ function hinews_articles($index, $short) {
 
 
 function hinews_shortcode($atts = [], $content = null, $tag = '') {
-    error_log('### Begin shorcode render ###');
-
     if (array_key_exists('index', $atts)) {
         $index = $atts['index'];
     } else {
@@ -117,10 +112,8 @@ function hinews_shortcode($atts = [], $content = null, $tag = '') {
     }
 
     if (array_key_exists('short', $atts)) {
-        error_log('Short is in attrs.');
         $short = true;
     } else {
-        error_log('Short is NOT in attrs.');
         $short = false;
     }
 
