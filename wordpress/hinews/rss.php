@@ -3,11 +3,28 @@
 require_once('../../../wp-load.php');
 
 
+// function defination to convert array to xml
+function array_to_xml($data, &$xml_data) {
+    foreach ($data as $key => $value) {
+        if (is_array($value)) {
+            $subnode = $xml_data->addChild($key);
+            array_to_xml($value, $subnode);
+        } else {
+            if (substr($key, 0, 1) === '@') {
+                $xml_data->addAttribute(substr($key, 1, strlen($key)), htmlspecialchars($value));
+            } else {
+                $xml_data->addChild($key, htmlspecialchars($value));
+            }
+        }
+     }
+}
+
+
 function hinews_get_image_urls($news) {
     $images = array();
 
     foreach ($news->images as $image) {
-        $args = array('id' => $image->id, 'mimetype' => $image->mimetype);
+        $args = array('id' => $image->id, 'mimetype' => html_entity_decode($image->mimetype));
         $query_parms = '?' . http_build_query($args);
         $image_url = plugins_url('images.php' . $query_parms, __FILE__);
         array_push($images, $image_url);
@@ -31,26 +48,29 @@ function hinews_rss_article($index, $short) {
 
     $news_list = json_decode($response);
     $news = $news_list[0];
-    $rss = new SimpleXMLElement('<?xml version="1.0"?><rss></rss>');
-    $channel = new SimpleXMLElement('<?xml version="1.0"?><channel></channel>');
-    $channel->addChild('title', $news->title);
+    $rss = array();
+    $channel = array();
+    $channel['title'] = $news->title;
     $text = html_entity_decode($news->text);
 
     if ($short) {
         $text = explode('.', $text)[0] . '.';
     }
 
-    $channel->addChild('description', $text);
+    $channel['description'] = $text;
     $images = hinews_get_image_urls($news);
-    $image = new SimpleXMLElement('<?xml version="1.0"?><image></image>');
-    $image->addChild('url', $images[0]);
-    $image->addChild('title', 'Titelbild');
-    $image->addChild('link', $images[0]);    // Makes no sense here.
-    $channel->addChild('image', $image);
-    $channel->addChild('language', 'de-de');
-    $rss->addAttribute('version', '2.0');
-    $rss->addChild('channel', $channel);
-    return $rss->asXML();
+    $image = array();
+    $image['url'] = $images[0];
+    $image['title'] = $news->title;
+    $image['link'] = $images[0];    // Makes no sense here.
+    $channel['image'] = $image;
+    $channel['language'] = 'de-de';
+    $channel['link'] = 'https://hinews.homeinfo.de/';     // TODO: dummy.
+    $rss['channel'] = $channel;
+    $xml = new SimpleXMLElement('<?xml version="1.0"?><rss></rss>');
+    $xml->addAttribute('version', '2.0');
+    array_to_xml($rss, $xml);
+    return $xml->asXML();
 }
 
 
