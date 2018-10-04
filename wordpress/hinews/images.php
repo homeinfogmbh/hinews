@@ -16,7 +16,7 @@ function hinews_get_image($id) {
     $image_url = $base_url . $id . $parm_token;
     $image = file_get_contents($image_url);
 
-    if ($image === FALSE) {
+    if ($image === false) {
         return 'Could not retrieve image.';
     }
 
