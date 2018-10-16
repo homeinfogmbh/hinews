@@ -19,14 +19,14 @@ require_once("settings.php");
 add_shortcode('hinews', 'hinews_shortcode');
 
 
-function hinews_get_images($news) {
+function hinews_get_images($news, $short) {
     $image_template_file = plugins_url('image.html', __FILE__);
     $image_template = file_get_contents($image_template_file);
     $images = array();
 
     foreach ($news->images as $image) {
         $args = array('id' => $image->id, 'mimetype' => $image->mimetype);
-        $query_parms = '?' . http_build_query($args);
+        $query_parms = '?' . http_build_query($args) . '&short=' .$short;
         $image_url = plugins_url('images.php' . $query_parms, __FILE__);
         $image = sprintf($image_template, $image_url, $image->source);
         array_push($images, $image);
@@ -72,6 +72,10 @@ function hinews_articles($index, $short) {
     $columns = array();
 
     foreach ($news_list as $news) {
+        if ($index !== null) {
+            add_filter('pre_get_document_title', function () { return $news->title; });
+        }
+
         if (count($columns) == $column_count) {
             $columns = implode("\n", $columns);
             $article_row = sprintf($article_row_template, $columns);
@@ -79,14 +83,16 @@ function hinews_articles($index, $short) {
             $columns = array();
         }
 
-        $images = hinews_get_images($news);
+        $images = hinews_get_images($news, $short);
         $images = implode("\n", $images);
-        $title = html_entity_decode($news->title);
         $text = html_entity_decode($news->text);
 
         if ($short) {
-            $text = explode('.', $text)[0] . '.';
-        }
+			$title = "<font style='font-size:14px;'>".html_entity_decode($news->title)."</font>";
+            $text = explode('.', $text)[0] . '.<br><a href="https://testing.homeinfo.de/hvo-eg/www/index.php/homeinfo-news/">MEHR...</a>';
+        } else {
+			$title = html_entity_decode($news->title);
+		}
 
         $article = sprintf($article_template, $title, $images, $text);
         $column = sprintf($article_col_template, $article);
