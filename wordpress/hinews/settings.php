@@ -74,7 +74,7 @@ class HomeinfoNewsSettings {
         add_settings_field(
             'homeinfo_news_list', // ID
             'Artikelseite', // Title
-            array($this, 'token_callback'), // Callback
+            array($this, 'listSite_callback'), // Callback
             'homeinfo_news_settings_page', // Page
             'homeinfo_news_settings_section' // Section
         );
