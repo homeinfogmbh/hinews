@@ -3,7 +3,6 @@
 require_once('../../../wp-load.php');
 
 
-// function defination to convert array to xml
 function array_to_xml($data, &$xml_data) {
     foreach ($data as $key => $value) {
         if (is_array($value)) {
