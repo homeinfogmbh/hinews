@@ -90,9 +90,12 @@ function hinews_articles($index, $short) {
 
         if ($short) {
             $text = substr($text, 0, 150) . '...';
+            $site_url = get_site_url($path = 'homeinfo-news');
+            $article = sprintf($article_template, $title, $images, $text, $site_url);
+        } else {
+            $article = sprintf($article_template, $title, $images, $text);
         }
 
-        $article = sprintf($article_template, $title, $images, $text);
         $column = sprintf($article_col_template, $article);
         array_push($columns, $column);
     }
@@ -100,6 +103,7 @@ function hinews_articles($index, $short) {
     if (count($columns) > 0) {
         $columns = implode("\n", $columns);
         $article_row = sprintf($article_row_template, $columns);
+
         array_push($articles, $article_row);
         $columns = array();
     }
