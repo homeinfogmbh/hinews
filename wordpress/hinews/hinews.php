@@ -89,7 +89,7 @@ function hinews_articles($index, $short) {
         $text = html_entity_decode($news->text);
 
         if ($short) {
-            $text = substr($text, 0, 150);
+            $text = substr($text, 0, 150) . '...';
         }
 
         $article = sprintf($article_template, $title, $images, $text);
