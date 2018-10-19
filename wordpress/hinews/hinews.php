@@ -83,16 +83,14 @@ function hinews_articles($index, $short) {
             $columns = array();
         }
 
+        $title = html_entity_decode($news->title);
         $images = hinews_get_images($news, $short);
         $images = implode("\n", $images);
         $text = html_entity_decode($news->text);
 
         if ($short) {
-			$title = "<font style='font-size:14px;'>".html_entity_decode($news->title)."</font>";
-            $text = explode('.', $text)[0] . '.<br><a href="https://testing.homeinfo.de/hvo-eg/www/index.php/homeinfo-news/">MEHR...</a>';
-        } else {
-			$title = html_entity_decode($news->title);
-		}
+            $text = substr($text, 0, 150);
+        }
 
         $article = sprintf($article_template, $title, $images, $text);
         $column = sprintf($article_col_template, $article);
