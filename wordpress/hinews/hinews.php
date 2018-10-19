@@ -82,6 +82,7 @@ function hinews_articles($index, $short) {
 
         if ($index !== null) {
             add_filter('pre_get_document_title', function () { return $news->title; });
+            $articleIndex = $index;
         }
 
         if (count($columns) == $column_count) {
