@@ -26,9 +26,9 @@ function hinews_get_images($news, $short) {
 
     foreach ($news->images as $image) {
         $args = array(
-            'id'        =>  $image->id,
-            'mimetype'  =>  $image->mimetype,
-            'short'     =>  $short
+            'id'        => $image->id,
+            'mimetype'  => $image->mimetype,
+            'short'     => $short
         );
         $query_parms = '?' . http_build_query($args);
         $image_url = plugins_url('images.php' . $query_parms, __FILE__);
