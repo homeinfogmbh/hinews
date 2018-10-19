@@ -90,7 +90,7 @@ function hinews_articles($index, $short) {
 
         if ($short) {
             $text = substr($text, 0, 150) . '...';
-            $site_url = get_site_url($path = 'homeinfo-news');
+            $site_url = get_site_url(null, 'homeinfo-news', null);
             $article = sprintf($article_template, $title, $images, $text, $site_url);
         } else {
             $article = sprintf($article_template, $title, $images, $text);
