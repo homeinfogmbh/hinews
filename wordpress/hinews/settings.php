@@ -70,6 +70,14 @@ class HomeinfoNewsSettings {
             'homeinfo_news_settings_page', // Page
             'homeinfo_news_settings_section' // Section
         );
+
+        add_settings_field(
+            'homeinfo_news_list', // ID
+            'Artikelseite', // Title
+            array($this, 'token_callback'), // Callback
+            'homeinfo_news_settings_page', // Page
+            'homeinfo_news_settings_section' // Section
+        );
     }
 
     /**
@@ -84,6 +92,10 @@ class HomeinfoNewsSettings {
             $new_input['token'] = htmlentities($input['token']);
         }
 
+        if (isset($input['listSite'])) {
+            $new_input['listSite'] = htmlentities($input['listSite']);
+        }
+
         return $new_input;
     }
 
@@ -92,6 +104,10 @@ class HomeinfoNewsSettings {
      */
     public function token_callback() {
         echo '<input type="text" id="homeinfo_news_token" name="homeinfo_news_options[token]" value="'.$this->options['token'].'"/>';
+    }
+
+    public function listSite_callback() {
+        echo '<input type="text" id="homeinfo_news_list" name="homeinfo_news_options[listSite]" value="'.$this->options['listSite'].'"/>';
     }
 }
 
