@@ -96,13 +96,14 @@ function hinews_articles($index, $short) {
         $images = hinews_get_images($news, $short);
         $images = implode("\n", $images);
         $text = html_entity_decode($news->text);
+        $anchor = 'HINewsArticle_' . $articleIndex;
 
         if ($short) {
             $text = substr($text, 0, 150) . '...';
             $site_url = get_site_url(null, $options['listSite'], null);
-            $article = sprintf($article_template, $title, $images, $text, $site_url, $articleIndex);
+            $article = sprintf($article_template, $title, $images, $text, $site_url, $anchor);
         } else {
-            $article = sprintf($article_template, $articleIndex, $title, $images, $text);
+            $article = sprintf($article_template, $anchor, $title, $images, $text);
         }
 
         $column = sprintf($article_col_template, $article);
