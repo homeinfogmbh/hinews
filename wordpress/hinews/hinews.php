@@ -70,8 +70,11 @@ function hinews_articles($index, $short) {
     $articles = array();
     $column_count = 3;
     $columns = array();
+    $articleIndex = -1;
 
     foreach ($news_list as $news) {
+        $articleIndex++;
+
         if ($index !== null) {
             add_filter('pre_get_document_title', function () { return $news->title; });
         }
@@ -83,7 +86,6 @@ function hinews_articles($index, $short) {
             $columns = array();
         }
 
-        $id = sizeof($articles);
         $title = html_entity_decode($news->title);
         $images = hinews_get_images($news, $short);
         $images = implode("\n", $images);
@@ -92,9 +94,9 @@ function hinews_articles($index, $short) {
         if ($short) {
             $text = substr($text, 0, 150) . '...';
             $site_url = get_site_url(null, $options['listSite'], null);
-            $article = sprintf($article_template, $title, $images, $text, $site_url, $id);
+            $article = sprintf($article_template, $title, $images, $text, $site_url, $articleIndex);
         } else {
-            $article = sprintf($article_template, $id, $title, $images, $text);
+            $article = sprintf($article_template, $articleIndex, $title, $images, $text);
         }
 
         $column = sprintf($article_col_template, $article);
