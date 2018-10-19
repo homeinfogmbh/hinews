@@ -24,13 +24,16 @@ function hinews_get_image($id, $short) {
         $width = $maxWidth;
         $height = $maxHeight;
         $ratio = $source_imagex / $source_imagey; // width/height
-        if ($width/$height < $ratio)
+
+        if ($width/$height < $ratio) {
             $width = $height * $ratio;
-        else
+        } else {
             $height = $width / $ratio;
+        }
+
         $dest_image = imagecreatetruecolor($maxWidth, $maxHeight);
         imagecopyresampled($dest_image, $image, 0, 0, 0, 0, $width, $height, $source_imagex, $source_imagey);
-        imagejpeg($dest_image,NULL,80);
+        imagejpeg($dest_image, NULL, 80);
         header("Content-Type: image/jpeg");
     } else {
         $image = file_get_contents($image_url);
