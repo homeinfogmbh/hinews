@@ -44,15 +44,16 @@ function hinews_articles($index, $short) {
     wp_enqueue_style('hinews.css', plugins_url('hinews.css', __FILE__));
     wp_enqueue_script('hinews.js', plugins_url('hinews.js', __FILE__));
     $options = get_option('homeinfo_news_options');
-    $parm_token = '?access_token=' . $options['token'];
+    $args = array('access_token' => $options['token']);
     $base_url = 'https://backend.homeinfo.de/hinews/pub/article';
-    $articles_url = $base_url . $parm_token;
 
     if ($index !== null) {
-        $articles_url .= '&page=' . $index . '&size=1';
+        $args['page'] = $index;
+        $args['size'] = 1;
     }
 
-    $response = file_get_contents($articles_url);
+    $query_parms = '?' . http_build_query($args);
+    $response = file_get_contents($base_url . $query_parms);
 
     if ($response === false) {
         return 'Could not load data from API. Check your credentials.';
