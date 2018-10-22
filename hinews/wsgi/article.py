@@ -39,6 +39,9 @@ def list_():
     else:
         articles = Article.select().where(article_active())
 
+    if 'nopaging' in request.args:
+        return JSON([article.to_json() for article in articles])
+
     if BROWSER.info:
         return JSON(BROWSER.pages(articles).to_json())
 
