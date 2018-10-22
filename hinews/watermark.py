@@ -22,11 +22,10 @@ def write_text(image, text, font):
     ImageDraw.Draw(image).text(position, text, fill=fill, font=font)
 
 
-def make_watermark(size, text, font):
+def make_watermark(size, text, font, color=(0, 0, 0, 0), mode='RGBA'):
     """Creates an interim watermark image."""
 
-    color = (0, 0, 0, 0)
-    image = Image.new('RGBA', size, color=color)
+    image = Image.new(mode, size, color=color)
     write_text(image, text, font)
     # Calculate mask <https://gist.github.com/snay2/876425>.
     mask = image.convert('L').point(partial(max, 100))
