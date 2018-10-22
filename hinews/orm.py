@@ -4,8 +4,13 @@ from datetime import datetime
 from functools import lru_cache
 from uuid import uuid4
 
-from peewee import ForeignKeyField, DateField, DateTimeField, CharField, \
-    TextField, IntegerField, UUIDField
+from peewee import CharField
+from peewee import DateField
+from peewee import DateTimeField
+from peewee import ForeignKeyField
+from peewee import IntegerField
+from peewee import TextField
+from peewee import UUIDField
 
 from filedb import mimetype, FileProperty
 from his.orm import Account

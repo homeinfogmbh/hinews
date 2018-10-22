@@ -8,8 +8,12 @@ from his import ACCOUNT, authenticated, authorized
 from his.messages import MissingData, InvalidData
 from wsgilib import Binary, JSON
 
-from hinews.messages.image import NoSuchImage, NoImageProvided, \
-    NoMetaDataProvided, ImageAdded, ImageDeleted, ImagePatched
+from hinews.messages.image import ImageAdded
+from hinews.messages.image import ImageDeleted
+from hinews.messages.image import ImagePatched
+from hinews.messages.image import NoImageProvided
+from hinews.messages.image import NoMetaDataProvided
+from hinews.messages.image import NoSuchImage
 from hinews.orm import Image
 from hinews.wsgi.article import get_article
 

@@ -5,8 +5,10 @@ from flask import request
 from his import ACCOUNT, authenticated, authorized
 from wsgilib import JSON, Browser
 
-from hinews.messages.article import NoSuchArticle, ArticleCreated, \
-    ArticleDeleted, ArticlePatched
+from hinews.messages.article import ArticleCreated
+from hinews.messages.article import ArticleDeleted
+from hinews.messages.article import ArticlePatched
+from hinews.messages.article import NoSuchArticle
 from hinews.orm import article_active, Article, Editor
 
 
