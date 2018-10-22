@@ -11,6 +11,7 @@ __all__ = ['watermark']
 
 TTF_DEJAVU = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 FONT_SIZE = 12
+DEFAULT_FONT = ImageFont.truetype(TTF_DEJAVU, FONT_SIZE)
 OFFSET = 10
 
 
@@ -43,11 +44,8 @@ def dump(image):
     return buf.read()
 
 
-def watermark(image_data, text, font=None):
+def watermark(image_data, text, font=DEFAULT_FONT):
     """Writes the respective text onto the image."""
-
-    if font is None:
-        font = ImageFont.truetype(TTF_DEJAVU, FONT_SIZE)
 
     image = Image.open(BytesIO(image_data))
     watermark_size = (image.width, font.size + 2*OFFSET)
