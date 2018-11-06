@@ -3,7 +3,7 @@
 * Plugin Name: HOMEINFO News
 * Plugin URI: https://www.homeinfo.de/
 * Description: News articles provided by HOMEINFO.
-* Version: 1.3.0
+* Version: 1.4.0
 **/
 
 // Make sure we don't expose any info if called directly.
