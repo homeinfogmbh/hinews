@@ -58,7 +58,7 @@ function hinews_articles($index, $short) {
         "http" => [
             "method" => "GET",
             "header" => "Accept-Language: de-DE\r\n" .
-                "Accept: application/xml\r\n"
+                "Accept: application/json\r\n"
         ]
     ];
 
