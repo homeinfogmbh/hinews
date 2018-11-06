@@ -53,7 +53,6 @@ function hinews_articles($index, $short) {
     }
 
     $query_parms = '?' . http_build_query($args);
-
     $opts = [
         "http" => [
             "method" => "GET",
@@ -61,7 +60,6 @@ function hinews_articles($index, $short) {
                 "Accept: application/json\r\n"
         ]
     ];
-
     $context = stream_context_create($opts);
     $response = file_get_contents($base_url . $query_parms, false, $context);
 
