@@ -3,7 +3,7 @@ HIS authentication or authorization.
 """
 from flask import request
 
-from wsgilib import JSON, XML, Binary, Browser, Error
+from wsgilib import JSON, XML, Binary, Browser
 
 from hinews import dom
 from hinews.messages.article import NoSuchArticle
@@ -101,7 +101,7 @@ def list_():
     if content_type == 'application/json':
         return JSON([article.to_json(preview=True) for article in articles])
 
-    raise Error('Invalid content type.')
+    return ('Invalid content type.', 406)
 
 
 def get_article(ident):
