@@ -53,7 +53,18 @@ function hinews_articles($index, $short) {
     }
 
     $query_parms = '?' . http_build_query($args);
-    $response = file_get_contents($base_url . $query_parms);
+
+    $opts = [
+        "http" => [
+            "method" => "GET",
+            "header" => "Accept-language: de-DE\r\n" .
+                "Accept: application/xml\r\n".
+                "Cookie: foo=bar\r\n"
+        ]
+    ];
+
+    $context = stream_context_create($opts);
+    $response = file_get_contents($base_url . $query_parms, false, $context);
 
     if ($response === false) {
         return 'Could not load data from API. Check your credentials.';
