@@ -57,9 +57,8 @@ function hinews_articles($index, $short) {
     $opts = [
         "http" => [
             "method" => "GET",
-            "header" => "Accept-language: de-DE\r\n" .
-                "Accept: application/xml\r\n".
-                "Cookie: foo=bar\r\n"
+            "header" => "Accept-Language: de-DE\r\n" .
+                "Accept: application/xml\r\n"
         ]
     ];
 
