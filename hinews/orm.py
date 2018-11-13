@@ -145,10 +145,9 @@ class Article(_NewsModel):
 
         return dictionary
 
-    def to_dom(self):
+    def to_dom(self, local=False):
         """Converts the article into a XML DOM model."""
         article = dom.Article()
-        article.id = self.id
         article.created = self.created
         article.active_from = self.active_from
         article.active_until = self.active_until
@@ -156,8 +155,12 @@ class Article(_NewsModel):
         article.subtitle = self.subtitle
         article.text = self.text
         article.source = self.source
-        article.image = [image.to_dom() for image in self.images]
         article.tag = [tag.tag for tag in self.tags]
+
+        if not local:
+            article.id = self.id
+            article.image = [image.to_dom() for image in self.images]
+
         return article
 
     def delete_instance(self, recursive=False, delete_nullable=False):
@@ -254,13 +257,18 @@ class Image(_NewsModel):
         dictionary['mimetype'] = mimetype(self._file)
         return dictionary
 
-    def to_dom(self):
+    def to_dom(self, filename=None):
         """Converts the image into a XML DOM model."""
         image = dom.Image()
-        image.id = self.id
         image.uploaded = self.uploaded
         image.source = self.source
         image.mimetype = mimetype(self._file)
+
+        if filename is None:
+            image.id = self.id
+        else:
+            image.filename = filename
+
         return image
 
     def delete_instance(self, recursive=False, delete_nullable=False):
