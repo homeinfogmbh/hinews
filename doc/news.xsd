@@ -25,6 +25,13 @@
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
+            <xs:element name="title" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        The article's title.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="text" type="xs:string">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
@@ -36,6 +43,13 @@
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
                         The article's source.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="created" type="xs:dateTime">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        The article's creation time.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
@@ -54,17 +68,10 @@
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
-        <xs:attribute name="id" type="xs:integer" use="required">
+        <xs:attribute name="id" type="xs:integer">
             <xs:annotation>
                 <xs:documentation xml:lang="en">
                     The article's ID.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="title" type="xs:string" use="required">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">
-                    The article's title.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -72,13 +79,6 @@
             <xs:annotation>
                 <xs:documentation xml:lang="en">
                     The article's subtitle.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="created" type="xs:dateTime" use="required">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">
-                    The article's creation time.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -106,6 +106,36 @@
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
+            <xs:choice>
+              <xs:element name="id" type="xs:integer" use="required">
+                  <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                          The image's ID (for web application).
+                      </xs:documentation>
+                  </xs:annotation>
+              </xs:element>
+              <xs:element name="filename" type="xs:string" use="required">
+                  <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                          The image's file name (for offline transmission).
+                      </xs:documentation>
+                  </xs:annotation>
+              </xs:element>
+            </xs:choice>
+            <xs:element name="uploaded" type="xs:dateTime">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        The image's upload date and time.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="mimetype" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        The image's MIME type.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="source" type="xs:string">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
@@ -114,26 +144,5 @@
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
-        <xs:attribute name="id" type="xs:integer" use="required">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">
-                    The image's ID.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="uploaded" type="xs:dateTime" use="required">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">
-                    The image's upload date and time.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="mimetype" type="xs:string" use="required">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">
-                    The image's MIME type.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
     </xs:complexType>
 </xs:schema>
