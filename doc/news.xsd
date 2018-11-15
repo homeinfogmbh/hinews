@@ -107,14 +107,14 @@
         </xs:annotation>
         <xs:sequence>
             <xs:choice>
-              <xs:element name="id" type="xs:integer" use="required">
+              <xs:element name="id" type="xs:integer">
                   <xs:annotation>
                       <xs:documentation xml:lang="en">
                           The image's ID (for web application).
                       </xs:documentation>
                   </xs:annotation>
               </xs:element>
-              <xs:element name="filename" type="xs:string" use="required">
+              <xs:element name="filename" type="xs:string">
                   <xs:annotation>
                       <xs:documentation xml:lang="en">
                           The image's file name (for offline transmission).
