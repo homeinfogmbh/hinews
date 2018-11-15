@@ -91,15 +91,12 @@ def list_():
     if 'page' in request.args:
         articles = BROWSER.browse(articles)
 
-    if 'application/xml' in ACCEPT:
-        news = dom.news()
-        news.article = [article.to_dom() for article in articles]
-        return XML(news)
-
     if 'application/json' in ACCEPT:
         return JSON([article.to_json(preview=True) for article in articles])
 
-    return ('Invalid content type.', 406)
+    news = dom.news()
+    news.article = [article.to_dom() for article in articles]
+    return XML(news)
 
 
 def get_article(ident):
