@@ -91,7 +91,7 @@ def list_():
     if 'page' in request.args:
         articles = BROWSER.browse(articles)
 
-    if 'application/json' in ACCEPT:
+    if 'application/json' in ACCEPT and 'xml' not in request.args:
         return JSON([article.to_json(preview=True) for article in articles])
 
     news = dom.news()
