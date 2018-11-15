@@ -1,6 +1,6 @@
 """ORM models."""
 
-from datetime import datetime
+from datetime import date, datetime
 from functools import lru_cache
 from uuid import uuid4
 
@@ -49,10 +49,10 @@ def create_tables(fail_silently=False):
 def article_active():
     """Yields article active query."""
 
-    now = datetime.now()
+    today = date.today()
     return (
-        ((Article.active_from >> None) | (Article.active_from <= now))
-        & ((Article.active_until >> None) | (Article.active_until >= now)))
+        ((Article.active_from >> None) | (Article.active_from <= today))
+        & ((Article.active_until >> None) | (Article.active_until >= today)))
 
 
 @lru_cache()
