@@ -46,7 +46,7 @@ def list_():
 
 
 @authenticated
-@authorized
+@authorized('hinews')
 def count():
     """Counts active and inactive articles."""
 
