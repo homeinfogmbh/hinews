@@ -39,13 +39,20 @@ def list_():
     else:
         articles = Article.select().where(article_active())
 
-    if 'nopaging' in request.args:
-        return JSON([article.to_json() for article in articles])
-
     if BROWSER.info:
         return JSON(BROWSER.pages(articles).to_json())
 
     return JSON([article.to_json() for article in BROWSER.browse(articles)])
+
+
+@authenticated
+@authorized
+def count():
+    """Counts active and inactive articles."""
+
+    active = Article.select().where(article_active())
+    inactive = Article.select().where(~ article_active())
+    return JSON({'active': len(active), 'inactive': len(inactive)})
 
 
 @authenticated
@@ -110,6 +117,7 @@ def patch(ident):
 
 ROUTES = (
     ('GET', '/article', list_, 'list_articles'),
+    ('GET', '/article/count', count, 'count_articles'),
     ('GET', '/article/<int:ident>', get, 'get_article'),
     ('POST', '/article', post, 'post_article'),
     ('DELETE', '/article/<int:ident>', delete, 'delete_article'),
