@@ -32,9 +32,7 @@ def get_article(ident):
 def list_():
     """Lists all available articles."""
 
-    if 'all' in request.args:
-        articles = Article
-    elif 'inactive' in request.args:
+    if 'inactive' in request.args:
         articles = Article.select().where(~ article_active())
     else:
         articles = Article.select().where(article_active())
