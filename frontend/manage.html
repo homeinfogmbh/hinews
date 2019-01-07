@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang='de'>
+  <head>
+    <title>Newsservice</title>
+    <meta content='Newsservice' name='keywords'>
+    <meta content='content managment system' name='description'>
+    <meta content='homeinfo.de' name='author'>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+    <link href='img/favicon.ico' rel='shortcut icon' type='image/x-icon'>
+    <script src="javascript/jquery/jquery.min.js" type="text/javascript"></script>
+    <script src="javascript/jquery/jquery-ui.min.js" type="text/javascript"></script>
+	<script src="javascript/header.js" type="text/javascript"></script>
+	<script src="javascript/menue.js" type="text/javascript"></script>
+	<script src="javascript/default.js" type="text/javascript"></script>
+	<link href="stylesheet/default.css" rel="stylesheet" type="text/css" media="all" />
+	<script src="javascript/manage.js" type="text/javascript"></script>
+    <link href="stylesheet/bootstrap.min.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="stylesheet/light-theme.css" rel="stylesheet" type="text/css" media="all" id="color-settings-body-color" />
+	<link href="stylesheet/jquery-ui.min.css" rel="stylesheet">
+    <script src="javascript/bootstrap.min.js" type="text/javascript"></script>
+    <script src="plugins/theme.js" type="text/javascript"></script>
+  </head>
+
+  <body class='contrast-red'>
+    <header>
+		<div id="header"></div>
+    </header>
+    <div id='wrapper'>
+      <div id='main-nav-bg'></div>
+	  <div id="menue"></div>
+      <section id='content'>
+        <div class='container'>
+			<div class='row' id='content-wrapper'>
+                <div class='col-sm-12'>
+					<div class='page-header page-header-with-buttons'>
+						<h1 class='pull-left'>
+							<i class='fa fa-cogs'></i>
+							<span>News verwalten</span>
+						</h1>
+					</div>
+				</div>
+			</div>
+			<div id='message'></div><br>
+			<div class='row'>
+				<div class='col-xs-12 col-md-3'>
+					<input type='text' class='form-control' id='searchfield' placeholder='News suchen' style='padding-right:25px;'>
+				</div>
+				<div class='col-sm-2' id='deletesearch' style='margin:8px -50px; display:none'>
+					<i class='fa fa-times'></i>
+				</div>
+				<div class='col-xs-12 col-md-2'>
+					<select class='form-control' id='actives'>
+						<option value='true'>Aktive</option>
+						<option value='false'>Nicht Aktive</option>
+					</select>
+				</div>
+			</div><br>
+			<!--
+			<div class='row'>
+				<div class='col-xs-4 col-md-4'>
+					<label>Suche nach Schlagwörter</label><br>
+					<div id='keywords'></div>
+				</div>
+				<div class='col-xs-3 col-md-4'>
+					<label>Schlagwort zur Suche hinzufügen</label><br>
+					<select class='form-control keywords' id='keyword' size='5' style='overflow-x:hidden; overflow-y:auto;'>
+					</select>
+				</div>
+			</div><br>
+			<div class='row'>
+				<div class='col-xs-4 col-md-4'>
+					<label>Suche nach Kunden</label><br>
+					<div id='companies'></div>
+				</div>
+				<div class='col-xs-3 col-md-4'>
+					<label>Kunden zur Suche hinzufügen</label><br>
+					<select class='form-control keywords' id='company' size='5' style='overflow-x:hidden; overflow-y:auto;'>
+					</select>
+				</div>
+			</div><br>
+			-->
+			<div class='row'>
+				<div class='col-xs-12 col-md-12' id="pages">
+				</div>
+			</div><br>
+			<div class='row'>
+				<div class='col-xs-12 col-md-12'>
+					<table class='table' style='margin-bottom:0;' id='sort'>
+						<thead>
+							<tr>
+								<th width='2%'>#</th>
+								<th width='80px'>Bild</th>
+								<th width='8%'>Titel</th>
+								<th>Text</th>
+								<th>Stichwörter</th>
+								<th width='140px'>Letzte Änderung</th>
+								<th width='140px'>Aktiv von</th>
+								<th width='140px'>Aktiv bis</th>
+								<th width='62px'></th>
+							</tr>
+						</thead>
+						<tbody id='newslist'>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<br><br>
+			<footer id='footer'>
+				<div class='col-sm-6 text'>
+					Umsetzung <a href="https://www.homeinfo.de" target="_blank">HomeInfo GmbH</a>
+				</div>
+			</footer>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

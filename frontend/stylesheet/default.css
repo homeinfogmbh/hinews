@@ -1,0 +1,46 @@
+.chart, .pointer {
+	cursor: pointer;
+}
+.no_drag {
+	cursor: pointer;
+}
+#content {
+	padding-top:40px;
+}
+#closer {
+    color: #aaaaaa;
+    border-bottom: 2px solid #eeeeee;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+#closer-no-margin {
+    color: #aaaaaa;
+    border-bottom: 2px solid #eeeeee;
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+#menue, #header {
+	position: fixed;
+	width: 100%;
+	z-index: 999;
+}
+.loader {
+	z-index: 2;
+    border: 6px solid #e3e3e3; /* Light grey */
+    border-top: 6px solid #337ab7; /* Blue */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+#pageloader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

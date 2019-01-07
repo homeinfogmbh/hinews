@@ -1,0 +1,36 @@
+#tableclass {
+	border: none;
+    border-right: solid 1px #DDEFEF;
+    border-collapse: separate;
+    border-spacing: 0;
+    font: 12px Arial, sans-serif;
+}
+#tableclass thead th {
+    background-color: #DDEFEF;
+    color: #336B6B;
+    padding: 10px;
+    text-align: left;
+    text-shadow: 1px 1px 1px #fff;
+    white-space: nowrap;
+}
+#tableclass tbody td {
+    border-bottom: solid 1px #DDEFEF;
+    color: #333;
+    padding: 10px;
+    text-shadow: 1px 1px 1px #fff;
+    white-space: nowrap;
+}
+#scroller {
+    margin-left: 351px;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding-bottom: 5px;
+    width: 65%;
+}
+#tableclass .sticky {
+    border-left: solid 1px #DDEFEF;
+    border-right: solid 1px #DDEFEF;
+    left: 0;
+    position: absolute;
+    width: 350px;
+}
