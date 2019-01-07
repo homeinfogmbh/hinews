@@ -37,7 +37,7 @@ def list_():
     if 'inactive' in request.args:
         condition = ~condition
 
-    articles = Article.select().where(condition).order_by(Article.created)
+    articles = Article.select().where(condition).order_by(Article.created.desc)
 
     if BROWSER.info:
         return JSON(BROWSER.pages(articles).to_json())
