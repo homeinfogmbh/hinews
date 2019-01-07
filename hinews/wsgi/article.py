@@ -32,10 +32,12 @@ def get_article(ident):
 def list_():
     """Lists all available articles."""
 
+    condition = article_active()
+
     if 'inactive' in request.args:
-        articles = Article.select().where(~ article_active())
-    else:
-        articles = Article.select().where(article_active())
+        condition = ~condition
+
+    articles = Article.select().where(condition).order_by(Article.created)
 
     if BROWSER.info:
         return JSON(BROWSER.pages(articles).to_json())
