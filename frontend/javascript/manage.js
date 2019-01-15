@@ -35,7 +35,7 @@ $(document).ready(function() {
 
 function getKeywords() {
 	$.ajax({
-		url: 'https://backend.homeinfo.de/hinews/customers?session=' + localStorage.getItem("token"),
+		url: 'https://backend.homeinfo.de/hinews/customers',
 		type: 'GET',
 		success: function (companies) {
 			_companies = companies;
@@ -43,7 +43,7 @@ function getKeywords() {
 				return compareStrings(a.id, b.id);
 			})
 			$.ajax({
-				url: 'https://backend.homeinfo.de/hinews/tags?session=' + localStorage.getItem("token"),
+				url: 'https://backend.homeinfo.de/hinews/tags',
 				type: 'GET',
 				success: function (tags) {
 					_keywords = tags;
@@ -65,7 +65,7 @@ function getKeywords() {
 }
 function getPages() {
 	$.ajax({
-		url: "https://backend.homeinfo.de/hinews/article?pages&size=15" + (_showactive ?"" :"&inactive") + "&session=" + localStorage.getItem("token"),
+		url: "https://backend.homeinfo.de/hinews/article?pages&size=15" + (_showactive ?"" :"&inactive"),
 		type: "GET",
 		success: function (pages) {
 			if (pages.pages > 1) {
@@ -83,7 +83,7 @@ function getPages() {
 }
 function getArticleList() {
 	$.ajax({
-		url: "https://backend.homeinfo.de/hinews/article?size=15&page=" + _selectedPage + (_showactive ?"" :"&inactive") + "&session=" +localStorage.getItem("token"),
+		url: "https://backend.homeinfo.de/hinews/article?size=15&page=" + _selectedPage + (_showactive ?"" :"&inactive"),
 		type: "GET",
 		success: function (articles) {
 			_articles = articles;
@@ -125,13 +125,13 @@ function loadArticles(loadactives = false) {
 				tags += _articles[i].tags[tag].tag + ((tag < _articles[i].tags.length-1) ?', ' :'');
 			newslist += "<tr " + datecolor + ">" +
 					"<td>" + ++counter + "</td>" +
-					"<td>" + ((_articles[i].images.length > 0) ?((_articles[i].images[0].mimetype.indexOf('video') !== -1) ?'<video src="https://backend.homeinfo.de/hinews/image/' + _articles[i].images[0].id + "?session=" + localStorage.getItem('token') + '" style="max-width:160px; max-height:80px" preload="metadata" controls muted>Video<br/></video>' :"<img src='https://backend.homeinfo.de/hinews/image/" + _articles[i].images[0].id + "?session=" + localStorage.getItem('token') + "' style='max-width:160px; max-height:80px'>") :"") + "</td>" +
+					"<td>" + ((_articles[i].images.length > 0) ?((_articles[i].images[0].mimetype.indexOf('video') !== -1) ?'<video src="https://backend.homeinfo.de/hinews/image/' + _articles[i].images[0].id + '" style="max-width:160px; max-height:80px" preload="metadata" controls muted>Video<br/></video>' :"<img src='https://backend.homeinfo.de/hinews/image/" + _articles[i].images[0].id + "' style='max-width:160px; max-height:80px'>") :"") + "</td>" +
 					"<td>" + _articles[i].title + "</td>" +
 					"<td>" + (($("<p/>").html(_articles[i].text).text().length > 350) ?$("<p/>").html(_articles[i].text).text().substring(0, 350)+'...' :$("<p/>").html(_articles[i].text).text()) + "</td>" +
 					"<td><span data-toggle='tooltip' title='" + tags + "'>" + ((tags.length > 20) ?tags.substring(0, 20) + '...?' :tags) + "</span></td>" +
 					"<td>" + _articles[i].created.split('T').join(' ').substring(0, 16) + "</td>" +
-					"<td><input type='text' class='form-control datetime active_from' data-jsonid='" + _articles[i].id + "' placeholder='" + _articles[i].activeFrom + "'></td>" +
-					"<td><input type='text' class='form-control datetime active_until' data-jsonid='" + _articles[i].id + "' placeholder='" + _articles[i].activeUntil + "'></td>" +
+					"<td><input type='text' class='form-control datetime active_from' data-jsonid='" + _articles[i].id + "' placeholder='" + (_articles[i].activeFrom != null ?_articles[i].activeFrom :'')+ "'></td>" +
+					"<td><input type='text' class='form-control datetime active_until' data-jsonid='" + _articles[i].id + "' placeholder='" + (_articles[i].activeUntil != null ?_articles[i].activeUntil :'') + "'></td>" +
 					"<td style='vertical-align: middle'>" +
 						"<i class='fa fa-edit btn_edit_news pointer' style='font-size:20px; color:#a2a2a2; padding-right:10px' title='News bearbeiten' data-jsonid='" + _articles[i].id + "'></i>" +
 						"<i class='fa fa-trash-o btn_delete pointer' style='font-size:20px; color:#a2a2a2;' title='News löschen'></i>" +
@@ -162,7 +162,7 @@ function loadArticles(loadactives = false) {
             }
 
             $.ajax({
-			    url: "https://backend.homeinfo.de/hinews/article/" + id + "?session=" +localStorage.getItem("token"),
+			    url: "https://backend.homeinfo.de/hinews/article/" + id,
 			    type: "PATCH",
 				data: JSON.stringify(patch),
 				contentType: 'application/json'
@@ -215,7 +215,7 @@ function setButtons() {
 		$("#pageloader").show();
 		//for (i=0; i < msg.length; i++) { // delete all // multi
 		$.ajax({
-			url: "https://backend.homeinfo.de/hinews/article/" + id + "?session=" +localStorage.getItem("token"),
+			url: "https://backend.homeinfo.de/hinews/article/" + id,
 			type: "DELETE",
 			success: function (msg) {
 				//console.log(msg);

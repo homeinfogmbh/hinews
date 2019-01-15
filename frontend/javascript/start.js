@@ -7,7 +7,7 @@ $(document).ready(function() {
 
 function getCustomers() {
 	$.ajax({
-		url: 'https://backend.homeinfo.de/hinews/customers?session=' + localStorage.getItem("token"),
+		url: 'https://backend.homeinfo.de/hinews/customers',
 		type: 'GET',
 		success: function (customers) {
 			//console.log(customers);
@@ -22,7 +22,7 @@ function getCustomers() {
 function getUserList() {
 	$.ajax({
 		timeout: 5000,
-		url: "https://his.homeinfo.de/account/!?session=" + localStorage.getItem("token"),
+		url: 'https://his.homeinfo.de/account/!',
 		type: "GET",
 		success: function (users) {
 			_users = users;
@@ -36,7 +36,7 @@ function getUserList() {
 function getActives() {
 	$.ajax({
 		timeout: 5000,
-		url: "https://backend.homeinfo.de/hinews/articles?session=" + localStorage.getItem("token"),
+		url: "https://backend.homeinfo.de/hinews/articles",
 		type: "GET",
 		success: function (actives) {
 			var overview = 'Aktive News: <b>' + actives.active + '</b><br>' +
@@ -51,7 +51,7 @@ function getActives() {
 }
 function getArticleList() {
 	$.ajax({
-		url: "https://backend.homeinfo.de/hinews/article?session=" + localStorage.getItem("token"),
+		url: "https://backend.homeinfo.de/hinews/article",
 		type: "GET",
 		success: function (articles) {
 			var activityData = [];
