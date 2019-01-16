@@ -81,7 +81,7 @@ class Article(_NewsModel):
     title = CharField(255)
     subtitle = CharField(255, null=True)
     text = TextField()
-    source = TextField()
+    source = TextField(null=True)
 
     @classmethod
     def from_json(cls, dictionary, author, **kwargs):
