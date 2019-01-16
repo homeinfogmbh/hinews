@@ -1,11 +1,14 @@
+$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+	options.crossDomain = {crossDomain: true};
+	options.xhrFields = {withCredentials: true};
+});
 checkSession();
 $(document).ready(function(){
 	$("#warning").hide();
     $("#login").click(function(){
 		login();
     });
-	if (localStorage.getItem("token") == null)
-		$("#container_style").show();
+	$("#container_style").show();
 });
 $(document).keypress(function(e) {
     if(e.which == 13) { // 'enter'
@@ -23,8 +26,6 @@ function login() {
 		data: JSON.stringify({'account':$("#username").val(), "passwd":$("#password").val()}),
 		success: function (msg) {
 			if (typeof(Storage) !== "undefined") {
-				localStorage.setItem("token", msg.token);
-				//console.log("Storage TOKEN: " + localStorage.getItem("token"));
 				window.location.href = "start.html";
 			} else {
 				//document.getElementById("warning").innerHTML = '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Dieser Browser unterstützt keine Cookies, dadurch kann die Seite leider nicht benutzt werden.';
@@ -51,16 +52,13 @@ function login() {
 }
 
 function checkSession() {
-	if (localStorage.getItem("token") != null) {
 		$('#pageloader').show();
 		$.ajax({
 			timeout: 3000,
-			url: "https://his.homeinfo.de/session/!?session=" +  localStorage.getItem("token"),
+			url: "https://his.homeinfo.de/session/!",
 			type: "GET",
 			success: function (msg) {
-				if (msg.token == localStorage.getItem("token")) {
-					window.location.href = "start.html";
-				}
+				window.location.href = "start.html";
 			},
 			error: function (xmlhttprequest, textstatus, message) { // EXPIRED
 				$('#pageloader').hide();
@@ -69,5 +67,4 @@ function checkSession() {
 					document.getElementById("warning").innerHTML = '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Service ist leider nicht aktiv. Bitte versuchen Sie es später noch einmal.';
 			}
 		});
-	}	
 }	

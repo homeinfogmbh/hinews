@@ -66,7 +66,7 @@ class Upload {
 			if (!f.type.match('image.*') && !f.type.match('video.*')) {
 				thisobject.selector.find('#upload_error').html('<font style="color:red; font-size:16px">' + f.name + ' nicht erlaubt</font>');
 				continue;
-			} else if (f.size > 5242880) {
+			} else if (f.size > 104857600) { // 100mb
 				thisobject.selector.find('#upload_error').html('<font style="color:red; font-size:16px">' + f.name + ' ist zu groß (max. 5mb)</font>');
 				continue;
 			} else if (i >= thisobject.maximages || thisobject.fileList.length >= thisobject.maximages) {
@@ -189,7 +189,7 @@ class Upload {
 			$(this).parent().remove();
 			if (id.indexOf('n') === -1) { // 'n' not uploaded yet
 				$.ajax({
-					url: 'https://backend.homeinfo.de/hinews/image/' + id + '?session=' + localStorage.getItem("token"),
+					url: 'https://backend.homeinfo.de/hinews/image/' + id,
 					type: 'DELETE',
 					success: function (msg) {
 						//console.log(msg);

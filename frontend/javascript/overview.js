@@ -10,7 +10,7 @@ $(document).ready(function() {
 
 function getCustomers() {
 	$.ajax({
-		url: 'https://backend.homeinfo.de/hinews/customers?session=' + localStorage.getItem("token"),
+		url: 'https://backend.homeinfo.de/hinews/customers',
 		type: 'GET',
 		success: function (customers) {
 			console.log(customers);
@@ -24,7 +24,7 @@ function getCustomers() {
 }
 function getArticleList() {
 	$.ajax({
-		url: "https://backend.homeinfo.de/hinews/article?session=" +localStorage.getItem("token"),
+		url: 'https://backend.homeinfo.de/hinews/article',
 		type: "GET",
 		success: function (articles) {
 			console.log(articles)
@@ -121,7 +121,7 @@ function setButtons() {
 		$("#pageloader").show();
 		//for (i=0; i < msg.length; i++) { // delete all // multi
 		$.ajax({
-			url: "https://backend.homeinfo.de/hinews/article/" + id + "?session=" +localStorage.getItem("token"),
+			url: 'https://backend.homeinfo.de/hinews/article/" + id',
 			type: "DELETE",
 			success: function (msg) {
 				//console.log(msg);

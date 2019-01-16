@@ -28,10 +28,9 @@ $(document).ready(function() {
 	
 	$('.logout').click(function() {
 		$.ajax({
-			url: "https://his.homeinfo.de/session/!?session=" +  localStorage.getItem("token"),
+			url: "https://his.homeinfo.de/session/!",
 			type: "DELETE",
 			complete: function (msg) {
-				localStorage.removeItem("token");
 				window.location.href = "index.html";
 			}
 		});

@@ -10,7 +10,7 @@ $(document).ready(function() {
 		$('#headline').html("<i class='fa fa-edit'></i> News bearbeiten");
 	// Get keywords
 	$.ajax({
-		url: 'https://backend.homeinfo.de/hinews/tags?session=' + localStorage.getItem("token"),
+		url: 'https://backend.homeinfo.de/hinews/tags',
 		type: 'GET',
 		success: function (tags) {
 			_keywords = tags;
@@ -19,7 +19,7 @@ $(document).ready(function() {
 			});
 			// Get customers
 			$.ajax({
-				url: 'https://backend.homeinfo.de/hinews/customers?session=' + localStorage.getItem("token"),
+				url: 'https://backend.homeinfo.de/hinews/customers',
 				type: 'GET',
 				success: function (customers) {
 					//console.log(customers);
@@ -108,24 +108,23 @@ $(document).ready(function() {
 					}
 				}
 			}
-			if ($("#title").val() != '')
-				article.title = $("#title").val();
+			article.title = $("#title").val();
 			if ($("#subtitle").val() != '')
 				article.subtitle = $("#subtitle").val();
-			if ($("#newstext").val() != '')
+			//if ($("#newstext").val() != '')
 				article.text = $("#newstext").val();
-			if ($("#source").val() != '')
+			//if ($("#source").val() != '')
 				article.source = $("#source").val();
 			if ($("#active_from").val() != '')
 				article.activeFrom = $("#active_from").val();
 			if ($("#active_until").val() != '')
 				article.activeUntil = $("#active_until").val();
-			console.log(article);
+			//console.log(article);
 
-			var url = "https://backend.homeinfo.de/hinews/article?session=" + localStorage.getItem("token");
+			var url = "https://backend.homeinfo.de/hinews/article";
 			var type = 'POST';
 			if (_id !== null) {
-				url = "https://backend.homeinfo.de/hinews/article/" + _id + "?session=" + localStorage.getItem("token");
+				url = "https://backend.homeinfo.de/hinews/article/" + _id;
 				type = 'PATCH';
 			}
 			$.ajax({
@@ -138,7 +137,7 @@ $(document).ready(function() {
 					setImageSources();
 					if (msg.id !== undefined) // For new articles
 						_id = msg.id;
-					_upload.uploadFile("https://backend.homeinfo.de/hinews/article/" + _id + "/images?session=" + localStorage.getItem("token"));
+					_upload.uploadFile("https://backend.homeinfo.de/hinews/article/" + _id + "/images");
 				},
 				error: function (msg) {
 					uploadCompleted(msg);
@@ -150,19 +149,18 @@ $(document).ready(function() {
 
 function getArticle() {
 	$.ajax({
-		url: "https://backend.homeinfo.de/hinews/article/" + _id + "?session=" + localStorage.getItem("token"),
+		url: "https://backend.homeinfo.de/hinews/article/" + _id,
 		type: "GET",
 		success: function (article) {
-			//console.log(article);
 			_article = article;
 			$('#headline').html("<i class='fa fa-edit'></i> News bearbeiten <font style='font-size:14px'>von Benutzer <b>" + article.author.id + "</b> vom <b>" + article.created.split('T').join(' ') + '</b>.' + ((article.editors.length > 0) ?'<br> Letze Änderung am <b>' + article.editors[article.editors.length-1].timestamp.split('T').join(' ') + '</b> von Benutzer <b>' + article.editors[article.editors.length-1].account.id + '</b>' :'') + '</font>');
 			$("#title").val($("<p/>").html(article.title).text());
 			$("#subtitle").val($("<p/>").html(article.subtitle).text());
-			//$("#newstext").val(article.text.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&quot;/g,"'"));
-			$("#newstext").val(jQuery.parseHTML(article.text)[0].data);
+			if (article.text !== '')
+				$("#newstext").val(jQuery.parseHTML(article.text)[0].data);
 			$("#source").val(article.source);
 			for (var articel_image = 0; articel_image < article.images.length; articel_image++)
-				_upload.loadImage('https://backend.homeinfo.de/hinews/image/' + article.images[articel_image].id + '?session=' + localStorage.getItem("token"), article.images[articel_image].source, article.images[articel_image].id, article.images[articel_image].mimetype);
+				_upload.loadImage('https://backend.homeinfo.de/hinews/image/' + article.images[articel_image].id, article.images[articel_image].source, article.images[articel_image].id, article.images[articel_image].mimetype);
 			
 			if (article.tags.length > 0) {
 				for (var selectedKeyword = 0; selectedKeyword < article.tags.length; selectedKeyword++)
@@ -245,7 +243,7 @@ function setImageSources() {
 			if ($('.img_source').length > 0 && $('.img_source').eq(article).val() !== _article.images[article].source) {
 				var data =  {'source': $('.img_source').eq(article).val()};
 				$.ajax({
-					url: 'https://backend.homeinfo.de/hinews/image/' + _article.images[article].id + '?session=' + localStorage.getItem("token"),
+					url: 'https://backend.homeinfo.de/hinews/image/' + _article.images[article].id,
 					type: 'PATCH',
 					data: JSON.stringify(data),
 					contentType: 'application/json',

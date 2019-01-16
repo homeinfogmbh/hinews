@@ -1,4 +1,7 @@
-checkSession(); // Disable for testing without login
+$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+	options.crossDomain = {crossDomain: true};
+	options.xhrFields = {withCredentials: true};
+});
 
 $(document).ready(function() {
 	holdSession();
@@ -10,30 +13,33 @@ function getURLParameterByName(name) {
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
 }
 
-function checkSession() {
+function holdSession() {
 	$.ajax({
-		timeout: 5000,
-		url: "https://his.homeinfo.de/session/!?session=" +  localStorage.getItem("token"),
-		type: "GET",
+		url: 'https://his.homeinfo.de/session/!?duration=30', //?duration=5 // max 5min - 30min; default: 15min
+		type: "PUT",
 		success: function (msg) {
-			//console.log(msg);
-			//console.log("Success " + msg.token)
-			if (msg.token != localStorage.getItem("token")) {
+			if ((new Date(msg.end) - new Date()) < 0)
 				window.location.href = "index.html";
-			} else {
-				$("#sessiontime").html('<font size="2" color="#bbb">Sitzung läuft ab <br>um ' + msg.end.substring(11,16) + '</font>');
+			else {	
+				$("#sessiontime").html('<font size="2" color="#bbb">Sitzung läuft ab <br>um ' + msg.end.substring(11, 16) + ' <i class="fa fa-refresh btn_session pointer"></i></font>');
+				$('.btn_session').click(function(e) {
+					holdSession();
+				});
 				getUser();
 			}
 		},
 		error: function (msg) { // EXPIRED
-			window.location.href = "index.html";
-		}
+			if (msg.statusText == "Gone" ) {
+				window.location.href = "index.html"; // Disable for testing without login
+			}
+		},
 	});
 }
+
 function getUser() {
 	$.ajax({
 		timeout: 5000,
-		url: "https://his.homeinfo.de/account/!?session=" + localStorage.getItem("token"),
+		url: "https://his.homeinfo.de/account/!",
 		type: "GET",
 		success: function (msg) {
 			//console.log(msg);
@@ -47,24 +53,6 @@ function getUser() {
 			console.log(msg);
 		}
 	});	
-}
-function holdSession() {
-	$.ajax({
-		url: "https://his.homeinfo.de/session/!?session=" +  localStorage.getItem("token") + '&duration=30', //?duration=5 // max 5min - 30min; default: 15min
-		type: "PUT",
-		success: function (msg) {
-			localStorage.setItem("token", msg.token);
-			$("#sessiontime").html('<font size="2" color="#bbb">Sitzung läuft ab <br>um ' + msg.end.substring(11, 16) + ' <i class="fa fa-refresh btn_session pointer"></i></font>');
-			$('.btn_session').click(function(e) {
-				holdSession();
-			});
-		},
-		error: function (msg) { // EXPIRED
-			if (msg.statusText == "Gone" ) {
-				window.location.href = "index.html"; // Disable for testing without login
-			}
-		},
-	});
 }
 
 function compareStrings(a, b) {
