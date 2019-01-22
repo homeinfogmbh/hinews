@@ -71,7 +71,7 @@ def search():
     else:
         match_active = ~article_active()
 
-    condition = match_active & (match_customers | match_tags)
+    condition = match_active & match_customers & match_tags
     articles = Article.select().join(Tag).where(condition)
 
     if BROWSER.info:
