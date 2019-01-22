@@ -53,23 +53,13 @@ def search():
     customers = request.json.get('customers')
     tags = request.json.get('tags')
     active = request.json.get('active')
-
-    if customers:
-        match_customers = Article.customer << customers
-    else:
-        match_customers = True
-
-    if tags:
-        match_tags = Tag.tag << tags
-    else:
-        match_tags = True
+    match_customers = (Article.customer << customers) if customers else True
+    match_tags = (Tag.tag << tags) if tags else True
 
     if active is None:
         match_active = True
-    elif active:
-        match_active = article_active()
     else:
-        match_active = ~article_active()
+        match_active = article_active() if active else (~ article_active())
 
     condition = match_active & match_customers & match_tags
     articles = Article.select().join(Tag).where(condition)
