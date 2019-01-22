@@ -155,6 +155,6 @@ ROUTES = (
     ('GET', '/articles', count, 'count_articles'),
     ('GET', '/article/<int:ident>', get, 'get_article'),
     ('POST', '/article', post, 'post_article'),
-    ('POST', '/article/search', post, 'search_article'),
+    ('POST', '/article/search', search, 'search_article'),
     ('DELETE', '/article/<int:ident>', delete, 'delete_article'),
     ('PATCH', '/article/<int:ident>', patch, 'patch_article'))
