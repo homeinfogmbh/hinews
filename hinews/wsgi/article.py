@@ -9,7 +9,7 @@ from hinews.messages.article import ArticleCreated
 from hinews.messages.article import ArticleDeleted
 from hinews.messages.article import ArticlePatched
 from hinews.messages.article import NoSuchArticle
-from hinews.orm import article_active, Article, Editor
+from hinews.orm import article_active, Article, Editor, Tag
 
 
 __all__ = ['get_article', 'ROUTES']
@@ -39,6 +39,40 @@ def list_():
 
     articles = Article.select().where(condition).order_by(
         Article.created.desc())
+
+    if BROWSER.info:
+        return JSON(BROWSER.pages(articles).to_json())
+
+    return JSON([article.to_json() for article in BROWSER.browse(articles)])
+
+
+@authenticated
+@authorized('hinews')
+def search():
+    """Searches for certain parameters."""
+    customers = request.json.get('customers')
+    tags = request.json.get('tags')
+    active = request.json.get('active')
+
+    if customers:
+        match_customers = Article.customer << customers
+    else:
+        match_customers = True
+
+    if tags:
+        match_tags = Tag.tag << tags
+    else:
+        match_tags = True
+
+    if active is None:
+        match_active = True
+    elif active:
+        match_active = article_active()
+    else:
+        match_active = ~article_active()
+
+    condition = match_active & (match_customers | match_tags)
+    articles = Article.select().join(Tag).where(condition)
 
     if BROWSER.info:
         return JSON(BROWSER.pages(articles).to_json())
@@ -121,5 +155,6 @@ ROUTES = (
     ('GET', '/articles', count, 'count_articles'),
     ('GET', '/article/<int:ident>', get, 'get_article'),
     ('POST', '/article', post, 'post_article'),
+    ('POST', '/article/search', post, 'search_article'),
     ('DELETE', '/article/<int:ident>', delete, 'delete_article'),
     ('PATCH', '/article/<int:ident>', patch, 'patch_article'))
