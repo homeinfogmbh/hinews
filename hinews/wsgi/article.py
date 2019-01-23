@@ -18,6 +18,25 @@ __all__ = ['get_article', 'ROUTES']
 BROWSER = Browser(default_size=20)
 
 
+def _filter_customers(articles, cids):
+    """Filters articles by customers."""
+
+    cids = frozenset(cids)
+
+    if not cids:
+        yield from articles
+        return
+
+    for article in articles:
+        article_cids = frozenset(customer.id for customer in article.customers)
+
+        if not article_cids:
+            yield article
+        else:
+            if article_cids & cids:
+                yield article
+
+
 def get_article(ident):
     """Returns the respective article."""
 
@@ -50,19 +69,22 @@ def list_():
 @authorized('hinews')
 def search():
     """Searches for certain parameters."""
-    customers = request.json.get('customers')
-    tags = request.json.get('tags')
+    select = Article.select()
     active = request.json.get('active')
-    match_customers = (Article.customer << customers) if customers else True
-    match_tags = (Tag.tag << tags) if tags else True
 
     if active is None:
-        match_active = True
+        condition = True
     else:
-        match_active = article_active() if active else (~ article_active())
+        condition = article_active() if active else (~ article_active())
 
-    condition = match_active & match_customers & match_tags
-    articles = Article.select().join(Tag).where(condition)
+    tags = request.json.get('tags')
+
+    if tags:
+        select = select.join(Tag, on=Tag.article == Article.id)
+        condition &= (Tag.tag << tags)
+
+    cids = request.json.get('customers')
+    articles = _filter_customers(select.where(condition), cids)
 
     if BROWSER.info:
         return JSON(BROWSER.pages(articles).to_json())
