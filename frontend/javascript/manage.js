@@ -5,12 +5,14 @@ var _selectedPage = 0;
 var _showactive = true;
 $(document).ready(function() {
 	 $("#actives").val('true');
-	getPages(); // getKeywords();
+	getPages(); 
+	getKeywords();
 	$('#searchfield').on('input',function(e) {
 		loadArticles();
 	});
 
 	$('.keywords').click(function(e) {
+		$("#pageloader").show();
 		if ($(this).val() !== null) {
 			var selector;
 			if ($(this)[0].id === 'company')
@@ -22,7 +24,7 @@ $(document).ready(function() {
 				selector.empty();
 			selector.append("<span class='label label-default btn_removekeyword pointer' style='margin-right:5px; display: inline-block' data-cid=" + $(this).find(':selected').data('cid') + ">" + $(this).val() + "<i class='fa fa-times' style='margin-left:5px'></i></span>");
 			$('option:selected', this).remove();
-			loadArticles();
+			getPages();
 		}
 	});
 
@@ -64,9 +66,26 @@ function getKeywords() {
 	});
 }
 function getPages() {
+	var url = "https://backend.homeinfo.de/hinews/article?pages&size=15" + (_showactive ?"" :"&inactive");
+	var type = 'GET';
+	var searchParams = {
+		"customers": [],
+		"tags": [],
+		"active": _showactive
+	};
+	if ($('#keywords').find('span').length > 0 || selectedCompany < $('#companies').find('span').length > 0) {
+		url = "https://backend.homeinfo.de/hinews/article/search?pages&size=15";
+		type = 'POST';
+		for (var selectedKeyword = 0; selectedKeyword < $('#keywords').find('span').length; selectedKeyword++)
+			searchParams.tags.push($('#keywords').find('span').eq(selectedKeyword).text());
+		for (var selectedCompany = 0; selectedCompany < $('#companies').find('span').length; selectedCompany++)
+			searchParams.customers.push($('#companies').find('span').eq(selectedCompany).data('cid'));
+	}
 	$.ajax({
-		url: "https://backend.homeinfo.de/hinews/article?pages&size=15" + (_showactive ?"" :"&inactive"),
-		type: "GET",
+		url: url,
+		type: type,
+		data: JSON.stringify(searchParams),
+		contentType: 'application/json',
 		success: function (pages) {
 			if (pages.pages > 1) {
 				var pagechanger = '';
@@ -82,9 +101,26 @@ function getPages() {
 	});
 }
 function getArticleList() {
+	var url = "https://backend.homeinfo.de/hinews/article?size=15&page=" + _selectedPage + (_showactive ?"" :"&inactive");
+	var type = 'GET';
+	var searchParams = {
+		"customers": [],
+		"tags": [],
+		"active": _showactive
+	};
+	if ($('#keywords').find('span').length > 0 || selectedCompany < $('#companies').find('span').length > 0) {
+		url = "https://backend.homeinfo.de/hinews/article/search?size=15&page=" + _selectedPage;
+		type = 'POST';
+		for (var selectedKeyword = 0; selectedKeyword < $('#keywords').find('span').length; selectedKeyword++)
+			searchParams.tags.push($('#keywords').find('span').eq(selectedKeyword).text());
+		for (var selectedCompany = 0; selectedCompany < $('#companies').find('span').length; selectedCompany++)
+			searchParams.customers.push($('#companies').find('span').eq(selectedCompany).data('cid'));
+	}
 	$.ajax({
-		url: "https://backend.homeinfo.de/hinews/article?size=15&page=" + _selectedPage + (_showactive ?"" :"&inactive"),
-		type: "GET",
+		url: url,
+		type: type,
+		data: JSON.stringify(searchParams),
+		contentType: 'application/json',
 		success: function (articles) {
 			_articles = articles;
 			for (var article = 0; article < _articles.length; article++) {
@@ -190,9 +226,10 @@ function setButtons() {
 		e.preventDefault();
 	});
 	$('.btn_removekeyword').click(function(e) {
+		$("#pageloader").show();
 		$(this).remove();
 		setKeywordSelections();
-		loadArticles();
+		getPages();
 	});
 	$('.btn_edit_news').click(function(e) {
 		window.location.href = "article.html?id=" + $(this).data('jsonid');
@@ -266,7 +303,7 @@ function setKeywordSelections() {
 	for (company in _companies) {
 		allowSelection = true;
 		for (selectedKeyword = 0; selectedKeyword < $('#companies').find('span').length; selectedKeyword++) {
-			if ($('#companies').find('span').eq(selectedKeyword).text() === _companies[company].id.split('&amp;').join('&') + ((_companies[company].hasOwnProperty('annotation')) ?' (' + _companies[company].annotation + ')' :'')) {
+			if ($('#companies').find('span').eq(selectedKeyword).text() === _companies[company].id.toString().split('&amp;').join('&') + ((_companies[company].hasOwnProperty('annotation')) ?' (' + _companies[company].annotation + ')' :'')) {
 				allowSelection = false;
 				break;
 			}
@@ -278,6 +315,7 @@ function setKeywordSelections() {
 	if ($('#companies').text() === '')
 		$('#companies').html('alle');
 }
+// Deprecated
 function searchTags(nr) {
 	var keywordfound;
 	for (var selectedKeyword = 0; selectedKeyword < $('#keywords').find('span').length; selectedKeyword++) {
@@ -291,6 +329,7 @@ function searchTags(nr) {
 	}
 	return true;
 }
+// Deprecated
 function searchCompany(nr) {
 	for (var selectedCompany = 0; selectedCompany < $('#companies').find('span').length; selectedCompany++) {
 		for (var i = 0; i < _articles[nr].customers.length; i++) {
