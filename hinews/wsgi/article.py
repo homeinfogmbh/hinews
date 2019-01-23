@@ -9,13 +9,32 @@ from hinews.messages.article import ArticleCreated
 from hinews.messages.article import ArticleDeleted
 from hinews.messages.article import ArticlePatched
 from hinews.messages.article import NoSuchArticle
-from hinews.orm import article_active, Article, Editor, Tag, Whitelist
+from hinews.orm import article_active, Article, Editor, Tag
 
 
 __all__ = ['get_article', 'ROUTES']
 
 
 BROWSER = Browser(default_size=20)
+
+
+def _filter_customers(articles, cids):
+    """Filters articles by customers."""
+
+    cids = frozenset(cids)
+
+    if not cids:
+        yield from articles
+        return
+
+    for article in articles:
+        article_cids = frozenset(customer.id for customer in article.customers)
+
+        if not article_cids:
+            yield article
+        else:
+            if article_cids & cids:
+                yield article
 
 
 def get_article(ident):
@@ -58,19 +77,14 @@ def search():
     else:
         condition = article_active() if active else (~ article_active())
 
-    customers = request.json.get('customers')
-
-    if customers:
-        select = select.join(Whitelist, on=Whitelist.article == Article.id)
-        condition &= (Whitelist.customer << customers)
-
     tags = request.json.get('tags')
 
     if tags:
         select = select.join(Tag, on=Tag.article == Article.id)
         condition &= (Tag.tag << tags)
 
-    articles = select.where(condition)
+    cids = request.json.get('customers')
+    articles = _filter_customers(select.where(condition), cids)
 
     if BROWSER.info:
         return JSON(BROWSER.pages(articles).to_json())
