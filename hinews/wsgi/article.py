@@ -67,7 +67,7 @@ def search():
     tags = request.json.get('tags')
 
     if tags:
-        select = select.join(Tag, on=Tag.article == Article.id))
+        select = select.join(Tag, on=Tag.article == Article.id)
         condition &= (Tag.tag << tags)
 
     articles = select.where(condition)
