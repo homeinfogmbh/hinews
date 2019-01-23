@@ -61,13 +61,13 @@ def search():
     customers = request.json.get('customers')
 
     if customers:
-        select = select.join(Whitelist)
+        select = select.join(Whitelist, on=Whitelist.article == Article.id)
         condition &= (Whitelist.customer << customers)
 
     tags = request.json.get('tags')
 
     if tags:
-        select = select.join(Tag)
+        select = select.join(Tag, on=Tag.article == Article.id))
         condition &= (Tag.tag << tags)
 
     articles = select.where(condition)
