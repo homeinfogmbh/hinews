@@ -9,7 +9,7 @@ from hinews.messages.article import ArticleCreated
 from hinews.messages.article import ArticleDeleted
 from hinews.messages.article import ArticlePatched
 from hinews.messages.article import NoSuchArticle
-from hinews.orm import article_active, Article, Editor, Tag
+from hinews.orm import article_active, Article, Editor, Tag, Whitelist
 
 
 __all__ = ['get_article', 'ROUTES']
@@ -50,19 +50,27 @@ def list_():
 @authorized('hinews')
 def search():
     """Searches for certain parameters."""
-    customers = request.json.get('customers')
-    tags = request.json.get('tags')
+    select = Article.select()
     active = request.json.get('active')
-    match_customers = (Article.customer << customers) if customers else True
-    match_tags = (Tag.tag << tags) if tags else True
 
     if active is None:
-        match_active = True
+        condition = True
     else:
-        match_active = article_active() if active else (~ article_active())
+        condition = article_active() if active else (~ article_active())
 
-    condition = match_active & match_customers & match_tags
-    articles = Article.select().join(Tag).where(condition)
+    customers = request.json.get('customers')
+
+    if customers:
+        select = select.join(Whitelist)
+        condition &= (Whitelist.customer << customers)
+
+    tags = request.json.get('tags')
+
+    if tags:
+        select = select.join(Tag)
+        condition &= (Tag.tag << tags)
+
+    articles = select.where(condition)
 
     if BROWSER.info:
         return JSON(BROWSER.pages(articles).to_json())
