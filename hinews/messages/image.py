@@ -1,48 +1,21 @@
 """Image related messages."""
 
-from hinews.messages.common import NewsMessage
+from hinews.messages.facility import NEWS_MESSAGE
 
 
 __all__ = [
-    'NoSuchImage',
-    'NoImageProvided',
-    'NoMetaDataProvided',
-    'ImageAdded',
-    'ImageDeleted',
-    'ImagePatched']
+    'NO_SUCH_IMAGE',
+    'NO_IMAGE_PROVIDED',
+    'NO_META_DATA_PROVIDED',
+    'IMAGE_ADDED',
+    'IMAGE_DELETED',
+    'IMAGE_PATCHED']
 
 
-class NoSuchImage(NewsMessage):
-    """Indicates that the respective image does not exist."""
-
-    STATUS = 404
-
-
-class NoImageProvided(NewsMessage):
-    """Indicates that no image was provided during POST request."""
-
-    STATUS = 422
-
-
-class NoMetaDataProvided(NewsMessage):
-    """Indicates that no meta data was provided during POST request."""
-
-    STATUS = 422
-
-
-class ImageAdded(NewsMessage):
-    """Indicates that the image was added sucessfully."""
-
-    STATUS = 201
-
-
-class ImageDeleted(NewsMessage):
-    """Indicates tat the image was deleted successfully."""
-
-    STATUS = 200
-
-
-class ImagePatched(NewsMessage):
-    """Indicates that the image was patched successfully."""
-
-    STATUS = 200
+NO_SUCH_IMAGE = NEWS_MESSAGE('The requested image does not exist.', status=404)
+NO_IMAGE_PROVIDED = NEWS_MESSAGE('No image provided.', status=422)
+NO_META_DATA_PROVIDED = NEWS_MESSAGE('No meta data provided.', status=422)
+IMAGE_ADDED = NEWS_MESSAGE('The image has been added.', status=201)
+IMAGE_DELETED = NEWS_MESSAGE('The image has been deleted.', status=200)
+IMAGE_PATCHED = NEWS_MESSAGE(
+    'The image meta data has been updated.', status=200)

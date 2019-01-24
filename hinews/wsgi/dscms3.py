@@ -3,7 +3,7 @@
 from dscms3 import DSCMS3User
 from wsgilib import Binary
 
-from hinews.messages.image import NoSuchImage
+from hinews.messages.image import NO_SUCH_IMAGE
 from hinews.orm import Image
 
 
@@ -17,7 +17,7 @@ def get_image(ident):
     try:
         image = Image.get(Image.id == ident)
     except Image.DoesNotExist:
-        raise NoSuchImage()
+        raise NO_SUCH_IMAGE
 
     try:
         return Binary(image.watermarked)

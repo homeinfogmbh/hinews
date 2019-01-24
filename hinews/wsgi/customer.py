@@ -5,7 +5,7 @@ from flask import request
 from his import authenticated, authorized
 from wsgilib import JSON
 
-from hinews.messages.customer import CustomerAdded, CustomerDeleted
+from hinews.messages.customer import CUSTOMER_ADDED, CUSTOMER_DELETED
 from hinews.orm import AccessToken, Whitelist
 from hinews.wsgi.article import get_article
 
@@ -39,7 +39,7 @@ def post(ident):
     article = get_article(ident)
     customer = Whitelist.add(article, request.data.decode())
     customer.save()
-    return CustomerAdded(id=customer.id)
+    return CUSTOMER_ADDED.update(id=customer.id)
 
 
 @authenticated
@@ -55,7 +55,7 @@ def delete(article_id, customer_id):
         ids.append(customer.id)
         customer.delete_instance()
 
-    return CustomerDeleted(ids=ids)
+    return CUSTOMER_DELETED.update(ids=ids)
 
 
 ROUTES = (

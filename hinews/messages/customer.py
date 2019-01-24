@@ -1,24 +1,10 @@
 """Customer related messages."""
 
-from hinews.messages.common import NewsMessage
+from hinews.messages.facility import NEWS_MESSAGE
 
 
-__all__ = ['NoSuchCustomer', 'CustomerAdded', 'CustomerDeleted']
+__all__ = ['CUSTOMER_ADDED', 'CUSTOMER_DELETED']
 
 
-class NoSuchCustomer(NewsMessage):
-    """Indicates that the respective customer does not exist."""
-
-    STATUS = 404
-
-
-class CustomerAdded(NewsMessage):
-    """Indicates that the respective customer was successfully added."""
-
-    STATUS = 201
-
-
-class CustomerDeleted(NewsMessage):
-    """Indicates that the respective customer was deleted successfully."""
-
-    STATUS = 200
+CUSTOMER_ADDED = NEWS_MESSAGE('The customer has been added.', status=201)
+CUSTOMER_DELETED = NEWS_MESSAGE('The customer has been deleted.', status=200)

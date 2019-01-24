@@ -3,8 +3,8 @@
 from his import authenticated
 from wsgilib import JSON, Binary
 
-from hinews.messages.article import NoSuchArticle
-from hinews.messages.image import NoSuchImage
+from hinews.messages.article import NO_SUCH_ARTICLE
+from hinews.messages.image import NO_SUCH_IMAGE
 from hinews.orm import article_active, Article, Tag, Image
 
 
@@ -41,7 +41,7 @@ def _get_article(ident):
         if article.id == ident:
             return article
 
-    raise NoSuchArticle()
+    raise NO_SUCH_ARTICLE
 
 
 def _get_image(ident):
@@ -50,12 +50,12 @@ def _get_image(ident):
     try:
         article_image = Image.get(Image.id == ident)
     except Image.DoesNotExist:
-        raise NoSuchImage()
+        raise NO_SUCH_IMAGE
 
     if article_image.article in _preview_articles():
         return article_image
 
-    raise NoSuchImage()
+    raise NO_SUCH_IMAGE
 
 
 @authenticated

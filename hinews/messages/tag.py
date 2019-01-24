@@ -1,24 +1,12 @@
 """Tag related messages."""
 
-from hinews.messages.common import NewsMessage
+from hinews.messages.facility import NEWS_MESSAGE
 
 
-__all__ = ['NoSuchTag', 'TagAdded', 'TagDeleted']
+__all__ = ['NO_SUCH_TAG', 'TAG_ADDED', 'TAG_DELETED', 'TAG_EXISTS']
 
 
-class NoSuchTag(NewsMessage):
-    """Indicates that the respective tag does not exist."""
-
-    STATUS = 404
-
-
-class TagAdded(NewsMessage):
-    """Indicates that the respective tag was successfully added."""
-
-    STATUS = 201
-
-
-class TagDeleted(NewsMessage):
-    """Indicates that the respective tag was deleted successfully."""
-
-    STATUS = 200
+NO_SUCH_TAG = NEWS_MESSAGE('The requested tag does not exist.', status=404)
+TAG_ADDED = NEWS_MESSAGE('The tag has been added.', status=201)
+TAG_DELETED = NEWS_MESSAGE('The tag has been deleted.', status=200)
+TAG_EXISTS = NEWS_MESSAGE('The tag already exists.', status=409)

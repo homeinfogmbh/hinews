@@ -5,15 +5,15 @@ from json import loads
 from flask import request
 
 from his import ACCOUNT, authenticated, authorized
-from his.messages import MissingData, InvalidData
+from his.messages.data import MISSING_DATA, INVALID_DATA
 from wsgilib import Binary, JSON
 
-from hinews.messages.image import ImageAdded
-from hinews.messages.image import ImageDeleted
-from hinews.messages.image import ImagePatched
-from hinews.messages.image import NoImageProvided
-from hinews.messages.image import NoMetaDataProvided
-from hinews.messages.image import NoSuchImage
+from hinews.messages.image import IMAGE_ADDED
+from hinews.messages.image import IMAGE_DELETED
+from hinews.messages.image import IMAGE_PATCHED
+from hinews.messages.image import NO_IMAGE_PROVIDED
+from hinews.messages.image import NO_META_DATA_PROVIDED
+from hinews.messages.image import NO_SUCH_IMAGE
 from hinews.orm import Image
 from hinews.wsgi.article import get_article
 
@@ -27,7 +27,7 @@ def get_image(ident):
     try:
         return Image.get(Image.id == ident)
     except Image.DoesNotExist:
-        raise NoSuchImage()
+        raise NO_SUCH_IMAGE
 
 
 @authenticated
@@ -64,12 +64,12 @@ def post(ident):
     try:
         image = request.files['image']
     except KeyError:
-        raise NoImageProvided()
+        raise NO_IMAGE_PROVIDED
 
     try:
         metadata = request.files['metadata']
     except KeyError:
-        raise NoMetaDataProvided()
+        raise NO_META_DATA_PROVIDED
 
     with image.stream as stream:
         data = stream.read()
@@ -82,12 +82,12 @@ def post(ident):
     try:
         image = Image.add(article, data, metadata, ACCOUNT.id)
     except KeyError as key_error:
-        raise MissingData(key=key_error.args[0])
+        raise MISSING_DATA.update(key=key_error.args[0])
     except ValueError as value_error:
-        raise InvalidData(hint=value_error.args[0])
+        raise INVALID_DATA.update(hint=value_error.args[0])
 
     image.save()
-    return ImageAdded(id=image.id)
+    return IMAGE_ADDED.update(id=image.id)
 
 
 @authenticated
@@ -96,7 +96,7 @@ def delete(ident):
     """Deletes an image."""
 
     get_image(ident).delete_instance()
-    return ImageDeleted()
+    return IMAGE_DELETED
 
 
 @authenticated
@@ -107,7 +107,7 @@ def patch(ident):
     image = get_image(ident)
     image.patch_json(request.json)
     image.save()
-    return ImagePatched()
+    return IMAGE_PATCHED
 
 
 ROUTES = (

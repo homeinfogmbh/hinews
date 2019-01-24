@@ -19,5 +19,3 @@ class InvalidElements(Exception):
 
 class InvalidTag(Exception):
     """Indicates that a respective tag is not registered."""
-
-    pass

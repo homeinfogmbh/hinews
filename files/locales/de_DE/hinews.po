@@ -1,6 +1,6 @@
-# Translations template for HINews.
+# Translations template for HOMEINFO News.
 # Copyright (C) 2018 HOMEINFO Digitale Informationssysteme GmbH.
-# This file is distributed under the same license as the HINews project.
+# This file is distributed under the same license as the HOMEINFO News project.
 # Richard Neumann <r.neumann@homeinfo.de>, 2018.
 #
 msgid ""
@@ -16,56 +16,74 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Hand\n"
 
-msgid "NoSuchArticle"
-msgstr "Kein solcher Artikel."
+#: article.py:13
+msgid "This article does not exist."
+msgstr "Der gewünschte Artikel existiert nicht."
 
-msgid "ArticleCreated"
-msgstr "Artikel erstellt."
+#: article.py:14
+msgid "The article has been created."
+msgstr "Der Artikel wurde erstellt."
 
-msgid "ArticleDeleted"
-msgstr "Artikel gelöscht."
+#: article.py:15
+msgid "The article has been deleted."
+msgstr "Der Artikel wurde gelöscht."
 
-msgid "ArticlePatched"
-msgstr "Artikel geändert."
+#: article.py:16
+msgid "The article has been updated."
+msgstr "Der Artikel wurde geändert."
 
-msgid "NoSuchImage"
-msgstr "Kein solches Bild."
+#: customer.py:9
+msgid "The customer has been added."
+msgstr "Der Kunde wurde hinzugefügt."
 
-msgid "NoImageProvided"
+#: customer.py:10
+msgid "The customer has been deleted."
+msgstr "Der Kunde wurde gelöscht."
+
+#: image.py:15
+msgid "The requested image does not exist."
+msgstr "Das gewünschte Bild existiert nicht."
+
+#: image.py:16
+msgid "No image provided."
 msgstr "Kein Bild übergeben."
 
-msgid "NoMetaDataProvided"
+#: image.py:17
+msgid "No meta data provided."
 msgstr "Keine Metadaten übergeben."
 
-msgid "ImageAdded"
-msgstr "Bild hinzugefügt."
+#: image.py:18
+msgid "The image has been added."
+msgstr "Das Bild wurde hinzugefügt."
 
-msgid "ImageDeleted"
-msgstr "Bild gelöscht."
+#: image.py:19
+msgid "The image has been deleted."
+msgstr "Das Bild wurde gelöscht."
 
-msgid "ImagePatched"
-msgstr "Bildmetadaten geändert."
+#: image.py:20
+msgid "The image meta data has been updated."
+msgstr "Die Bildmetadaten wurdem geändert."
 
-msgid "NoSuchTag"
-msgstr "Kein solcher Tag."
-
-msgid "TagAdded"
-msgstr "Tag hinzugefügt."
-
-msgid "TagDeleted"
-msgstr "Tag gelöscht."
-
-msgid "NoSuchCustomer"
-msgstr "Kein solcher Kunde."
-
-msgid "CustomerAdded"
-msgstr "Kunde hinzugefügt."
-
-msgid "CustomerDeleted"
-msgstr "Kunde gelöscht."
-
-msgid "MissingAccessToken"
+#: public.py:9
+msgid "No access token provided."
 msgstr "Fehlendes Access-Token."
 
-msgid "InvalidAccessToken"
+#: public.py:10
+msgid "Invalid access token."
 msgstr "Ungültiges Access-Token."
+
+#: tag.py:9
+msgid "The requested tag does not exist."
+msgstr "Das gewünschte Schlagwort existiert nicht."
+
+#: tag.py:10
+msgid "The tag has been added."
+msgstr "Das Schlagwort wurde hinzugefügt."
+
+#: tag.py:11
+msgid "The tag has been deleted."
+msgstr "Das Schlagwort wurde gelöscht."
+
+#: tag.py:12
+msgid "The tag already exists."
+msgstr "Das Schlagwort wurde gelöscht."

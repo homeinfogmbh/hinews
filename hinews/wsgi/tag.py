@@ -2,11 +2,11 @@
 
 from flask import request
 
-from his import authenticated, authorized
+from his import authenticated, authorized, root
 from wsgilib import JSON
 
 from hinews.exceptions import InvalidTag
-from hinews.messages.tag import NoSuchTag, TagAdded, TagDeleted
+from hinews.messages.tag import NO_SUCH_TAG, TAG_ADDED, TAG_DELETED, TAG_EXISTS
 from hinews.orm import TagList, Tag
 from hinews.wsgi.article import get_article
 
@@ -32,6 +32,24 @@ def get(ident):
 
 @authenticated
 @authorized('hinews')
+@root
+def add():
+    """Adds a new tag to the list of registered tags."""
+
+    tag = request.data.decode().strip()
+
+    try:
+        tag = TagList.get(TagList.tag == tag)
+    except TagList.DoesNotExist:
+        tag = TagList(tag=tag)
+        tag.save()
+        return TAG_ADDED.update(id=tag.id)
+
+    return TAG_EXISTS.update(id=tag.id)
+
+
+@authenticated
+@authorized('hinews')
 def post(ident):
     """Adds a tag to the respective article."""
 
@@ -40,10 +58,10 @@ def post(ident):
     try:
         tag = Tag.add(article, request.data.decode())
     except InvalidTag:
-        return NoSuchTag()
+        return NO_SUCH_TAG
 
     tag.save()
-    return TagAdded(id=tag.id)
+    return TAG_ADDED.update(id=tag.id)
 
 
 @authenticated
@@ -61,14 +79,15 @@ def delete(article_id, tag_or_id):
     try:
         tag = Tag.get(selection)
     except Tag.DoesNotExist:
-        return TagDeleted()
+        return TAG_DELETED
 
     tag.delete_instance()
-    return TagDeleted()
+    return TAG_DELETED
 
 
 ROUTES = (
     ('GET', '/tags', list_, 'list_tags'),
+    ('POST', '/tags', add, 'add_tag'),
     ('GET', '/article/<int:ident>/tags', get, 'get_tags'),
     ('POST', '/article/<int:ident>/tags', post, 'post_tag'),
     ('DELETE', '/article/<int:article_id>/tags/<tag>', delete, 'delete_tag'))

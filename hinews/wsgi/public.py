@@ -5,10 +5,10 @@ from flask import request
 
 from wsgilib import ACCEPT, JSON, XML, Binary, Browser
 
-from hinews import dom
-from hinews.messages.article import NoSuchArticle
-from hinews.messages.image import NoSuchImage
-from hinews.messages.public import MissingAccessToken, InvalidAccessToken
+from hinews import dom  # pylint: disable=E0611
+from hinews.messages.article import NO_SUCH_ARTICLE
+from hinews.messages.image import NO_SUCH_IMAGE
+from hinews.messages.public import MISSING_ACCESS_TOKEN, INVALID_ACCESS_TOKEN
 from hinews.wsgi.functions import select_options
 from hinews.orm import Article, Image, AccessToken
 
@@ -25,12 +25,12 @@ def _get_customer():
     try:
         access_token = request.args['access_token']
     except KeyError:
-        raise MissingAccessToken()
+        raise MISSING_ACCESS_TOKEN
 
     try:
         access_token = AccessToken.get(AccessToken.token == access_token)
     except AccessToken.DoesNotExist:
-        raise InvalidAccessToken()
+        raise INVALID_ACCESS_TOKEN
 
     return access_token.customer
 
@@ -55,14 +55,14 @@ def _get_article(ident):
     try:
         article = Article.get(Article.id == ident)
     except Article.DoesNotExist:
-        raise NoSuchArticle()
+        raise NO_SUCH_ARTICLE
 
     customers = article.customers
 
     if not customers or customer in customers:
         return article
 
-    raise NoSuchArticle()
+    raise NO_SUCH_ARTICLE
 
 
 def _get_image(ident):
@@ -73,14 +73,14 @@ def _get_image(ident):
     try:
         image = Image.get(Image.id == ident)
     except Image.DoesNotExist:
-        raise NoSuchImage()
+        raise NO_SUCH_IMAGE
 
     customers = image.article.customers
 
     if not customers or customer in customers:
         return image
 
-    raise NoSuchImage()
+    raise NO_SUCH_IMAGE
 
 
 def list_():

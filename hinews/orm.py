@@ -17,7 +17,7 @@ from his.orm import Account
 from mdb import Customer
 from peeweeplus import MySQLDatabase, JSONModel
 
-from hinews import dom
+from hinews import dom  # pylint: disable=E0611
 from hinews.config import CONFIG
 from hinews.exceptions import InvalidTag
 from hinews.watermark import watermark
@@ -65,8 +65,7 @@ def _cached_account_info(ident):
 class _NewsModel(JSONModel):
     """Basic news database model."""
 
-    class Meta:
-        """Configures the database and schema."""
+    class Meta:     # pylint: disable=C0111,R0903
         database = DATABASE
         schema = database.database
 
@@ -177,8 +176,7 @@ class Article(_NewsModel):
 class Editor(_NewsModel):
     """An article's editor."""
 
-    class Meta:
-        """Sets the table name."""
+    class Meta:     # pylint: disable=C0111,R0903
         table_name = 'editor'
 
     article = ForeignKeyField(
@@ -205,8 +203,7 @@ class Editor(_NewsModel):
 class Image(_NewsModel):
     """An image of an article."""
 
-    class Meta:
-        """Sets the table name."""
+    class Meta:     # pylint: disable=C0111,R0903
         table_name = 'image'
 
     article = ForeignKeyField(
@@ -281,8 +278,7 @@ class Image(_NewsModel):
 class TagList(_NewsModel):
     """An tag for articles."""
 
-    class Meta:
-        """Sets the table name."""
+    class Meta:     # pylint: disable=C0111,R0903
         table_name = 'tag_list'
 
     tag = CharField(255)
@@ -355,8 +351,7 @@ class Whitelist(_NewsModel):
 class AccessToken(_NewsModel):
     """Customers' access tokens."""
 
-    class Meta:
-        """Sets the table name."""
+    class Meta:     # pylint: disable=C0111,R0903
         table_name = 'access_token'
 
     customer = ForeignKeyField(

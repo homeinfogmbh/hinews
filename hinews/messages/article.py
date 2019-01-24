@@ -1,34 +1,16 @@
 """Article related messages."""
 
-from hinews.messages.common import NewsMessage
+from hinews.messages.facility import NEWS_MESSAGE
 
 
 __all__ = [
-    'NoSuchArticle',
-    'ArticleCreated',
-    'ArticleDeleted',
-    'ArticlePatched']
+    'NO_SUCH_ARTICLE',
+    'ARTICLE_CREATED',
+    'ARTICLE_CREATED',
+    'ARTICLE_PATCHED']
 
 
-class NoSuchArticle(NewsMessage):
-    """Indicates that the respective article does not exist."""
-
-    STATUS = 404
-
-
-class ArticleCreated(NewsMessage):
-    """Indicates that the respective article was successfully created."""
-
-    STATUS = 201
-
-
-class ArticleDeleted(NewsMessage):
-    """Indicates that the respective article was successfully deleted."""
-
-    STATUS = 200
-
-
-class ArticlePatched(NewsMessage):
-    """Indicates that the respective article was successfully patched."""
-
-    STATUS = 200
+NO_SUCH_ARTICLE = NEWS_MESSAGE('This article does not exist.', status=404)
+ARTICLE_CREATED = NEWS_MESSAGE('The article has been created.', status=201)
+ARTICLE_DELETED = NEWS_MESSAGE('The article has been deleted.', status=200)
+ARTICLE_PATCHED = NEWS_MESSAGE('The article has been updated.', status=200)

@@ -5,10 +5,10 @@ from flask import request
 from his import ACCOUNT, authenticated, authorized
 from wsgilib import JSON, Browser
 
-from hinews.messages.article import ArticleCreated
-from hinews.messages.article import ArticleDeleted
-from hinews.messages.article import ArticlePatched
-from hinews.messages.article import NoSuchArticle
+from hinews.messages.article import ARTICLE_CREATED
+from hinews.messages.article import ARTICLE_DELETED
+from hinews.messages.article import ARTICLE_PATCHED
+from hinews.messages.article import NO_SUCH_ARTICLE
 from hinews.orm import article_active, Article, Editor, Tag
 
 
@@ -43,7 +43,7 @@ def get_article(ident):
     try:
         return Article.get(Article.id == ident)
     except Article.DoesNotExist:
-        raise NoSuchArticle()
+        raise NO_SUCH_ARTICLE
 
 
 @authenticated
@@ -127,7 +127,7 @@ def post():
     for customer in article.update_customers(customers):
         customer.save()
 
-    return ArticleCreated(id=article.id)
+    return ARTICLE_CREATED.update(id=article.id)
 
 
 @authenticated
@@ -136,7 +136,7 @@ def delete(ident):
     """Adds a new article."""
 
     get_article(ident).delete_instance()
-    return ArticleDeleted()
+    return ARTICLE_DELETED
 
 
 @authenticated
@@ -159,7 +159,7 @@ def patch(ident):
 
     new_editor = Editor.add(article, ACCOUNT.id)
     new_editor.save()
-    return ArticlePatched()
+    return ARTICLE_PATCHED
 
 
 ROUTES = (

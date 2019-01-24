@@ -5,9 +5,9 @@ from flask import request
 
 from wsgilib import Application, JSON, XML, Binary
 
-from hinews import dom
-from hinews.messages.article import NoSuchArticle
-from hinews.messages.image import NoSuchImage
+from hinews import dom  # pylint: disable=E0611
+from hinews.messages.article import NO_SUCH_ARTICLE
+from hinews.messages.image import NO_SUCH_IMAGE
 from hinews.orm import article_active, Article, Image
 
 
@@ -29,7 +29,7 @@ def _get_article(ident):
     try:
         return Article.get(article_active() & (Article.id == ident))
     except Article.DoesNotExist:
-        raise NoSuchArticle()
+        raise NO_SUCH_ARTICLE
 
 
 def _get_image(ident):
@@ -38,7 +38,7 @@ def _get_image(ident):
     try:
         return Image.get(Image.id == ident)
     except Image.DoesNotExist:
-        raise NoSuchImage()
+        raise NO_SUCH_IMAGE
 
 
 def list_():

@@ -1,18 +1,10 @@
 """Public API related messages."""
 
-from hinews.messages.common import NewsMessage
+from hinews.messages.facility import NEWS_MESSAGE
 
 
-__all__ = ['MissingAccessToken', 'InvalidAccessToken']
+__all__ = ['MISSING_ACCESS_TOKEN', 'INVALID_ACCESS_TOKEN']
 
 
-class MissingAccessToken(NewsMessage):
-    """Indicates that no access token was provided."""
-
-    STATUS = 422
-
-
-class InvalidAccessToken(NewsMessage):
-    """Indicates that the the access token is invalid."""
-
-    STATUS = 422
+MISSING_ACCESS_TOKEN = NEWS_MESSAGE('No access token provided.', status=401)
+INVALID_ACCESS_TOKEN = NEWS_MESSAGE('Invalid access token.', status=403)
