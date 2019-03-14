@@ -1,6 +1,6 @@
 """Article related messages."""
 
-from hinews.messages.facility import NEWS_MESSAGE
+from wsgilib import JSONMessage
 
 
 __all__ = [
@@ -10,7 +10,7 @@ __all__ = [
     'ARTICLE_PATCHED']
 
 
-NO_SUCH_ARTICLE = NEWS_MESSAGE('This article does not exist.', status=404)
-ARTICLE_CREATED = NEWS_MESSAGE('The article has been created.', status=201)
-ARTICLE_DELETED = NEWS_MESSAGE('The article has been deleted.', status=200)
-ARTICLE_PATCHED = NEWS_MESSAGE('The article has been updated.', status=200)
+NO_SUCH_ARTICLE = JSONMessage('This article does not exist.', status=404)
+ARTICLE_CREATED = JSONMessage('The article has been created.', status=201)
+ARTICLE_DELETED = JSONMessage('The article has been deleted.', status=200)
+ARTICLE_PATCHED = JSONMessage('The article has been updated.', status=200)
