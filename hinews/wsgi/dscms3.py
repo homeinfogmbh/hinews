@@ -1,6 +1,6 @@
 """Image authentication for dscms3."""
 
-from dscms3 import User
+from dscms3 import Users
 from wsgilib import Binary
 
 from hinews.messages.image import NO_SUCH_IMAGE
@@ -10,7 +10,7 @@ from hinews.orm import Image
 __all__ = ['ROUTES']
 
 
-@User.authenticated
+@Users.authenticated
 def get_image(ident):
     """Returns the respective image."""
 
