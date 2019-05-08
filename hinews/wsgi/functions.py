@@ -27,7 +27,7 @@ def select_options():
         try:
             since = strpdate(since)
         except ValueError:
-            raise Error('Invalid date: {}.'.format(since))
+            raise Error(f'Invalid date: {since}')
 
         selection &= Article.active_from >= since
 
@@ -37,7 +37,7 @@ def select_options():
         try:
             until = strpdate(until)
         except ValueError:
-            raise Error('Invalid date: {}.'.format(until))
+            raise Error(f'Invalid date: {until}')
 
         selection &= Article.active_until < until
 
@@ -47,7 +47,7 @@ def select_options():
         tags = loads(tags)
 
         if not isinstance(tags, list):
-            raise Error('Not a list: {}.'.format(tags))
+            raise Error(f'Not a list: {tags}')
 
         tags = Tag.select().where(Tag.tag >> tags)
         articles = set(tag.article_id for tag in tags)

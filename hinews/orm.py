@@ -234,7 +234,7 @@ class Image(_NewsModel):
     @property
     def watermarked(self):
         """Returns a watermarked image."""
-        return watermark(self.data, 'Quelle: {}'.format(self.oneliner))
+        return watermark(self.data, f'Quelle: {self.oneliner}')
 
     def patch_json(self, dictionary):
         """Patches the image metadata with the respective dictionary."""
