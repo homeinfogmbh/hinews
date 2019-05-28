@@ -264,7 +264,7 @@ class Image(_NewsModel):
         if filename is None:
             image.id = self.id
         else:
-            image.filename = filename
+            image.filename = str(filename)
 
         return image
 
