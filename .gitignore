@@ -8,3 +8,7 @@ dist
 .buildconfig
 hinews/dom.py
 wordpress/hinews.zip
+.anjuta*
+*.anjut
+.anjuta*
+*.anjuta

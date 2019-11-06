@@ -14,7 +14,7 @@ from hinews.orm import article_active, Article, Image
 __all__ = ['APPLICATION']
 
 
-APPLICATION = Application('hinews', debug=True, cors=True)
+APPLICATION = Application('hinews', debug=True)
 
 
 def _get_articles():
