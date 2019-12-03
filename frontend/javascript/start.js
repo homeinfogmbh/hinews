@@ -59,6 +59,7 @@ function getArticleListCompleted(data) {
 	var activity = '';
 	var article;
 	var editor;
+	console.log(data);
 	for (article = 0; article < data[0].length; article++) {
 		activityData.push({'id':data[0][article].id, 'user':data[0][article].author.id, 'date':data[0][article].created, 'activity':'News <b>"' + data[0][article].title + '"</b> erstellt'});
 		for (editor = 0; editor < data[0][article].editors.length; editor++)
