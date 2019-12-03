@@ -5,7 +5,6 @@ $(document).ready(function() {
 	getCustomers();
 });
 
-
 function getCustomers() {
 	$.ajax({
 		url: 'https://backend.homeinfo.de/hinews/customers',
@@ -45,7 +44,7 @@ function getActives() {
 			$('#overview').html(overview);
 			var promises = [];
 			promises.push(getArticleList());
-			promises.push(getArticleList("&inactive"));
+			promises.push(getArticleList("?inactive"));
 			Promise.all(promises).then(getArticleListCompleted);
 	
 		},
