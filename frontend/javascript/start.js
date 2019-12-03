@@ -42,43 +42,54 @@ function getActives() {
 			var overview = 'Aktive News: <b>' + actives.active + '</b><br>' +
 					'News gesamt: <b>' + ( actives.active + actives.inactive) + '</b><br><br>';
 			$('#overview').html(overview);
-			getArticleList();
+			var promises = [];
+			promises.push(getArticleList());
+			promises.push(getArticleList("&inactive"));
+			Promise.all(promises).then(getArticleListCompleted);
+	
 		},
 		error: function (msg) {
 			console.log(msg);
 		}
 	});	
 }
-function getArticleList() {
+
+function getArticleListCompleted(data) {
+	var activityData = [];
+	var activity = '';
+	var article;
+	var editor;
+	for (article = 0; article < data[0].length; article++) {
+		activityData.push({'id':data[0][article].id, 'user':data[0][article].author.id, 'date':data[0][article].created, 'activity':'News <b>"' + data[0][article].title + '"</b> erstellt'});
+		for (editor = 0; editor < data[0][article].editors.length; editor++)
+			activityData.push({'id':data[0][article].id, 'user':data[0][article].editors[editor].account.id, 'date':data[0][article].editors[editor].timestamp, 'activity':'News <b>"' + data[1][article].title + '"</b> bearbeitet'});
+	}
+	for (article = 0; article < data[1].length; article++) {
+		activityData.push({'id':data[1][article].id, 'user':data[1][article].author.id, 'date':data[1][article].created, 'activity':'News <b>"' + data[1][article].title + '"</b> erstellt'});
+		for (editor = 0; editor < data[1][article].editors.length; editor++)
+			activityData.push({'id':data[1][article].id, 'user':data[1][article].editors[editor].account.id, 'date':data[1][article].editors[editor].timestamp, 'activity':'News <b>"' + data[1][article].title + '"</b> bearbeitet'});
+	}
+	activityData.sort(function(a, b) {
+		return compareStringsInverted(a.date, b.date);
+	})
+	var user;
+	for (var i = 0; i < ((activityData.length > 100) ?100 :activityData.length); i++) {
+		activity += "<tr>" + 
+				"<td>" + (i+1) + "</td>" +
+				"<td>" + activityData[i].id + "</td>" +
+				"<td>" + activityData[i].user + "</td>" +
+				"<td>" + activityData[i].activity + "</td>" +
+				"<td>" + activityData[i].date.split('T').join(' ') + "</td>" +
+			"</tr>"
+	}
+	$('#activity').html(activity);
+	$('#pageloader').hide();
+}
+function getArticleList(active = "") {
 	$.ajax({
-		url: "https://backend.homeinfo.de/hinews/article",
+		url: "https://backend.homeinfo.de/hinews/article" + active,
 		type: "GET",
-		success: function (articles) {
-			var activityData = [];
-			var activity = '';
-			for (var article = 0; article < articles.length; article++) {
-				activityData.push({'id':articles[article].id, 'user':articles[article].author.id, 'date':articles[article].created, 'activity':'News <b>"' + articles[article].title + '"</b> erstellt'}); // $.datepicker.formatDate('mm/dd/yy', new Date(articles[article].created))
-				for (var editor = 0; editor < articles[article].editors.length; editor++)
-					activityData.push({'id':articles[article].id, 'user':articles[article].editors[editor].account.id, 'date':articles[article].editors[editor].timestamp, 'activity':'News <b>"' + articles[article].title + '"</b> bearbeitet'}); // $.datepicker.formatDate('mm/dd/yy', new Date(articles[article].created))
-			}
-			activityData.sort(function(a, b) {
-				return compareStringsInverted(a.date, b.date);
-			})
-			var user;
-			for (var i = 0; i < ((activityData.length > 100) ?100 :activityData.length); i++) {
-				activity += "<tr>" + 
-						"<td>" + (i+1) + "</td>" +
-						"<td>" + activityData[i].id + "</td>" +
-						"<td>" + activityData[i].user + "</td>" +
-						"<td>" + activityData[i].activity + "</td>" +
-						"<td>" + activityData[i].date.split('T').join(' ') + "</td>" +
-					"</tr>"
-			}
-			$('#activity').html(activity);
-		},
-		complete: function (msg) {
-			$('#pageloader').hide();
-		},
+		success: function (articles) { },
 		error: function (msg) {
 			JSON.stringify(msg);
 			console.log(msg);
