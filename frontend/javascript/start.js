@@ -5,6 +5,7 @@ $(document).ready(function() {
 	getCustomers();
 });
 
+
 function getCustomers() {
 	$.ajax({
 		url: 'https://backend.homeinfo.de/hinews/customers',
