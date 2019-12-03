@@ -44,7 +44,7 @@ function getActives() {
 			$('#overview').html(overview);
 			var promises = [];
 			promises.push(getArticleList());
-			promises.push(getArticleList("?inactive"));
+			promises.push(getArticleList("inactive"));
 			Promise.all(promises).then(getArticleListCompleted);
 	
 		},
@@ -59,7 +59,6 @@ function getArticleListCompleted(data) {
 	var activity = '';
 	var article;
 	var editor;
-	console.log(data);
 	for (article = 0; article < data[0].length; article++) {
 		activityData.push({'id':data[0][article].id, 'user':data[0][article].author.id, 'date':data[0][article].created, 'activity':'News <b>"' + data[0][article].title + '"</b> erstellt'});
 		for (editor = 0; editor < data[0][article].editors.length; editor++)
@@ -87,10 +86,9 @@ function getArticleListCompleted(data) {
 	$('#pageloader').hide();
 }
 function getArticleList(active = "") {
-	$.ajax({
-		url: "https://backend.homeinfo.de/hinews/article" + active,
+	return $.ajax({
+		url: "https://backend.homeinfo.de/hinews/article?" + active,
 		type: "GET",
-		success: function (articles) { },
 		error: function (msg) {
 			JSON.stringify(msg);
 			console.log(msg);
