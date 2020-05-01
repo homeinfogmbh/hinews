@@ -86,6 +86,7 @@ def post(ident):
     except ValueError as value_error:
         raise INVALID_DATA.update(hint=value_error.args[0])
 
+    image.file.save()
     image.save()
     return IMAGE_ADDED.update(id=image.id)
 
