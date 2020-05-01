@@ -8,11 +8,10 @@ from peewee import CharField
 from peewee import DateField
 from peewee import DateTimeField
 from peewee import ForeignKeyField
-from peewee import IntegerField
 from peewee import TextField
 from peewee import UUIDField
 
-from filedb import mimetype, FileProperty
+from filedb import File
 from his.orm import Account
 from mdb import Customer
 from peeweeplus import MySQLDatabase, JSONModel
@@ -33,7 +32,8 @@ __all__ = [
     'Tag',
     'Whitelist',
     'AccessToken',
-    'MODELS']
+    'MODELS'
+]
 
 
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
@@ -210,18 +210,17 @@ class Image(_NewsModel):
         Article, column_name='article', backref='images', on_delete='CASCADE')
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    _file = IntegerField(column_name='file')
+    file = ForeignKeyField(File, column_name='file')
     uploaded = DateTimeField()
     source = TextField(null=True)
-    data = FileProperty(_file)
 
     @classmethod
-    def add(cls, article, data, metadata, account):
+    def add(cls, article, bytes_, metadata, account):
         """Adds the respective image data to the article."""
         article_image = cls()
         article_image.article = article
         article_image.account = account
-        article_image.data = data
+        article_image.file = File.from_bytes(bytes_)
         article_image.uploaded = datetime.now()
         article_image.source = metadata['source']
         return article_image
@@ -234,7 +233,7 @@ class Image(_NewsModel):
     @property
     def watermarked(self):
         """Returns a watermarked image."""
-        return watermark(self.data, f'Quelle: {self.oneliner}')
+        return watermark(self.file.bytes, f'Quelle: {self.oneliner}')
 
     def patch_json(self, dictionary):
         """Patches the image metadata with the respective dictionary."""
@@ -251,7 +250,7 @@ class Image(_NewsModel):
         if not preview:
             dictionary['account'] = _cached_account_info(self.account_id)
 
-        dictionary['mimetype'] = mimetype(self._file)
+        dictionary['mimetype'] = self.file.mimetype
         return dictionary
 
     def to_dom(self, filename=None):
@@ -259,7 +258,7 @@ class Image(_NewsModel):
         image = dom.Image()
         image.uploaded = self.uploaded
         image.source = self.source
-        image.mimetype = mimetype(self._file)
+        image.mimetype = self.file.mimetype
 
         if filename is None:
             image.id = self.id
@@ -267,12 +266,6 @@ class Image(_NewsModel):
             image.filename = str(filename)
 
         return image
-
-    def delete_instance(self, recursive=False, delete_nullable=False):
-        """Deltes the image."""
-        self.data = None    # Delete file.
-        return super().delete_instance(
-            recursive=recursive, delete_nullable=delete_nullable)
 
 
 class TagList(_NewsModel):
