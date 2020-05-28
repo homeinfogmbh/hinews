@@ -80,7 +80,7 @@ def get_image(ident):
     try:
         return Binary(_get_image(ident).watermarked)
     except OSError:     # Not an image.
-        return Binary(_get_image(ident).data)
+        return Binary(_get_image(ident).bytes)
 
 
 ROUTES = (

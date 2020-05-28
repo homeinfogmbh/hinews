@@ -22,7 +22,7 @@ def get_image(ident):
     try:
         return Binary(image.watermarked)
     except OSError:     # Not an image.
-        return Binary(image.data)
+        return Binary(image.bytes)
 
 
 ROUTES = (('GET', '/dscms3/image/<int:ident>', get_image, 'get_dscms3_image'),)

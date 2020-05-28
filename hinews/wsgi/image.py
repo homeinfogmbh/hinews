@@ -51,7 +51,7 @@ def list_article_images(ident):
 def get(ident):
     """Returns a specific image."""
 
-    return Binary(get_image(ident).data)
+    return Binary(get_image(ident).bytes)
 
 
 @authenticated
