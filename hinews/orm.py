@@ -226,14 +226,19 @@ class Image(_NewsModel):
         return article_image
 
     @property
-    def oneliner(self):
-        """Returns the source text as a one-liner."""
-        return ' '.join(self.source.split('\n'))
+    def bytes(self):
+        """Returns the file's bytes."""
+        return self.file.bytes
 
     @property
     def watermarked(self):
         """Returns a watermarked image."""
-        return watermark(self.file.bytes, f'Quelle: {self.oneliner}')
+        return watermark(self.bytes, f'Quelle: {self.oneliner}')
+
+    @property
+    def oneliner(self):
+        """Returns the source text as a one-liner."""
+        return ' '.join(self.source.split('\n'))
 
     def patch_json(self, dictionary):
         """Patches the image metadata with the respective dictionary."""
