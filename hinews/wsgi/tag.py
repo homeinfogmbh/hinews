@@ -1,9 +1,11 @@
 """Tag handlers."""
 
+from typing import Union
+
 from flask import request
 
 from his import authenticated, authorized, root
-from wsgilib import JSON
+from wsgilib import JSON, JSONMessage
 
 from hinews.exceptions import InvalidTag
 from hinews.messages.tag import NO_SUCH_TAG, TAG_ADDED, TAG_DELETED, TAG_EXISTS
@@ -16,7 +18,7 @@ __all__ = ['ROUTES']
 
 @authenticated
 @authorized('hinews')
-def list_():
+def list_() -> JSON:
     """Lists available tags."""
 
     return JSON([tag.tag for tag in TagList])
@@ -24,7 +26,7 @@ def list_():
 
 @authenticated
 @authorized('hinews')
-def get(ident):
+def get(ident: int) -> JSON:
     """Lists tags of the respective article."""
 
     return JSON([tag.to_json() for tag in get_article(ident).tags])
@@ -33,7 +35,7 @@ def get(ident):
 @authenticated
 @authorized('hinews')
 @root
-def add():
+def add() -> JSONMessage:
     """Adds a new tag to the list of registered tags."""
 
     tag = request.data.decode().strip()
@@ -50,7 +52,7 @@ def add():
 
 @authenticated
 @authorized('hinews')
-def post(ident):
+def post(ident: int) -> JSONMessage:
     """Adds a tag to the respective article."""
 
     article = get_article(ident)
@@ -66,7 +68,7 @@ def post(ident):
 
 @authenticated
 @authorized('hinews')
-def delete(article_id, tag_or_id):
+def delete(article_id: int, tag_or_id: Union[str, int]) -> JSONMessage:
     """Deletes the respective tag."""
 
     try:
