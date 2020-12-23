@@ -3,7 +3,7 @@
 from flask import request
 
 from his import authenticated, authorized
-from wsgilib import JSON
+from wsgilib import JSON, JSONMessage
 
 from hinews.messages.customer import CUSTOMER_ADDED, CUSTOMER_DELETED
 from hinews.orm import AccessToken, Whitelist
@@ -15,7 +15,7 @@ __all__ = ['ROUTES']
 
 @authenticated
 @authorized('hinews')
-def list_():
+def list_() -> JSON:
     """Lists available customers."""
 
     customers = set(access_token.customer for access_token in AccessToken)
@@ -24,7 +24,7 @@ def list_():
 
 @authenticated
 @authorized('hinews')
-def get(ident):
+def get(ident: int) -> JSON:
     """Lists customer of the respective article."""
 
     return JSON([
@@ -33,7 +33,7 @@ def get(ident):
 
 @authenticated
 @authorized('hinews')
-def post(ident):
+def post(ident: int) -> JSONMessage:
     """Adds a customer to the respective article."""
 
     article = get_article(ident)
@@ -44,7 +44,7 @@ def post(ident):
 
 @authenticated
 @authorized('hinews')
-def delete(article_id, customer_id):
+def delete(article_id: int, customer_id: int) -> JSONMessage:
     """Deletes the respective customer from the article."""
 
     ids = []
