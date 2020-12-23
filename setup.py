@@ -11,7 +11,7 @@ setup(
     install_requires=[
         'configlib',
         'dscms3',
-        'filedb'
+        'filedb',
         'flask',
         'his',
         'mdb',
