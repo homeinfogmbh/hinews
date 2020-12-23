@@ -1,6 +1,8 @@
 """Local interface without authentication
 or authorization for previews.
 """
+from typing import Iterable, Union
+
 from flask import request
 
 from wsgilib import Application, JSON, XML, Binary
@@ -17,13 +19,13 @@ __all__ = ['APPLICATION']
 APPLICATION = Application('hinews', debug=True)
 
 
-def _get_articles():
+def _get_articles() -> Iterable[Article]:
     """Yields articles of the querying customer."""
 
     return Article.select().where(article_active())
 
 
-def _get_article(ident):
+def _get_article(ident: int) -> Article:
     """Returns the respective article of the querying customer."""
 
     try:
@@ -32,7 +34,7 @@ def _get_article(ident):
         raise NO_SUCH_ARTICLE from None
 
 
-def _get_image(ident):
+def _get_image(ident: int) -> Image:
     """Returns the respective image."""
 
     try:
@@ -41,7 +43,7 @@ def _get_image(ident):
         raise NO_SUCH_IMAGE from None
 
 
-def list_():
+def list_() -> Union[JSON, XML]:
     """Lists the respective news."""
 
     try:
@@ -54,13 +56,13 @@ def list_():
     return XML(news)
 
 
-def get_article(ident):
+def get_article(ident: int) -> JSON:
     """Returns the respective article."""
 
     return JSON(_get_article(ident).to_json())
 
 
-def get_image(ident):
+def get_image(ident: int) -> Binary:
     """Returns the respective image."""
 
     try:
