@@ -17,4 +17,5 @@ __all__ = [
     'Article',
     'Image',
     'Tag',
-    'Whitelist']
+    'Whitelist'
+]
