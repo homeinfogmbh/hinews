@@ -25,12 +25,12 @@ def _get_customer():
     try:
         access_token = request.args['access_token']
     except KeyError:
-        raise MISSING_ACCESS_TOKEN
+        raise MISSING_ACCESS_TOKEN from None
 
     try:
         access_token = AccessToken.get(AccessToken.token == access_token)
     except AccessToken.DoesNotExist:
-        raise INVALID_ACCESS_TOKEN
+        raise INVALID_ACCESS_TOKEN from None
 
     return access_token.customer
 
@@ -55,7 +55,7 @@ def _get_article(ident):
     try:
         article = Article.get(Article.id == ident)
     except Article.DoesNotExist:
-        raise NO_SUCH_ARTICLE
+        raise NO_SUCH_ARTICLE from None
 
     customers = article.customers
 
@@ -73,7 +73,7 @@ def _get_image(ident):
     try:
         image = Image.get(Image.id == ident)
     except Image.DoesNotExist:
-        raise NO_SUCH_IMAGE
+        raise NO_SUCH_IMAGE from None
 
     customers = image.article.customers
 

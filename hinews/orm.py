@@ -306,7 +306,7 @@ class Tag(_NewsModel):
             try:
                 TagList.get(TagList.tag == tag)
             except TagList.DoesNotExist:
-                raise InvalidTag(tag)
+                raise InvalidTag(tag) from None
 
         try:
             return cls.get((cls.article == article) & (cls.tag == tag))

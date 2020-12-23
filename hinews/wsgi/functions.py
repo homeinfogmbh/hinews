@@ -27,7 +27,7 @@ def select_options():
         try:
             since = date.fromisoformat(since)
         except ValueError:
-            raise Error(f'Invalid date: {since}')
+            raise Error(f'Invalid date: {since}') from None
 
         selection &= Article.active_from >= since
 
@@ -37,7 +37,7 @@ def select_options():
         try:
             until = date.fromisoformat(until)
         except ValueError:
-            raise Error(f'Invalid date: {until}')
+            raise Error(f'Invalid date: {until}') from None
 
         selection &= Article.active_until < until
 

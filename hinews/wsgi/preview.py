@@ -50,7 +50,7 @@ def _get_image(ident):
     try:
         article_image = Image.get(Image.id == ident)
     except Image.DoesNotExist:
-        raise NO_SUCH_IMAGE
+        raise NO_SUCH_IMAGE from None
 
     if article_image.article in _preview_articles():
         return article_image

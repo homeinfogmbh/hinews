@@ -29,7 +29,7 @@ def _get_article(ident):
     try:
         return Article.get(article_active() & (Article.id == ident))
     except Article.DoesNotExist:
-        raise NO_SUCH_ARTICLE
+        raise NO_SUCH_ARTICLE from None
 
 
 def _get_image(ident):
@@ -38,7 +38,7 @@ def _get_image(ident):
     try:
         return Image.get(Image.id == ident)
     except Image.DoesNotExist:
-        raise NO_SUCH_IMAGE
+        raise NO_SUCH_IMAGE from None
 
 
 def list_():

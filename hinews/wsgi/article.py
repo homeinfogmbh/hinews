@@ -43,7 +43,7 @@ def get_article(ident):
     try:
         return Article.get(Article.id == ident)
     except Article.DoesNotExist:
-        raise NO_SUCH_ARTICLE
+        raise NO_SUCH_ARTICLE from None
 
 
 @authenticated

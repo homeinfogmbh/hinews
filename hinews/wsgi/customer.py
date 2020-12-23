@@ -62,5 +62,5 @@ ROUTES = (
     ('GET', '/customers', list_),
     ('GET', '/article/<int:ident>/customers', get),
     ('POST', '/article/<int:ident>/customers', post),
-    ('DELETE', '/article/<int:article_id>/customers/<customer_id>', delete
+    ('DELETE', '/article/<int:article_id>/customers/<customer_id>', delete)
 )

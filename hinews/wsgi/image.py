@@ -27,7 +27,7 @@ def get_image(ident):
     try:
         return Image.get(Image.id == ident)
     except Image.DoesNotExist:
-        raise NO_SUCH_IMAGE
+        raise NO_SUCH_IMAGE from None
 
 
 @authenticated
@@ -64,12 +64,12 @@ def post(ident):
     try:
         image = request.files['image']
     except KeyError:
-        raise NO_IMAGE_PROVIDED
+        raise NO_IMAGE_PROVIDED from None
 
     try:
         metadata = request.files['metadata']
     except KeyError:
-        raise NO_META_DATA_PROVIDED
+        raise NO_META_DATA_PROVIDED from None
 
     with image.stream as stream:
         data = stream.read()
