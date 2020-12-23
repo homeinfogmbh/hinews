@@ -6,7 +6,7 @@ from flask import request
 
 from his import ACCOUNT, authenticated, authorized
 from his.messages.data import MISSING_DATA, INVALID_DATA
-from wsgilib import Binary, JSON
+from wsgilib import Binary, JSON, JSONMessage
 
 from hinews.messages.image import IMAGE_ADDED
 from hinews.messages.image import IMAGE_DELETED
@@ -21,7 +21,7 @@ from hinews.wsgi.article import get_article
 __all__ = ['ROUTES']
 
 
-def get_image(ident):
+def get_image(ident: int) -> Image:
     """Returns the respective image."""
 
     try:
@@ -32,7 +32,7 @@ def get_image(ident):
 
 @authenticated
 @authorized('hinews')
-def list_():
+def list_() -> JSON:
     """Lists all available images."""
 
     return JSON([image.to_json() for image in Image])
@@ -40,7 +40,7 @@ def list_():
 
 @authenticated
 @authorized('hinews')
-def list_article_images(ident):
+def list_article_images(ident: int) -> JSON:
     """Lists all images of the respective articles."""
 
     return JSON([image.to_json() for image in get_article(ident).images])
@@ -48,7 +48,7 @@ def list_article_images(ident):
 
 @authenticated
 @authorized('hinews')
-def get(ident):
+def get(ident: int) -> Binary:
     """Returns a specific image."""
 
     return Binary(get_image(ident).bytes)
@@ -56,7 +56,7 @@ def get(ident):
 
 @authenticated
 @authorized('hinews')
-def post(ident):
+def post(ident: int) -> JSONMessage:
     """Adds a new image to the respective article."""
 
     article = get_article(ident)
@@ -93,7 +93,7 @@ def post(ident):
 
 @authenticated
 @authorized('hinews')
-def delete(ident):
+def delete(ident: int) -> JSONMessage:
     """Deletes an image."""
 
     get_image(ident).delete_instance()
@@ -102,7 +102,7 @@ def delete(ident):
 
 @authenticated
 @authorized('hinews')
-def patch(ident):
+def patch(ident: int) -> JSONMessage:
     """Modifies image meta data."""
 
     image = get_image(ident)
