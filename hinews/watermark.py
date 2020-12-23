@@ -2,6 +2,7 @@
 
 from functools import partial
 from io import BytesIO
+from typing import NamedTuple
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -15,7 +16,16 @@ DEFAULT_FONT = ImageFont.truetype(TTF_DEJAVU, FONT_SIZE)
 OFFSET = 10
 
 
-def write_text(image, text, font):
+class Color(NamedTuple):
+    """Represents a color."""
+
+    red: int = 0
+    blue: int = 0
+    green: int = 0
+    alpha: int = 0
+
+
+def write_text(image: Image, text: str, font: ImageFont):
     """Writes the text onto the respective image."""
 
     position = (OFFSET, OFFSET)
@@ -23,10 +33,11 @@ def write_text(image, text, font):
     ImageDraw.Draw(image).text(position, text, fill=fill, font=font)
 
 
-def make_watermark(size, text, font, color=(0, 0, 0, 0), mode='RGBA'):
+def make_watermark(size: int, text: str, font: ImageFont,
+                   color: Color = Color()) -> Image:
     """Creates an interim watermark image."""
 
-    image = Image.new(mode, size, color=color)
+    image = Image.new('RGBA', size, color=color)
     write_text(image, text, font)
     # Calculate mask <https://gist.github.com/snay2/876425>.
     mask = image.convert('L').point(partial(max, 100))
@@ -34,7 +45,7 @@ def make_watermark(size, text, font, color=(0, 0, 0, 0), mode='RGBA'):
     return image
 
 
-def dump(image):
+def dump(image: Image) -> bytes:
     """Dumps the image into the respective format."""
 
     buf = BytesIO()
@@ -44,7 +55,8 @@ def dump(image):
     return buf.read()
 
 
-def watermark(image_data, text, font=DEFAULT_FONT):
+def watermark(image_data: bytes, text: str,
+              font: ImageFont = DEFAULT_FONT) -> bytes:
     """Writes the respective text onto the image."""
 
     image = Image.open(BytesIO(image_data))
