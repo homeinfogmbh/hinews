@@ -4,6 +4,7 @@ from datetime import date
 from json import loads
 
 from flask import request
+from peewee import Expression
 
 from wsgilib import Error
 
@@ -13,13 +14,13 @@ from hinews.orm import article_active, Article, Tag
 __all__ = ['select_options']
 
 
-def select_options():
-    """Returns a selection expression for the articles."""
+def select_options() -> Expression:
+    """Returns a condition expression for the articles."""
 
     if 'all' in request.args:
-        selection = True
+        condition = True
     else:
-        selection = article_active()
+        condition = article_active()
 
     since = request.args.get('since')
 
@@ -29,7 +30,7 @@ def select_options():
         except ValueError:
             raise Error(f'Invalid date: {since}') from None
 
-        selection &= Article.active_from >= since
+        condition &= Article.active_from >= since
 
     until = request.args.get('until')
 
@@ -39,7 +40,7 @@ def select_options():
         except ValueError:
             raise Error(f'Invalid date: {until}') from None
 
-        selection &= Article.active_until < until
+        condition &= Article.active_until < until
 
     tags = request.args.get('tags')
 
@@ -51,6 +52,6 @@ def select_options():
 
         tags = Tag.select().where(Tag.tag >> tags)
         articles = set(tag.article_id for tag in tags)
-        selection &= Article.id << articles
+        condition &= Article.id << articles
 
-    return selection
+    return condition
