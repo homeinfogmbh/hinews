@@ -1,9 +1,11 @@
 """Article handlers."""
 
+from typing import Iterable, Iterator
+
 from flask import request
 
 from his import ACCOUNT, authenticated, authorized
-from wsgilib import JSON, Browser
+from wsgilib import Browser, JSON, JSONMessage
 
 from hinews.messages.article import ARTICLE_CREATED
 from hinews.messages.article import ARTICLE_DELETED
@@ -18,7 +20,8 @@ __all__ = ['get_article', 'ROUTES']
 BROWSER = Browser(default_size=20)
 
 
-def _filter_customers(articles, cids):
+def _filter_customers(articles: Iterable[Article],
+                      cids: Iterable[int]) -> Iterator[Article]:
     """Filters articles by customers."""
 
     cids = frozenset(cids)
@@ -37,7 +40,7 @@ def _filter_customers(articles, cids):
                 yield article
 
 
-def get_article(ident):
+def get_article(ident: int) -> Article:
     """Returns the respective article."""
 
     try:
@@ -48,7 +51,7 @@ def get_article(ident):
 
 @authenticated
 @authorized('hinews')
-def list_():
+def list_() -> JSON:
     """Lists all available articles."""
 
     condition = article_active()
@@ -67,7 +70,7 @@ def list_():
 
 @authenticated
 @authorized('hinews')
-def search():
+def search() -> JSON:
     """Searches for certain parameters."""
     select = Article.select()
     active = request.json.get('active')
@@ -94,7 +97,7 @@ def search():
 
 @authenticated
 @authorized('hinews')
-def count():
+def count() -> JSON:
     """Counts active and inactive articles."""
 
     active = Article.select().where(article_active())
@@ -104,7 +107,7 @@ def count():
 
 @authenticated
 @authorized('hinews')
-def get(ident):
+def get(ident: int) -> JSON:
     """Returns a specific article."""
 
     return JSON(get_article(ident).to_json())
@@ -112,7 +115,7 @@ def get(ident):
 
 @authenticated
 @authorized('hinews')
-def post():
+def post() -> JSONMessage:
     """Adds a new article."""
 
     json = request.json
@@ -132,7 +135,7 @@ def post():
 
 @authenticated
 @authorized('hinews')
-def delete(ident):
+def delete(ident: int) -> JSONMessage:
     """Adds a new article."""
 
     get_article(ident).delete_instance()
@@ -141,7 +144,7 @@ def delete(ident):
 
 @authenticated
 @authorized('hinews')
-def patch(ident):
+def patch(ident: int) -> JSONMessage:
     """Adds a new article."""
 
     article = get_article(ident)
