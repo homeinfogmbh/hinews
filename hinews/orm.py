@@ -1,12 +1,16 @@
 """ORM models."""
 
+from __future__ import annotations
 from datetime import date, datetime
 from functools import lru_cache
+from pathlib import Path
+from typing import Iterable, Iterator, Set, Union
 from uuid import uuid4
 
 from peewee import CharField
 from peewee import DateField
 from peewee import DateTimeField
+from peewee import Expression
 from peewee import ForeignKeyField
 from peewee import TextField
 from peewee import UUIDField
@@ -39,14 +43,14 @@ __all__ = [
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 
 
-def create_tables(fail_silently=False):
+def create_tables(fail_silently: bool = False):
     """Creates all tables."""
 
     for model in MODELS:
         model.create_table(fail_silently=fail_silently)
 
 
-def article_active():
+def article_active() -> Expression:
     """Yields article active query."""
 
     today = date.today()
@@ -56,7 +60,7 @@ def article_active():
 
 
 @lru_cache()
-def _cached_account_info(ident):
+def _cached_account_info(ident: int) -> Account:
     """Returns the respective author by its ID."""
 
     return Account.get(Account.id == ident).to_json()
@@ -83,20 +87,20 @@ class Article(_NewsModel):
     source = TextField(null=True)
 
     @classmethod
-    def from_json(cls, dictionary, author, **kwargs):
-        """Creates a new article from the provided dictionary."""
-        article = super().from_json(dictionary, **kwargs)
+    def from_json(cls, json: dict, author: Account, **kwargs) -> Article:
+        """Creates a new article from a JSON-ish dict."""
+        article = super().from_json(json, **kwargs)
         article.author = author
         return article
 
     @property
-    def customers(self):
+    def customers(self) -> Set[Customer]:
         """Returns a frozen set of customers that
         are whitelisted for this article.
         """
         return frozenset(whitelist.customer for whitelist in self.whitelist)
 
-    def update_tags(self, tags):
+    def update_tags(self, tags: Iterable[str]) -> Iterator[Tag]:
         """Updates the respective tags."""
         if tags is None:
             return
@@ -110,7 +114,7 @@ class Article(_NewsModel):
         for tag in tags:
             yield Tag.add(self, tag)
 
-    def update_customers(self, cids):
+    def update_customers(self, cids: Iterable[int]) -> Iterator[Whitelist]:
         """Updates the respective customers."""
         if cids is None:
             return
@@ -124,7 +128,8 @@ class Article(_NewsModel):
         for cid in cids:
             yield Whitelist.add(self, cid)
 
-    def to_json(self, preview=False, fk_fields=True, **kwargs):
+    def to_json(self, preview: bool = False, fk_fields: bool = True,
+                **kwargs) -> dict:
         """Returns a JSON-ish dictionary."""
         if preview:
             fk_fields = False
@@ -144,7 +149,7 @@ class Article(_NewsModel):
 
         return dictionary
 
-    def to_dom(self, local=False):
+    def to_dom(self, local: bool = False) -> dom.Article:
         """Converts the article into a XML DOM model."""
         article = dom.Article()
         article.created = self.created
@@ -162,7 +167,8 @@ class Article(_NewsModel):
 
         return article
 
-    def delete_instance(self, recursive=False, delete_nullable=False):
+    def delete_instance(self, recursive: bool = False,
+                        delete_nullable: bool = False):
         """Deletes the article."""
         # Manually delete all referencing images to ensure
         # deletion of the respective filedb entries.
@@ -186,14 +192,14 @@ class Editor(_NewsModel):
     timestamp = DateTimeField(default=datetime.now)
 
     @classmethod
-    def add(cls, article, account):
+    def add(cls, article: Article, account: Account) -> Editor:
         """Adds a new author record to the respective article."""
         try:
             return cls.get((cls.article == article) & (cls.account == account))
         except cls.DoesNotExist:
             return cls(article=article, account=account)
 
-    def to_json(self, *args, **kwargs):
+    def to_json(self, *args, **kwargs) -> dict:
         """Returns a JSON-ish dictionary."""
         dictionary = super().to_json(*args, **kwargs)
         dictionary['account'] = self.account.info
@@ -215,37 +221,38 @@ class Image(_NewsModel):
     source = TextField(null=True)
 
     @classmethod
-    def add(cls, article, bytes_, metadata, account):
+    def add(cls, article: Article, account: Account, bytes_: bytes,
+            metadata: dict) -> Image:
         """Adds the respective image data to the article."""
-        article_image = cls()
-        article_image.article = article
-        article_image.account = account
-        article_image.file = File.from_bytes(bytes_)
-        article_image.uploaded = datetime.now()
-        article_image.source = metadata['source']
-        return article_image
+        image = cls()
+        image.article = article
+        image.account = account
+        image.file = File.from_bytes(bytes_)
+        image.uploaded = datetime.now()
+        image.source = metadata['source']
+        return image
 
     @property
-    def bytes(self):
+    def bytes(self) -> bytes:
         """Returns the file's bytes."""
         return self.file.bytes
 
     @property
-    def watermarked(self):
+    def watermarked(self) -> bytes:
         """Returns a watermarked image."""
         return watermark(self.bytes, f'Quelle: {self.oneliner}')
 
     @property
-    def oneliner(self):
+    def oneliner(self) -> str:
         """Returns the source text as a one-liner."""
         return ' '.join(self.source.split('\n'))
 
-    def patch_json(self, dictionary):
+    def patch_json(self, json: dict):
         """Patches the image metadata with the respective dictionary."""
-        return super().patch_json(
-            dictionary, skip=('uploaded',), fk_fields=False)
+        return super().patch_json(json, skip={'uploaded'}, fk_fields=False)
 
-    def to_json(self, preview=False, fk_fields=True, **kwargs):
+    def to_json(self, preview: bool = False, fk_fields: bool = True,
+                **kwargs) -> dict:
         """Returns a JSON-compliant integer."""
         if preview:
             fk_fields = False
@@ -258,7 +265,7 @@ class Image(_NewsModel):
         dictionary['mimetype'] = self.file.mimetype
         return dictionary
 
-    def to_dom(self, filename=None):
+    def to_dom(self, filename: Union[Path, str] = None) -> dom.Image:
         """Converts the image into a XML DOM model."""
         image = dom.Image()
         image.uploaded = self.uploaded
@@ -282,7 +289,7 @@ class TagList(_NewsModel):
     tag = CharField(255)
 
     @classmethod
-    def add(cls, tag):
+    def add(cls, tag: str) -> TagList:
         """Adds the respective tag."""
         try:
             return cls.get(cls.tag == tag)
@@ -300,7 +307,7 @@ class Tag(_NewsModel):
     tag = CharField(255)
 
     @classmethod
-    def add(cls, article, tag, validate=True):
+    def add(cls, article: Article, tag: str, validate: bool = True) -> Tag:
         """Adds a new tag to the article."""
         if validate:
             try:
@@ -316,7 +323,7 @@ class Tag(_NewsModel):
             article_tag.tag = tag
             return article_tag
 
-    def to_json(self, preview=False, **kwargs):
+    def to_json(self, preview: bool = False, **kwargs) -> dict:
         """Returns a JSON-ish representation."""
         if preview:
             return self.tag
@@ -334,7 +341,7 @@ class Whitelist(_NewsModel):
         Customer, column_name='customer', on_delete='CASCADE')
 
     @classmethod
-    def add(cls, article, customer):
+    def add(cls, article: Article, customer: Customer) -> Whitelist:
         """Adds the respective customer to the article."""
         try:
             return cls.get(
@@ -358,7 +365,7 @@ class AccessToken(_NewsModel):
     token = UUIDField(default=uuid4)
 
     @classmethod
-    def add(cls, customer):
+    def add(cls, customer: Customer) -> AccessToken:
         """Adds an access token for the respective customer."""
         try:
             return cls.get(cls.customer == customer)
