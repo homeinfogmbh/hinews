@@ -1,8 +1,11 @@
 """Public customer interface without
 HIS authentication or authorization.
 """
+from typing import Iterator, Union
+
 from flask import request
 
+from mdb import Customer
 from wsgilib import ACCEPT, JSON, XML, Binary, Browser
 
 from hinews import dom  # pylint: disable=E0611
@@ -19,7 +22,7 @@ __all__ = ['ROUTES']
 BROWSER = Browser()
 
 
-def _get_customer():
+def _get_customer() -> Customer:
     """Returns the customer for the respective access token."""
 
     try:
@@ -35,7 +38,7 @@ def _get_customer():
     return access_token.customer
 
 
-def _get_articles(customer):
+def _get_articles(customer: Customer) -> Iterator[Article]:
     """Yields articles of the querying customer."""
 
     customer = _get_customer()
@@ -47,7 +50,7 @@ def _get_articles(customer):
             yield article
 
 
-def _get_article(ident):
+def _get_article(ident: int) -> Article:
     """Returns the respective article of the querying customer."""
 
     customer = _get_customer()
@@ -65,7 +68,7 @@ def _get_article(ident):
     raise NO_SUCH_ARTICLE
 
 
-def _get_image(ident):
+def _get_image(ident: int) -> Image:
     """Returns the respective image."""
 
     customer = _get_customer()
@@ -83,7 +86,7 @@ def _get_image(ident):
     raise NO_SUCH_IMAGE
 
 
-def list_():
+def list_() -> Union[JSON, XML]:
     """Lists the respective news."""
 
     articles = _get_articles(_get_customer())
@@ -99,13 +102,13 @@ def list_():
     return XML(news)
 
 
-def get_article(ident):
+def get_article(ident: int) -> JSON:
     """Returns the respective article."""
 
     return JSON(_get_article(ident).to_json(preview=True))
 
 
-def get_image(ident):
+def get_image(ident: int) -> Binary:
     """Returns the respective image."""
 
     try:
