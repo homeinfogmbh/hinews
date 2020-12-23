@@ -15,9 +15,9 @@ setup(
         'flask',
         'his',
         'mdb',
-        'PIL',
         'peewee',
         'peeweeplus',
+        'pil',
         'wsgilib'
     ],
     author='HOMEINFO - Digitale Informationssysteme GmbH',
