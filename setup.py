@@ -1,15 +1,29 @@
 #! /usr/bin/env python3
+"""Installation script."""
 
 from distutils.core import setup
 
 
 setup(
     name='hinews',
-    version='latest',
+    version_format='{tag}',
+    setup_requires=['setuptools-git-version'],
+    install_requires=[
+        'configlib',
+        'dscms3',
+        'filedb'
+        'flask',
+        'his',
+        'mdb',
+        'PIL',
+        'peewee',
+        'peeweeplus',
+        'wsgilib'
+    ],
     author='HOMEINFO - Digitale Informationssysteme GmbH',
-    author_email='<info at homeinfo dot de>',
+    author_email='<info@homeinfo.de>',
     maintainer='Richard Neumann',
-    maintainer_email='<r dot neumann at homeinfo period de>',
-    requires=['his'],
+    maintainer_email='<r.neumann@homeinfo.de>',
     packages=['hinews', 'hinews.messages', 'hinews.wsgi'],
-    description='HOMEINFO news API.')
+    description='HOMEINFO news API.'
+)

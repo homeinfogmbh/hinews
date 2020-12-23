@@ -70,7 +70,8 @@ def get_image(ident):
 
 
 ROUTES = (
-    ('GET', '/hinews/article', list_, 'list_articles'),
-    ('GET', '/hinews/article/<int:ident>', get_article, 'get_article'),
-    ('GET', '/hinews/image/<int:ident>', get_image, 'get_image'))
+    ('GET', '/hinews/article', list_),
+    ('GET', '/hinews/article/<int:ident>', get_article),
+    ('GET', '/hinews/image/<int:ident>', get_image)
+)
 APPLICATION.add_routes(ROUTES)

@@ -1,10 +1,10 @@
 """Common functions."""
 
+from datetime import date
 from json import loads
 
 from flask import request
 
-from timelib import strpdate
 from wsgilib import Error
 
 from hinews.orm import article_active, Article, Tag
@@ -25,7 +25,7 @@ def select_options():
 
     if since is not None:
         try:
-            since = strpdate(since)
+            since = date.fromisoformat(since)
         except ValueError:
             raise Error(f'Invalid date: {since}')
 
@@ -35,7 +35,7 @@ def select_options():
 
     if until is not None:
         try:
-            until = strpdate(until)
+            until = date.fromisoformat(until)
         except ValueError:
             raise Error(f'Invalid date: {until}')
 

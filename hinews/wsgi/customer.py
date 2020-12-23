@@ -59,8 +59,8 @@ def delete(article_id, customer_id):
 
 
 ROUTES = (
-    ('GET', '/customers', list_, 'list_customers'),
-    ('GET', '/article/<int:ident>/customers', get, 'get_customers'),
-    ('POST', '/article/<int:ident>/customers', post, 'post_customer'),
-    ('DELETE', '/article/<int:article_id>/customers/<customer_id>', delete,
-     'delete_customer'))
+    ('GET', '/customers', list_),
+    ('GET', '/article/<int:ident>/customers', get),
+    ('POST', '/article/<int:ident>/customers', post),
+    ('DELETE', '/article/<int:article_id>/customers/<customer_id>', delete
+)

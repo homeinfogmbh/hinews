@@ -163,10 +163,11 @@ def patch(ident):
 
 
 ROUTES = (
-    ('GET', '/article', list_, 'list_articles'),
-    ('GET', '/articles', count, 'count_articles'),
-    ('GET', '/article/<int:ident>', get, 'get_article'),
-    ('POST', '/article', post, 'post_article'),
-    ('POST', '/article/search', search, 'search_article'),
-    ('DELETE', '/article/<int:ident>', delete, 'delete_article'),
-    ('PATCH', '/article/<int:ident>', patch, 'patch_article'))
+    ('GET', '/article', list_),
+    ('GET', '/articles', count),
+    ('GET', '/article/<int:ident>', get),
+    ('POST', '/article', post),
+    ('POST', '/article/search', search),
+    ('DELETE', '/article/<int:ident>', delete),
+    ('PATCH', '/article/<int:ident>', patch)
+)

@@ -86,8 +86,9 @@ def delete(article_id, tag_or_id):
 
 
 ROUTES = (
-    ('GET', '/tags', list_, 'list_tags'),
-    ('POST', '/tags', add, 'add_tag'),
-    ('GET', '/article/<int:ident>/tags', get, 'get_tags'),
-    ('POST', '/article/<int:ident>/tags', post, 'post_tag'),
-    ('DELETE', '/article/<int:article_id>/tags/<tag>', delete, 'delete_tag'))
+    ('GET', '/tags', list_),
+    ('POST', '/tags', add),
+    ('GET', '/article/<int:ident>/tags', get),
+    ('POST', '/article/<int:ident>/tags', post),
+    ('DELETE', '/article/<int:article_id>/tags/<tag>', delete)
+)

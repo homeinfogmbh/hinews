@@ -25,4 +25,4 @@ def get_image(ident):
         return Binary(image.bytes)
 
 
-ROUTES = (('GET', '/dscms3/image/<int:ident>', get_image, 'get_dscms3_image'),)
+ROUTES = [('GET', '/dscms3/image/<int:ident>', get_image)]
