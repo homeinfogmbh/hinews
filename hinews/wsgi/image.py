@@ -5,7 +5,6 @@ from json import loads
 from flask import request
 
 from his import ACCOUNT, authenticated, authorized
-from his.messages.data import MISSING_DATA, INVALID_DATA
 from wsgilib import Binary, JSON, JSONMessage
 
 from hinews.messages.image import IMAGE_ADDED
@@ -78,14 +77,7 @@ def post(ident: int) -> JSONMessage:
         metadata = stream.read()
 
     metadata = loads(metadata.decode())
-
-    try:
-        image = Image.add(article, data, metadata, ACCOUNT.id)
-    except KeyError as key_error:
-        raise MISSING_DATA.update(key=key_error.args[0])
-    except ValueError as value_error:
-        raise INVALID_DATA.update(hint=value_error.args[0])
-
+    image = Image.add(article, data, metadata, ACCOUNT.id)
     image.file.save()
     image.save()
     return IMAGE_ADDED.update(id=image.id)
