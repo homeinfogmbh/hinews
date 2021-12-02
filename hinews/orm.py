@@ -18,10 +18,9 @@ from peewee import UUIDField
 from filedb import File
 from his.orm import Account
 from mdb import Customer
-from peeweeplus import MySQLDatabase, JSONModel
+from peeweeplus import MySQLDatabaseProxy, JSONModel
 
 from hinews import dom  # pylint: disable=E0611
-from hinews.config import CONFIG
 from hinews.exceptions import InvalidTag
 from hinews.watermark import watermark
 
@@ -40,7 +39,7 @@ __all__ = [
 ]
 
 
-DATABASE = MySQLDatabase.from_config(CONFIG['db'])
+DATABASE = MySQLDatabaseProxy('hinews')
 
 
 def create_tables(fail_silently: bool = False):
