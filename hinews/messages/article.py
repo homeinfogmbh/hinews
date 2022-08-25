@@ -7,7 +7,8 @@ __all__ = [
     'NO_SUCH_ARTICLE',
     'ARTICLE_CREATED',
     'ARTICLE_CREATED',
-    'ARTICLE_PATCHED']
+    'ARTICLE_PATCHED'
+]
 
 
 NO_SUCH_ARTICLE = JSONMessage('This article does not exist.', status=404)

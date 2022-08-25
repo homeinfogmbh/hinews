@@ -20,8 +20,10 @@ __all__ = ['get_article', 'ROUTES']
 BROWSER = Browser(default_size=20)
 
 
-def _filter_customers(articles: Iterable[Article],
-                      cids: Iterable[int]) -> Iterator[Article]:
+def _filter_customers(
+        articles: Iterable[Article],
+        cids: Iterable[int]
+) -> Iterator[Article]:
     """Filters articles by customers."""
 
     cids = frozenset(cids)

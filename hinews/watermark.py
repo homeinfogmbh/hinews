@@ -33,8 +33,12 @@ def write_text(image: Image, text: str, font: ImageFont):
     ImageDraw.Draw(image).text(position, text, fill=fill, font=font)
 
 
-def make_watermark(size: int, text: str, font: ImageFont,
-                   color: Color = Color()) -> Image:
+def make_watermark(
+        size: tuple[int, int],
+        text: str,
+        font: ImageFont,
+        color: Color = Color()
+) -> Image:
     """Creates an interim watermark image."""
 
     image = Image.new('RGBA', size, color=color)
@@ -55,8 +59,11 @@ def dump(image: Image) -> bytes:
     return buf.read()
 
 
-def watermark(image_data: bytes, text: str,
-              font: ImageFont = DEFAULT_FONT) -> bytes:
+def watermark(
+        image_data: bytes,
+        text: str,
+        font: ImageFont = DEFAULT_FONT
+) -> bytes:
     """Writes the respective text onto the image."""
 
     image = Image.open(BytesIO(image_data))

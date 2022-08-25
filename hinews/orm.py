@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterable, Iterator, Set, Union
+from typing import Iterable, Iterator, Union
 from uuid import uuid4
 
 from peewee import CharField
@@ -52,10 +52,16 @@ def create_tables(fail_silently: bool = False):
 def article_active() -> Expression:
     """Yields article active query."""
 
-    today = date.today()
     return (
-        ((Article.active_from >> None) | (Article.active_from <= today))
-        & ((Article.active_until >> None) | (Article.active_until >= today)))
+        (
+                (Article.active_from >> None)
+                | (Article.active_from <= (today := date.today()))
+        )
+        & (
+                (Article.active_until >> None)
+                | (Article.active_until >= today)
+        )
+    )
 
 
 @lru_cache()
@@ -68,7 +74,7 @@ def _cached_account_info(ident: int) -> Account:
 class _NewsModel(JSONModel):
     """Basic news database model."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         database = DATABASE
         schema = database.database
 
@@ -93,7 +99,7 @@ class Article(_NewsModel):
         return article
 
     @property
-    def customers(self) -> Set[Customer]:
+    def customers(self) -> frozenset[Customer]:
         """Returns a frozen set of customers that
         are whitelisted for this article.
         """
@@ -212,16 +218,23 @@ class Image(_NewsModel):
         table_name = 'image'
 
     article = ForeignKeyField(
-        Article, column_name='article', backref='images', on_delete='CASCADE')
+        Article, column_name='article', backref='images', on_delete='CASCADE'
+    )
     account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE')
+        Account, column_name='account', on_delete='CASCADE'
+    )
     file = ForeignKeyField(File, column_name='file')
     uploaded = DateTimeField()
     source = TextField(null=True)
 
     @classmethod
-    def add(cls, article: Article, account: Account, bytes_: bytes,
-            metadata: dict) -> Image:
+    def add(
+            cls,
+            article: Article,
+            account: Account,
+            bytes_: bytes,
+            metadata: dict
+    ) -> Image:
         """Adds the respective image data to the article."""
         image = cls()
         image.article = article
@@ -250,8 +263,12 @@ class Image(_NewsModel):
         """Patches the image metadata with the respective dictionary."""
         return super().patch_json(json, skip={'uploaded'}, fk_fields=False)
 
-    def to_json(self, preview: bool = False, fk_fields: bool = True,
-                **kwargs) -> dict:
+    def to_json(
+            self,
+            preview: bool = False,
+            fk_fields: bool = True,
+            **kwargs
+    ) -> dict:
         """Returns a JSON-compliant integer."""
         if preview:
             fk_fields = False
@@ -302,7 +319,8 @@ class Tag(_NewsModel):
     """Article <> Tag mappings."""
 
     article = ForeignKeyField(
-        Article, column_name='article', backref='tags', on_delete='CASCADE')
+        Article, column_name='article', backref='tags', on_delete='CASCADE'
+    )
     tag = CharField(255)
 
     @classmethod
@@ -322,7 +340,7 @@ class Tag(_NewsModel):
             article_tag.tag = tag
             return article_tag
 
-    def to_json(self, preview: bool = False, **kwargs) -> dict:
+    def to_json(self, preview: bool = False, **kwargs) -> Union[str, dict]:
         """Returns a JSON-ish representation."""
         if preview:
             return self.tag
@@ -335,16 +353,19 @@ class Whitelist(_NewsModel):
 
     article = ForeignKeyField(
         Article, column_name='article', backref='whitelist',
-        on_delete='CASCADE')
+        on_delete='CASCADE'
+    )
     customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE')
+        Customer, column_name='customer', on_delete='CASCADE'
+    )
 
     @classmethod
     def add(cls, article: Article, customer: Customer) -> Whitelist:
         """Adds the respective customer to the article."""
         try:
             return cls.get(
-                (cls.article == article) & (cls.customer == customer))
+                (cls.article == article) & (cls.customer == customer)
+            )
         except cls.DoesNotExist:
             article_customer = cls()
             article_customer.article = article
@@ -355,12 +376,13 @@ class Whitelist(_NewsModel):
 class AccessToken(_NewsModel):
     """Customers' access tokens."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         table_name = 'access_token'
 
     customer = ForeignKeyField(
         Customer, column_name='customer', on_delete='CASCADE',
-        on_update='CASCADE')
+        on_update='CASCADE'
+    )
     token = UUIDField(default=uuid4)
 
     @classmethod
