@@ -7,10 +7,9 @@ from setuptools import setup
 setup(
     name='hinews',
     version_format='{tag}',
-    setup_requires=['setuptools-git-version'],
+    setup_requires=['setuptools_scm'],
     install_requires=[
         'configlib',
-        'dscms3',
         'filedb',
         'flask',
         'his',
