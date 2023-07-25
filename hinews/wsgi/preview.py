@@ -12,17 +12,16 @@ from hinews.messages.image import NO_SUCH_IMAGE
 from hinews.orm import article_active, Article, Tag, Image
 
 
-__all__ = ['ROUTES']
+__all__ = ["ROUTES"]
 
 
-PREVIEW_TAGS = ('CMS',)
+PREVIEW_TAGS = ("CMS",)
 
 
 def _preview_article_ids() -> Set[int]:
     """Yields allowed preview articles."""
 
-    return set(atag.article_id for atag in Tag.select().where(
-        Tag.tag << PREVIEW_TAGS))
+    return set(atag.article_id for atag in Tag.select().where(Tag.tag << PREVIEW_TAGS))
 
 
 def _condition() -> Expression:
@@ -34,8 +33,7 @@ def _condition() -> Expression:
 def _preview_articles() -> Iterable[Article]:
     """Yields allowed preview articles."""
 
-    return Article.select().where(_condition()).order_by(
-        Article.created).limit(4)
+    return Article.select().where(_condition()).order_by(Article.created).limit(4)
 
 
 def _get_article(ident: int) -> Article:
@@ -66,8 +64,7 @@ def _get_image(ident: int) -> Image:
 def list_() -> JSON:
     """Lists the respective news."""
 
-    return JSON([
-        article.to_json(preview=True) for article in _preview_articles()])
+    return JSON([article.to_json(preview=True) for article in _preview_articles()])
 
 
 @authenticated
@@ -83,12 +80,12 @@ def get_image(ident: int) -> Binary:
 
     try:
         return Binary(_get_image(ident).watermarked)
-    except OSError:     # Not an image.
+    except OSError:  # Not an image.
         return Binary(_get_image(ident).bytes)
 
 
 ROUTES = (
-    ('GET', '/preview/article', list_),
-    ('GET', '/preview/article/<int:ident>', get_article),
-    ('GET', '/preview/image/<int:ident>', get_image)
+    ("GET", "/preview/article", list_),
+    ("GET", "/preview/article/<int:ident>", get_article),
+    ("GET", "/preview/image/<int:ident>", get_image),
 )

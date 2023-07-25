@@ -10,12 +10,12 @@ from hinews.wsgi import APPLICATION, LOCAL_APPLICATION
 
 
 __all__ = [
-    'APPLICATION',
-    'LOCAL_APPLICATION',
-    'article_active',
-    'AccessToken',
-    'Article',
-    'Image',
-    'Tag',
-    'Whitelist'
+    "APPLICATION",
+    "LOCAL_APPLICATION",
+    "article_active",
+    "AccessToken",
+    "Article",
+    "Image",
+    "Tag",
+    "Whitelist",
 ]

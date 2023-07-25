@@ -14,15 +14,14 @@ from hinews.messages.article import NO_SUCH_ARTICLE
 from hinews.orm import article_active, Article, Editor, Tag
 
 
-__all__ = ['get_article', 'ROUTES']
+__all__ = ["get_article", "ROUTES"]
 
 
 BROWSER = Browser(default_size=20)
 
 
 def _filter_customers(
-        articles: Iterable[Article],
-        cids: Iterable[int]
+    articles: Iterable[Article], cids: Iterable[int]
 ) -> Iterator[Article]:
     """Filters articles by customers."""
 
@@ -52,17 +51,16 @@ def get_article(ident: int) -> Article:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def list_() -> JSON:
     """Lists all available articles."""
 
     condition = article_active()
 
-    if 'inactive' in request.args:
+    if "inactive" in request.args:
         condition = ~condition
 
-    articles = Article.select().where(condition).order_by(
-        Article.created.desc())
+    articles = Article.select().where(condition).order_by(Article.created.desc())
 
     if BROWSER.info:
         return JSON(BROWSER.pages(articles).to_json())
@@ -71,24 +69,24 @@ def list_() -> JSON:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def search() -> JSON:
     """Searches for certain parameters."""
     select = Article.select()
-    active = request.json.get('active')
+    active = request.json.get("active")
 
     if active is None:
         condition = True
     else:
-        condition = article_active() if active else (~ article_active())
+        condition = article_active() if active else (~article_active())
 
-    tags = request.json.get('tags')
+    tags = request.json.get("tags")
 
     if tags:
         select = select.join(Tag, on=Tag.article == Article.id)
-        condition &= (Tag.tag << tags)
+        condition &= Tag.tag << tags
 
-    cids = request.json.get('customers')
+    cids = request.json.get("customers")
     articles = _filter_customers(select.where(condition), cids)
 
     if BROWSER.info:
@@ -98,17 +96,17 @@ def search() -> JSON:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def count() -> JSON:
     """Counts active and inactive articles."""
 
     active = Article.select().where(article_active())
-    inactive = Article.select().where(~ article_active())
-    return JSON({'active': len(active), 'inactive': len(inactive)})
+    inactive = Article.select().where(~article_active())
+    return JSON({"active": len(active), "inactive": len(inactive)})
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def get(ident: int) -> JSON:
     """Returns a specific article."""
 
@@ -116,13 +114,13 @@ def get(ident: int) -> JSON:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def post() -> JSONMessage:
     """Adds a new article."""
 
     json = request.json
-    tags = json.pop('tags', None)
-    customers = json.pop('customers', None)
+    tags = json.pop("tags", None)
+    customers = json.pop("customers", None)
     article = Article.from_json(json, ACCOUNT.id, fk_fields=False)
     article.save()
 
@@ -136,7 +134,7 @@ def post() -> JSONMessage:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def delete(ident: int) -> JSONMessage:
     """Adds a new article."""
 
@@ -145,14 +143,14 @@ def delete(ident: int) -> JSONMessage:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def patch(ident: int) -> JSONMessage:
     """Adds a new article."""
 
     article = get_article(ident)
     json = request.json
-    tags = json.pop('tags', None)
-    customers = json.pop('customers', None)
+    tags = json.pop("tags", None)
+    customers = json.pop("customers", None)
     article.patch_json(json, fk_fields=False)
     article.save()
 
@@ -168,11 +166,11 @@ def patch(ident: int) -> JSONMessage:
 
 
 ROUTES = (
-    ('GET', '/article', list_),
-    ('GET', '/articles', count),
-    ('GET', '/article/<int:ident>', get),
-    ('POST', '/article', post),
-    ('POST', '/article/search', search),
-    ('DELETE', '/article/<int:ident>', delete),
-    ('PATCH', '/article/<int:ident>', patch)
+    ("GET", "/article", list_),
+    ("GET", "/articles", count),
+    ("GET", "/article/<int:ident>", get),
+    ("POST", "/article", post),
+    ("POST", "/article/search", search),
+    ("DELETE", "/article/<int:ident>", delete),
+    ("PATCH", "/article/<int:ident>", patch),
 )

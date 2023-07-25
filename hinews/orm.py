@@ -26,20 +26,20 @@ from hinews.watermark import watermark
 
 
 __all__ = [
-    'create_tables',
-    'article_active',
-    'Article',
-    'Editor',
-    'Image',
-    'TagList',
-    'Tag',
-    'Whitelist',
-    'AccessToken',
-    'MODELS'
+    "create_tables",
+    "article_active",
+    "Article",
+    "Editor",
+    "Image",
+    "TagList",
+    "Tag",
+    "Whitelist",
+    "AccessToken",
+    "MODELS",
 ]
 
 
-DATABASE = MySQLDatabaseProxy('hinews')
+DATABASE = MySQLDatabaseProxy("hinews")
 
 
 def create_tables(fail_silently: bool = False):
@@ -53,15 +53,8 @@ def article_active() -> Expression:
     """Yields article active query."""
 
     return (
-        (
-                (Article.active_from >> None)
-                | (Article.active_from <= (today := date.today()))
-        )
-        & (
-                (Article.active_until >> None)
-                | (Article.active_until >= today)
-        )
-    )
+        (Article.active_from >> None) | (Article.active_from <= (today := date.today()))
+    ) & ((Article.active_until >> None) | (Article.active_until >= today))
 
 
 @lru_cache()
@@ -82,7 +75,7 @@ class _NewsModel(JSONModel):
 class Article(_NewsModel):
     """A news-related text."""
 
-    author = ForeignKeyField(Account, column_name='author')
+    author = ForeignKeyField(Account, column_name="author")
     created = DateTimeField(default=datetime.now)
     active_from = DateField(null=True)
     active_until = DateField(null=True)
@@ -133,24 +126,21 @@ class Article(_NewsModel):
         for cid in cids:
             yield Whitelist.add(self, cid)
 
-    def to_json(self, preview: bool = False, fk_fields: bool = True,
-                **kwargs) -> dict:
+    def to_json(self, preview: bool = False, fk_fields: bool = True, **kwargs) -> dict:
         """Returns a JSON-ish dictionary."""
         if preview:
             fk_fields = False
 
         dictionary = super().to_json(fk_fields=fk_fields, **kwargs)
-        dictionary['images'] = [
-            image.to_json(preview=preview) for image in self.images]
-        dictionary['tags'] = [
-            tag.to_json(preview=preview) for tag in self.tags]
+        dictionary["images"] = [image.to_json(preview=preview) for image in self.images]
+        dictionary["tags"] = [tag.to_json(preview=preview) for tag in self.tags]
 
         if not preview:
-            dictionary['author'] = _cached_account_info(self.author_id)
-            dictionary['editors'] = [
-                editor.to_json() for editor in self.editors]
-            dictionary['customers'] = [
-                customer.to_json() for customer in self.customers]
+            dictionary["author"] = _cached_account_info(self.author_id)
+            dictionary["editors"] = [editor.to_json() for editor in self.editors]
+            dictionary["customers"] = [
+                customer.to_json() for customer in self.customers
+            ]
 
         return dictionary
 
@@ -172,8 +162,7 @@ class Article(_NewsModel):
 
         return article
 
-    def delete_instance(self, recursive: bool = False,
-                        delete_nullable: bool = False):
+    def delete_instance(self, recursive: bool = False, delete_nullable: bool = False):
         """Deletes the article."""
         # Manually delete all referencing images to ensure
         # deletion of the respective filedb entries.
@@ -181,19 +170,20 @@ class Article(_NewsModel):
             image.delete_instance()
 
         return super().delete_instance(
-            recursive=recursive, delete_nullable=delete_nullable)
+            recursive=recursive, delete_nullable=delete_nullable
+        )
 
 
 class Editor(_NewsModel):
     """An article's editor."""
 
-    class Meta:     # pylint: disable=C0111,R0903
-        table_name = 'editor'
+    class Meta:  # pylint: disable=C0111,R0903
+        table_name = "editor"
 
     article = ForeignKeyField(
-        Article, column_name='article', backref='editors', on_delete='CASCADE')
-    account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE')
+        Article, column_name="article", backref="editors", on_delete="CASCADE"
+    )
+    account = ForeignKeyField(Account, column_name="account", on_delete="CASCADE")
     timestamp = DateTimeField(default=datetime.now)
 
     @classmethod
@@ -207,33 +197,27 @@ class Editor(_NewsModel):
     def to_json(self, *args, **kwargs) -> dict:
         """Returns a JSON-ish dictionary."""
         dictionary = super().to_json(*args, **kwargs)
-        dictionary['account'] = self.account.info
+        dictionary["account"] = self.account.info
         return dictionary
 
 
 class Image(_NewsModel):
     """An image of an article."""
 
-    class Meta:     # pylint: disable=C0111,R0903
-        table_name = 'image'
+    class Meta:  # pylint: disable=C0111,R0903
+        table_name = "image"
 
     article = ForeignKeyField(
-        Article, column_name='article', backref='images', on_delete='CASCADE'
+        Article, column_name="article", backref="images", on_delete="CASCADE"
     )
-    account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE'
-    )
-    file = ForeignKeyField(File, column_name='file')
+    account = ForeignKeyField(Account, column_name="account", on_delete="CASCADE")
+    file = ForeignKeyField(File, column_name="file")
     uploaded = DateTimeField()
     source = TextField(null=True)
 
     @classmethod
     def add(
-            cls,
-            article: Article,
-            account: Account,
-            bytes_: bytes,
-            metadata: dict
+        cls, article: Article, account: Account, bytes_: bytes, metadata: dict
     ) -> Image:
         """Adds the respective image data to the article."""
         image = cls()
@@ -241,7 +225,7 @@ class Image(_NewsModel):
         image.account = account
         image.file = File.from_bytes(bytes_)
         image.uploaded = datetime.now()
-        image.source = metadata['source']
+        image.source = metadata["source"]
         return image
 
     @property
@@ -252,23 +236,18 @@ class Image(_NewsModel):
     @property
     def watermarked(self) -> bytes:
         """Returns a watermarked image."""
-        return watermark(self.bytes, f'Quelle: {self.oneliner}')
+        return watermark(self.bytes, f"Quelle: {self.oneliner}")
 
     @property
     def oneliner(self) -> str:
         """Returns the source text as a one-liner."""
-        return ' '.join(self.source.split('\n'))
+        return " ".join(self.source.split("\n"))
 
     def patch_json(self, json: dict):
         """Patches the image metadata with the respective dictionary."""
-        return super().patch_json(json, skip={'uploaded'}, fk_fields=False)
+        return super().patch_json(json, skip={"uploaded"}, fk_fields=False)
 
-    def to_json(
-            self,
-            preview: bool = False,
-            fk_fields: bool = True,
-            **kwargs
-    ) -> dict:
+    def to_json(self, preview: bool = False, fk_fields: bool = True, **kwargs) -> dict:
         """Returns a JSON-compliant integer."""
         if preview:
             fk_fields = False
@@ -276,9 +255,9 @@ class Image(_NewsModel):
         dictionary = super().to_json(fk_fields=fk_fields, **kwargs)
 
         if not preview:
-            dictionary['account'] = _cached_account_info(self.account_id)
+            dictionary["account"] = _cached_account_info(self.account_id)
 
-        dictionary['mimetype'] = self.file.mimetype
+        dictionary["mimetype"] = self.file.mimetype
         return dictionary
 
     def to_dom(self, filename: Union[Path, str] = None) -> dom.Image:
@@ -299,8 +278,8 @@ class Image(_NewsModel):
 class TagList(_NewsModel):
     """An tag for articles."""
 
-    class Meta:     # pylint: disable=C0111,R0903
-        table_name = 'tag_list'
+    class Meta:  # pylint: disable=C0111,R0903
+        table_name = "tag_list"
 
     tag = CharField(255)
 
@@ -319,7 +298,7 @@ class Tag(_NewsModel):
     """Article <> Tag mappings."""
 
     article = ForeignKeyField(
-        Article, column_name='article', backref='tags', on_delete='CASCADE'
+        Article, column_name="article", backref="tags", on_delete="CASCADE"
     )
     tag = CharField(255)
 
@@ -352,20 +331,15 @@ class Whitelist(_NewsModel):
     """Article <> Customer mappings."""
 
     article = ForeignKeyField(
-        Article, column_name='article', backref='whitelist',
-        on_delete='CASCADE'
+        Article, column_name="article", backref="whitelist", on_delete="CASCADE"
     )
-    customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE'
-    )
+    customer = ForeignKeyField(Customer, column_name="customer", on_delete="CASCADE")
 
     @classmethod
     def add(cls, article: Article, customer: Customer) -> Whitelist:
         """Adds the respective customer to the article."""
         try:
-            return cls.get(
-                (cls.article == article) & (cls.customer == customer)
-            )
+            return cls.get((cls.article == article) & (cls.customer == customer))
         except cls.DoesNotExist:
             article_customer = cls()
             article_customer.article = article
@@ -377,11 +351,10 @@ class AccessToken(_NewsModel):
     """Customers' access tokens."""
 
     class Meta:
-        table_name = 'access_token'
+        table_name = "access_token"
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE',
-        on_update='CASCADE'
+        Customer, column_name="customer", on_delete="CASCADE", on_update="CASCADE"
     )
     token = UUIDField(default=uuid4)
 

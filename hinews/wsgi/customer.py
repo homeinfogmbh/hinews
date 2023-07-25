@@ -10,11 +10,11 @@ from hinews.orm import AccessToken, Whitelist
 from hinews.wsgi.article import get_article
 
 
-__all__ = ['ROUTES']
+__all__ = ["ROUTES"]
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def list_() -> JSON:
     """Lists available customers."""
 
@@ -23,16 +23,15 @@ def list_() -> JSON:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def get(ident: int) -> JSON:
     """Lists customer of the respective article."""
 
-    return JSON([
-        customer.to_json() for customer in get_article(ident).customers])
+    return JSON([customer.to_json() for customer in get_article(ident).customers])
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def post(ident: int) -> JSONMessage:
     """Adds a customer to the respective article."""
 
@@ -43,15 +42,15 @@ def post(ident: int) -> JSONMessage:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def delete(article_id: int, customer_id: int) -> JSONMessage:
     """Deletes the respective customer from the article."""
 
     ids = []
 
     for customer in Whitelist.select().where(
-            (Whitelist.article == article_id)
-            & (Whitelist.customer == customer_id)):
+        (Whitelist.article == article_id) & (Whitelist.customer == customer_id)
+    ):
         ids.append(customer.id)
         customer.delete_instance()
 
@@ -59,8 +58,8 @@ def delete(article_id: int, customer_id: int) -> JSONMessage:
 
 
 ROUTES = (
-    ('GET', '/customers', list_),
-    ('GET', '/article/<int:ident>/customers', get),
-    ('POST', '/article/<int:ident>/customers', post),
-    ('DELETE', '/article/<int:article_id>/customers/<customer_id>', delete)
+    ("GET", "/customers", list_),
+    ("GET", "/article/<int:ident>/customers", get),
+    ("POST", "/article/<int:ident>/customers", post),
+    ("DELETE", "/article/<int:article_id>/customers/<customer_id>", delete),
 )

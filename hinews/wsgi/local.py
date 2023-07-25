@@ -13,10 +13,10 @@ from hinews.messages.image import NO_SUCH_IMAGE
 from hinews.orm import article_active, Article, Image
 
 
-__all__ = ['APPLICATION']
+__all__ = ["APPLICATION"]
 
 
-APPLICATION = Application('hinews', debug=True)
+APPLICATION = Application("hinews", debug=True)
 
 
 def _get_articles() -> Iterable[Article]:
@@ -47,7 +47,7 @@ def list_() -> Union[JSON, XML]:
     """Lists the respective news."""
 
     try:
-        request.args['xml']
+        request.args["xml"]
     except KeyError:
         return JSON([article.to_json() for article in _get_articles()])
 
@@ -67,13 +67,13 @@ def get_image(ident: int) -> Binary:
 
     try:
         return Binary(_get_image(ident).watermarked)
-    except OSError:     # Not an image.
+    except OSError:  # Not an image.
         return Binary(_get_image(ident).bytes)
 
 
 ROUTES = (
-    ('GET', '/hinews/article', list_),
-    ('GET', '/hinews/article/<int:ident>', get_article),
-    ('GET', '/hinews/image/<int:ident>', get_image)
+    ("GET", "/hinews/article", list_),
+    ("GET", "/hinews/article/<int:ident>", get_article),
+    ("GET", "/hinews/image/<int:ident>", get_image),
 )
 APPLICATION.add_routes(ROUTES)

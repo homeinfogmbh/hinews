@@ -17,7 +17,7 @@ from hinews.orm import Image
 from hinews.wsgi.article import get_article
 
 
-__all__ = ['ROUTES']
+__all__ = ["ROUTES"]
 
 
 def get_image(ident: int) -> Image:
@@ -30,7 +30,7 @@ def get_image(ident: int) -> Image:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def list_() -> JSON:
     """Lists all available images."""
 
@@ -38,7 +38,7 @@ def list_() -> JSON:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def list_article_images(ident: int) -> JSON:
     """Lists all images of the respective articles."""
 
@@ -46,7 +46,7 @@ def list_article_images(ident: int) -> JSON:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def get(ident: int) -> Binary:
     """Returns a specific image."""
 
@@ -54,19 +54,19 @@ def get(ident: int) -> Binary:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def post(ident: int) -> JSONMessage:
     """Adds a new image to the respective article."""
 
     article = get_article(ident)
 
     try:
-        image = request.files['image']
+        image = request.files["image"]
     except KeyError:
         raise NO_IMAGE_PROVIDED from None
 
     try:
-        metadata = request.files['metadata']
+        metadata = request.files["metadata"]
     except KeyError:
         raise NO_META_DATA_PROVIDED from None
 
@@ -84,7 +84,7 @@ def post(ident: int) -> JSONMessage:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def delete(ident: int) -> JSONMessage:
     """Deletes an image."""
 
@@ -93,7 +93,7 @@ def delete(ident: int) -> JSONMessage:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def patch(ident: int) -> JSONMessage:
     """Modifies image meta data."""
 
@@ -104,10 +104,10 @@ def patch(ident: int) -> JSONMessage:
 
 
 ROUTES = (
-    ('GET', '/article/<int:ident>/images', list_article_images),
-    ('POST', '/article/<int:ident>/images', post),
-    ('GET', '/image', list_),
-    ('GET', '/image/<int:ident>', get),
-    ('DELETE', '/image/<int:ident>', delete),
-    ('PATCH', '/image/<int:ident>', patch)
+    ("GET", "/article/<int:ident>/images", list_article_images),
+    ("POST", "/article/<int:ident>/images", post),
+    ("GET", "/image", list_),
+    ("GET", "/image/<int:ident>", get),
+    ("DELETE", "/image/<int:ident>", delete),
+    ("PATCH", "/image/<int:ident>", patch),
 )

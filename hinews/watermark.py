@@ -7,10 +7,10 @@ from typing import NamedTuple
 from PIL import Image, ImageDraw, ImageFont
 
 
-__all__ = ['watermark']
+__all__ = ["watermark"]
 
 
-TTF_DEJAVU = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+TTF_DEJAVU = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 FONT_SIZE = 12
 DEFAULT_FONT = ImageFont.truetype(TTF_DEJAVU, FONT_SIZE)
 OFFSET = 10
@@ -34,17 +34,14 @@ def write_text(image: Image, text: str, font: ImageFont):
 
 
 def make_watermark(
-        size: tuple[int, int],
-        text: str,
-        font: ImageFont,
-        color: Color = Color()
+    size: tuple[int, int], text: str, font: ImageFont, color: Color = Color()
 ) -> Image:
     """Creates an interim watermark image."""
 
-    image = Image.new('RGBA', size, color=color)
+    image = Image.new("RGBA", size, color=color)
     write_text(image, text, font)
     # Calculate mask <https://gist.github.com/snay2/876425>.
-    mask = image.convert('L').point(partial(max, 100))
+    mask = image.convert("L").point(partial(max, 100))
     image.putalpha(mask)
     return image
 
@@ -59,15 +56,11 @@ def dump(image: Image) -> bytes:
     return buf.read()
 
 
-def watermark(
-        image_data: bytes,
-        text: str,
-        font: ImageFont = DEFAULT_FONT
-) -> bytes:
+def watermark(image_data: bytes, text: str, font: ImageFont = DEFAULT_FONT) -> bytes:
     """Writes the respective text onto the image."""
 
     image = Image.open(BytesIO(image_data))
-    watermark_size = (image.width, font.size + 2*OFFSET)
+    watermark_size = (image.width, font.size + 2 * OFFSET)
     watermark_position = (0, image.height - watermark_size[1])
     watermark_image = make_watermark(watermark_size, text, font)
     image.paste(watermark_image, watermark_position, mask=watermark_image)

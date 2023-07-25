@@ -13,11 +13,11 @@ from hinews.orm import TagList, Tag
 from hinews.wsgi.article import get_article
 
 
-__all__ = ['ROUTES']
+__all__ = ["ROUTES"]
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def list_() -> JSON:
     """Lists available tags."""
 
@@ -25,7 +25,7 @@ def list_() -> JSON:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def get(ident: int) -> JSON:
     """Lists tags of the respective article."""
 
@@ -33,7 +33,7 @@ def get(ident: int) -> JSON:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 @root
 def add() -> JSONMessage:
     """Adds a new tag to the list of registered tags."""
@@ -51,7 +51,7 @@ def add() -> JSONMessage:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def post(ident: int) -> JSONMessage:
     """Adds a tag to the respective article."""
 
@@ -67,7 +67,7 @@ def post(ident: int) -> JSONMessage:
 
 
 @authenticated
-@authorized('hinews')
+@authorized("hinews")
 def delete(article_id: int, tag_or_id: Union[str, int]) -> JSONMessage:
     """Deletes the respective tag."""
 
@@ -76,7 +76,7 @@ def delete(article_id: int, tag_or_id: Union[str, int]) -> JSONMessage:
     except ValueError:
         selection = (Tag.article == article_id) & (Tag.tag == tag_or_id)
     else:
-        selection = (Tag.id == ident)
+        selection = Tag.id == ident
 
     try:
         tag = Tag.get(selection)
@@ -88,9 +88,9 @@ def delete(article_id: int, tag_or_id: Union[str, int]) -> JSONMessage:
 
 
 ROUTES = (
-    ('GET', '/tags', list_),
-    ('POST', '/tags', add),
-    ('GET', '/article/<int:ident>/tags', get),
-    ('POST', '/article/<int:ident>/tags', post),
-    ('DELETE', '/article/<int:article_id>/tags/<tag>', delete)
+    ("GET", "/tags", list_),
+    ("POST", "/tags", add),
+    ("GET", "/article/<int:ident>/tags", get),
+    ("POST", "/article/<int:ident>/tags", post),
+    ("DELETE", "/article/<int:article_id>/tags/<tag>", delete),
 )

@@ -16,7 +16,7 @@ from hinews.wsgi.functions import select_options
 from hinews.orm import Article, Image, AccessToken
 
 
-__all__ = ['ROUTES']
+__all__ = ["ROUTES"]
 
 
 BROWSER = Browser()
@@ -26,7 +26,7 @@ def _get_customer() -> Customer:
     """Returns the customer for the respective access token."""
 
     try:
-        access_token = request.args['access_token']
+        access_token = request.args["access_token"]
     except KeyError:
         raise MISSING_ACCESS_TOKEN from None
 
@@ -91,10 +91,10 @@ def list_() -> Union[JSON, XML]:
 
     articles = _get_articles(_get_customer())
 
-    if 'page' in request.args:
+    if "page" in request.args:
         articles = BROWSER.browse(articles)
 
-    if 'application/json' in ACCEPT and 'xml' not in request.args:
+    if "application/json" in ACCEPT and "xml" not in request.args:
         return JSON([article.to_json(preview=True) for article in articles])
 
     news = dom.news()
@@ -113,12 +113,12 @@ def get_image(ident: int) -> Binary:
 
     try:
         return Binary(_get_image(ident).watermarked)
-    except OSError:     # Not an image.
+    except OSError:  # Not an image.
         return Binary(_get_image(ident).bytes)
 
 
 ROUTES = (
-    ('GET', '/pub/article', list_),
-    ('GET', '/pub/article/<int:ident>', get_article),
-    ('GET', '/pub/image/<int:ident>', get_image)
+    ("GET", "/pub/article", list_),
+    ("GET", "/pub/article/<int:ident>", get_article),
+    ("GET", "/pub/image/<int:ident>", get_image),
 )

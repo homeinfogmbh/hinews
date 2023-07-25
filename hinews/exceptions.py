@@ -1,7 +1,7 @@
 """Exceptions."""
 
 
-__all__ = ['InvalidElements', 'InvalidTag']
+__all__ = ["InvalidElements", "InvalidTag"]
 
 
 class InvalidElements(Exception):
